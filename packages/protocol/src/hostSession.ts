@@ -85,6 +85,7 @@ export async function runHostTransportSession(
     let finished = false;
     let timeoutTriggered = false;
     let forceTerminateTimer: NodeJS.Timeout | undefined;
+    const cancelGraceMs = options.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS;
     const timeoutTimer = setTimeout(() => {
       if (finished) {
         return;
@@ -114,8 +115,6 @@ export async function runHostTransportSession(
           });
       }, cancelGraceMs);
     }, options.runtimeOptions.timeoutMs + HOST_TIMEOUT_BACKSTOP_MS);
-
-    const cancelGraceMs = options.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS;
 
     const cleanup = () => {
       finished = true;

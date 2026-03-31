@@ -46,6 +46,8 @@ export function resolveProvider(provider: ToolProvider): ResolvedToolProvider {
   const name = provider.name ?? DEFAULT_PROVIDER_NAME;
   assertValidNamespace(name);
 
+  // strict: false allows schemas with extra keywords (e.g. Zod-generated $schema)
+  // that don't conform to the strict JSON Schema vocabulary.
   const ajv = new Ajv({
     allErrors: true,
     strict: false,
