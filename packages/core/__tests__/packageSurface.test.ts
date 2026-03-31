@@ -6,6 +6,8 @@ describe("@execbox/core package surface", () => {
 
     expect(core).toHaveProperty("createToolCallDispatcher");
     expect(core).toHaveProperty("extractProviderManifests");
+    expect(core).toHaveProperty("isExecuteFailureResult");
+    expect(core).toHaveProperty("isExecuteSuccess");
     expect(core).toHaveProperty("normalizeCode");
     expect(core).toHaveProperty("sanitizeToolName");
     expect(core).toHaveProperty("resolveProvider");

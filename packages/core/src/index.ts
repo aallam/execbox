@@ -4,6 +4,8 @@ export {
   createExecutionContext,
   formatConsoleLine,
   getExecutionTimeoutMessage,
+  isExecuteFailureResult,
+  isExecuteSuccess,
   isKnownExecuteErrorCode,
   normalizeThrownMessage,
   normalizeThrownName,

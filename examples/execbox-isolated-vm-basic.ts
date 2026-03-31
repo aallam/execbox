@@ -1,4 +1,4 @@
-import { resolveProvider } from "@execbox/core";
+import { isExecuteSuccess, resolveProvider } from "@execbox/core";
 import { IsolatedVmExecutor } from "@execbox/isolated-vm";
 
 async function main(): Promise<void> {
@@ -15,7 +15,7 @@ async function main(): Promise<void> {
     provider,
   ]);
 
-  if (!result.ok) {
+  if (!isExecuteSuccess(result)) {
     throw new Error(
       `isolated-vm example failed: ${result.error.code}: ${result.error.message}`,
     );

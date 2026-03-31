@@ -65,6 +65,8 @@ Swap in `@execbox/remote` when you want the same API but a caller-managed remote
 
 - `@execbox/core`
   - `ExecutionOptions`
+  - `isExecuteSuccess`
+  - `isExecuteFailureResult`
   - `resolveProvider`
   - `normalizeCode`
   - `sanitizeToolName`
@@ -80,7 +82,7 @@ Swap in `@execbox/remote` when you want the same API but a caller-managed remote
 ## Basic Usage
 
 ```ts
-import { resolveProvider } from "@execbox/core";
+import { isExecuteSuccess, resolveProvider } from "@execbox/core";
 import { QuickJsExecutor } from "@execbox/quickjs";
 import * as z from "zod";
 
@@ -106,6 +108,12 @@ const result = await executor.execute(
   [provider],
   { timeoutMs: 250 },
 );
+
+if (!isExecuteSuccess(result)) {
+  throw new Error(`${result.error.code}: ${result.error.message}`);
+}
+
+console.log(result.result.sum);
 ```
 
 ## MCP Adapters

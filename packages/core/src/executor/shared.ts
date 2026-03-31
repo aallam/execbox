@@ -52,6 +52,24 @@ export function createTimeoutExecuteResult(durationMs = 0): ExecuteResult {
 }
 
 /**
+ * Returns whether an execution result completed successfully.
+ */
+export function isExecuteSuccess<T>(
+  result: ExecuteResult<T>,
+): result is Extract<ExecuteResult<T>, { ok: true }> {
+  return result.ok;
+}
+
+/**
+ * Returns whether an execution result completed with a structured failure.
+ */
+export function isExecuteFailureResult<T>(
+  result: ExecuteResult<T>,
+): result is Extract<ExecuteResult<T>, { ok: false }> {
+  return !result.ok;
+}
+
+/**
  * Normalizes an unknown thrown value into a human-readable message.
  */
 export function normalizeThrownMessage(error: unknown): string {
