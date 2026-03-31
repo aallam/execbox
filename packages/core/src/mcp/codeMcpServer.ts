@@ -86,6 +86,8 @@ function registerExecuteTool(
   maxTextChars: number,
   description: string,
 ): void {
+  // Cast required: McpServer.registerTool's generic signature doesn't support
+  // the narrow input/output shape we need for the code-execution tool.
   const registerTool = server.registerTool.bind(server) as (
     toolName: string,
     config: {
@@ -113,6 +115,7 @@ function registerExecuteTool(
       return {
         content: [{ text: renderText(execution, maxTextChars), type: "text" }],
         isError: !execution.ok,
+        // ExecuteResult is JSON-safe; cast satisfies the SDK's generic record type.
         structuredContent: execution as Record<string, unknown>,
       };
     },
@@ -125,6 +128,7 @@ function registerSearchTool(
   provider: ResolvedToolProvider,
   maxTextChars: number,
 ): void {
+  // Cast required: same rationale as registerExecuteTool above.
   const registerTool = server.registerTool.bind(server) as (
     toolName: string,
     config: {

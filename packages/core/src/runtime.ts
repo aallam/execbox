@@ -5,6 +5,7 @@ export {
   getExecutionTimeoutMessage,
   isKnownExecuteErrorCode,
   normalizeThrownMessage,
+  normalizeThrownName,
   truncateLogs,
 } from "./executor/shared.ts";
 export { normalizeCode } from "./normalize.ts";
