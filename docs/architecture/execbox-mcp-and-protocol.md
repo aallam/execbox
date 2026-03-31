@@ -5,7 +5,7 @@ This page explains two related but distinct parts of the current architecture:
 - MCP adapters in `@execbox/core`
 - transport-safe execution seams in `@execbox/protocol`
 
-Use this page as the overview. For the remote execution control flow, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the message-level protocol contract, read [execbox-protocol-reference.md](./execbox-protocol-reference.md). For the normative runner contract, read [execbox-runner-compatibility-spec.md](./execbox-runner-compatibility-spec.md).
+Use this page as the overview. For the remote execution control flow, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the message-level protocol contract, read [execbox-protocol-reference.md](./execbox-protocol-reference.md). For the normative runner specification, read [execbox-runner-specification.md](./execbox-runner-specification.md).
 
 ## MCP Wrapping Today
 

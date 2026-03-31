@@ -50,5 +50,5 @@ const result = await executor.execute("await tools.echo({ ok: true })", [
 ## Examples
 
 - [Process-backed execbox execution](https://github.com/aallam/execbox/blob/main/examples/execbox-process.ts)
-- [Architecture overview](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/README.md)
-- [Executors architecture](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-executors.md)
+- [Architecture overview](https://github.com/aallam/execbox/blob/main/docs/architecture/README.md)
+- [Executors architecture](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-executors.md)

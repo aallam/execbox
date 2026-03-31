@@ -58,8 +58,8 @@ attachQuickJsRemoteEndpoint(myRunnerPort);
 ## Examples
 
 - [Remote execbox execution](https://github.com/aallam/execbox/blob/main/examples/execbox-remote.ts)
-- [Execbox architecture overview](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/README.md)
-- [Execbox remote execution workflow](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-remote-workflow.md)
-- [Execbox protocol reference](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-protocol-reference.md)
-- [Execbox runner compatibility spec](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-runner-compatibility-spec.md)
-- [Execbox MCP adapters and protocol overview](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-mcp-and-protocol.md)
+- [Execbox architecture overview](https://github.com/aallam/execbox/blob/main/docs/architecture/README.md)
+- [Execbox remote execution workflow](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-remote-workflow.md)
+- [Execbox protocol reference](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-protocol-reference.md)
+- [Execbox runner specification](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-runner-specification.md)
+- [Execbox MCP adapters and protocol overview](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-mcp-and-protocol.md)
