@@ -20,7 +20,7 @@
     "build": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && npm run build --workspace @execbox/isolated-vm",
     "clean": "rm -rf coverage dist packages/*/dist",
     "example:execbox": "node --import tsx examples/execbox-basic.ts",
-    "example:execbox-isolated-vm": "NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot --import tsx examples/execbox-isolated-vm-basic.ts",
+    "example:execbox-isolated-vm": "node --import tsx scripts/isolatedVmLauncher.ts example",
     "example:execbox-mcp-provider": "node --import tsx examples/execbox-mcp-provider.ts",
     "example:execbox-mcp-server": "node --import tsx examples/execbox-mcp-server.ts",
     "example:execbox-process": "node --import tsx examples/execbox-process.ts",
@@ -33,7 +33,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "vitest run",
-    "test:isolated-vm": "VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot ./node_modules/vitest/vitest.mjs run packages/isolated-vm/__tests__",
+    "test:isolated-vm": "node --import tsx scripts/isolatedVmLauncher.ts test",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "verify:isolated-vm": "npm run typecheck && npm run build --workspace @execbox/isolated-vm && npm run test:isolated-vm && npm run examples:isolated-vm"

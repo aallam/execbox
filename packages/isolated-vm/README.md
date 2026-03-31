@@ -28,8 +28,10 @@ npm install @execbox/core @execbox/isolated-vm
 
 ## Requirements
 
+- use Node 22 or 24 for the workspace isolated-vm scripts
 - Node 22+ must run with `--no-node-snapshot`
 - the optional `isolated-vm` native dependency must install successfully in the host environment
+- if you switch Node versions, rebuild the addon under that runtime with `npm rebuild isolated-vm`
 - native-addon failures are surfaced when `IsolatedVmExecutor` is constructed or used
 - advanced consumers can import the reusable runner from `@execbox/isolated-vm/runner`
 
@@ -71,5 +73,7 @@ This package is verified through the opt-in workspace flow:
 ```bash
 npm run verify:isolated-vm
 ```
+
+The workspace isolated-vm scripts fail fast on unsupported Node majors and on common ABI mismatches, so a bad local runtime does not crash out with a native-addon error.
 
 `isolated-vm` is not documented here as a hard security boundary. If process stability matters more than in-process performance, prefer process isolation around the executor.
