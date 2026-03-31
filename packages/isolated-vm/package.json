@@ -1,6 +1,6 @@
 {
   "name": "@execbox/isolated-vm",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "isolated-vm executor for the execbox core package.",
   "license": "MIT",
   "type": "module",
@@ -46,7 +46,7 @@
   "homepage": "https://github.com/aallam/execbox/tree/main/packages/isolated-vm#readme",
   "bugs": "https://github.com/aallam/execbox/issues",
   "dependencies": {
-    "@execbox/core": "^0.0.0"
+    "@execbox/core": "^0.1.0"
   },
   "optionalDependencies": {
     "isolated-vm": "^6.0.1"
