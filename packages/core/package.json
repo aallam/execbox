@@ -1,0 +1,54 @@
+{
+  "name": "@execbox/core",
+  "version": "0.0.0",
+  "description": "Core execution contract, provider resolution, and MCP adapters.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./mcp": {
+      "types": "./dist/mcp/index.d.ts",
+      "import": "./dist/mcp/index.js",
+      "require": "./dist/mcp/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "sandbox",
+    "code-execution",
+    "tools"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aallam/execbox.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/aallam/execbox/tree/main/packages/core#readme",
+  "bugs": "https://github.com/aallam/execbox/issues",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "acorn": "^8.15.0",
+    "ajv": "^8.17.1",
+    "zod": "^4.3.6"
+  }
+}

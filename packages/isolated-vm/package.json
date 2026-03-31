@@ -1,0 +1,54 @@
+{
+  "name": "@execbox/isolated-vm",
+  "version": "0.0.0",
+  "description": "isolated-vm executor for the execbox core package.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./runner": {
+      "types": "./dist/runner/index.d.ts",
+      "import": "./dist/runner/index.js",
+      "require": "./dist/runner/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "isolated-vm",
+    "sandbox",
+    "code-execution"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aallam/execbox.git",
+    "directory": "packages/isolated-vm"
+  },
+  "homepage": "https://github.com/aallam/execbox/tree/main/packages/isolated-vm#readme",
+  "bugs": "https://github.com/aallam/execbox/issues",
+  "dependencies": {
+    "@execbox/core": "^0.0.0"
+  },
+  "optionalDependencies": {
+    "isolated-vm": "^6.0.1"
+  }
+}

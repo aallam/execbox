@@ -1,0 +1,37 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@execbox/core": ["./packages/core/src/index.ts"],
+      "@execbox/core/mcp": ["./packages/core/src/mcp/index.ts"],
+      "@execbox/protocol": ["./packages/protocol/src/index.ts"],
+      "@execbox/quickjs": ["./packages/quickjs/src/index.ts"],
+      "@execbox/quickjs/runner": ["./packages/quickjs/src/runner/index.ts"],
+      "@execbox/quickjs/runner/protocol-endpoint": [
+        "./packages/quickjs/src/runner/protocolEndpoint.ts"
+      ],
+      "@execbox/remote": ["./packages/remote/src/index.ts"],
+      "@execbox/process": ["./packages/process/src/index.ts"],
+      "@execbox/worker": ["./packages/worker/src/index.ts"],
+      "@execbox/isolated-vm": ["./packages/isolated-vm/src/index.ts"],
+      "@execbox/isolated-vm/runner": [
+        "./packages/isolated-vm/src/runner/index.ts"
+      ]
+    },
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    "examples/**/*.ts",
+    "examples/execbox-isolated-vm-basic.ts",
+    "packages/core/**/*.ts",
+    "packages/protocol/**/*.ts",
+    "packages/quickjs/**/*.ts",
+    "packages/remote/**/*.ts",
+    "packages/process/**/*.ts",
+    "packages/worker/**/*.ts",
+    "packages/isolated-vm/**/*.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": ["**/node_modules", "packages/*/dist"]
+}

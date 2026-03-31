@@ -1,0 +1,61 @@
+{
+  "name": "@execbox/quickjs",
+  "version": "0.0.0",
+  "description": "QuickJS executor for the execbox core package.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./runner": {
+      "source": "./src/runner/index.ts",
+      "types": "./dist/runner/index.d.ts",
+      "import": "./dist/runner/index.js",
+      "require": "./dist/runner/index.cjs"
+    },
+    "./runner/protocol-endpoint": {
+      "source": "./src/runner/protocolEndpoint.ts",
+      "types": "./dist/runner/protocolEndpoint.d.ts",
+      "import": "./dist/runner/protocolEndpoint.js",
+      "require": "./dist/runner/protocolEndpoint.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "quickjs",
+    "sandbox",
+    "code-execution"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aallam/execbox.git",
+    "directory": "packages/quickjs"
+  },
+  "homepage": "https://github.com/aallam/execbox/tree/main/packages/quickjs#readme",
+  "bugs": "https://github.com/aallam/execbox/issues",
+  "dependencies": {
+    "@execbox/core": "^0.0.0",
+    "@execbox/protocol": "^0.0.0",
+    "quickjs-emscripten": "^0.31.0"
+  }
+}

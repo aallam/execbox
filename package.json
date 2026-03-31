@@ -1,0 +1,58 @@
+{
+  "name": "execbox-workspace",
+  "private": true,
+  "description": "Workspace for the execbox code execution packages.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/core",
+    "packages/protocol",
+    "packages/quickjs",
+    "packages/remote",
+    "packages/process",
+    "packages/worker",
+    "packages/isolated-vm"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && npm run build --workspace @execbox/isolated-vm",
+    "clean": "rm -rf coverage dist packages/*/dist",
+    "example:execbox": "node --import tsx examples/execbox-basic.ts",
+    "example:execbox-isolated-vm": "NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot --import tsx examples/execbox-isolated-vm-basic.ts",
+    "example:execbox-mcp-provider": "node --import tsx examples/execbox-mcp-provider.ts",
+    "example:execbox-mcp-server": "node --import tsx examples/execbox-mcp-server.ts",
+    "example:execbox-process": "node --import tsx examples/execbox-process.ts",
+    "example:execbox-remote": "node --import tsx examples/execbox-remote.ts",
+    "example:execbox-worker": "node --import tsx examples/execbox-worker.ts",
+    "examples": "npm run example:execbox && npm run example:execbox-process && npm run example:execbox-remote && npm run example:execbox-worker && npm run example:execbox-mcp-provider && npm run example:execbox-mcp-server",
+    "examples:isolated-vm": "npm run example:execbox-isolated-vm",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "vitest run",
+    "test:isolated-vm": "VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot ./node_modules/vitest/vitest.mjs run packages/isolated-vm/__tests__",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "verify:isolated-vm": "npm run typecheck && npm run build --workspace @execbox/isolated-vm && npm run test:isolated-vm && npm run examples:isolated-vm"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8",
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsdoc": "^62.8.0",
+    "eslint-plugin-security": "^4.0.0",
+    "globals": "^17.4.0",
+    "prettier": "^3.0.0",
+    "tsdown": "^0.16.8",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.55.0",
+    "vitest": "^3.2.4"
+  }
+}
