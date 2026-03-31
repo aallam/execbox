@@ -74,6 +74,6 @@ This package is verified through the opt-in workspace flow:
 npm run verify:isolated-vm
 ```
 
-The workspace isolated-vm scripts fail fast on unsupported Node majors and on common ABI mismatches, so a bad local runtime does not crash out with a native-addon error.
+The workspace isolated-vm scripts fail fast on unsupported Node majors. On supported runtimes, native-addon failures are surfaced directly by the real command.
 
 `isolated-vm` is not documented here as a hard security boundary. If process stability matters more than in-process performance, prefer process isolation around the executor.
