@@ -1,0 +1,113 @@
+# Execbox Architecture Overview
+
+Execbox is the code-execution part of the `execbox` workspace. It turns host tool catalogs into callable guest namespaces, lets those namespaces wrap MCP tools, and pairs with executor packages that decide where and how guest JavaScript runs.
+
+This doc set is for two audiences:
+
+- Integrators choosing packages and deployment shapes
+- Contributors reasoning about package boundaries, control flow, and trade-offs
+
+## Reading Guide
+
+- Start here for the package map, trust model, and overall flow.
+- Read [execbox-core.md](./execbox-core.md) for provider resolution, execution contracts, and error handling.
+- Read [execbox-executors.md](./execbox-executors.md) for QuickJS, process, worker-thread, and `isolated-vm` trade-offs.
+- Read [execbox-mcp-and-protocol.md](./execbox-mcp-and-protocol.md) for MCP wrapping and where `execbox-protocol` fits.
+- Read [execbox-remote-workflow.md](./execbox-remote-workflow.md) for the end-to-end remote execution control flow.
+- Read [execbox-protocol-reference.md](./execbox-protocol-reference.md) for the current protocol message catalog and session rules.
+- Read [execbox-runner-compatibility-spec.md](./execbox-runner-compatibility-spec.md) for the normative compatibility target for non-TypeScript runners.
+
+## Package Map
+
+```mermaid
+flowchart LR
+    APP["Host application"]
+    CORE["@execbox/core<br/>provider resolution + runner semantics + MCP adapters"]
+    QJS["@execbox/quickjs<br/>in-process QuickJS executor + reusable runner"]
+    REM["@execbox/remote<br/>transport-backed remote executor"]
+    PROC["@execbox/process<br/>child-process QuickJS executor"]
+    IVM["@execbox/isolated-vm<br/>in-process isolated-vm executor + reusable runner"]
+    PROTO["@execbox/protocol<br/>transport messages + shared host session"]
+    WORKER["@execbox/worker<br/>worker-thread QuickJS executor"]
+    MCP["MCP sources and wrapped servers"]
+
+    APP --> CORE
+    APP --> QJS
+    APP --> REM
+    APP --> PROC
+    APP --> IVM
+    APP --> WORKER
+    CORE --> MCP
+    REM --> PROTO
+    PROC --> PROTO
+    WORKER --> PROTO
+    PROC --> QJS
+    WORKER --> QJS
+```
+
+### Package Roles Today
+
+| Package                | Role                                                                                               |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| `@execbox/core`        | Core types, provider resolution, shared runner semantics, and MCP adapters                         |
+| `@execbox/quickjs`     | Default executor backend using a fresh QuickJS runtime per execution and a reusable QuickJS runner |
+| `@execbox/remote`      | Transport-backed executor that reuses the QuickJS protocol endpoint across an app-defined boundary |
+| `@execbox/process`     | Child-process executor that runs the QuickJS session behind Node IPC                               |
+| `@execbox/isolated-vm` | Alternate executor backend using a fresh `isolated-vm` context and a reusable isolated-vm runner   |
+| `@execbox/protocol`    | Transport-safe execution messages plus the shared host session used by worker/process executors    |
+| `@execbox/worker`      | Worker-thread executor that runs the QuickJS session behind a message boundary                     |
+
+## End-to-End Execution Model
+
+At a high level, execbox always follows the same model:
+
+1. Host code defines or discovers tools.
+2. `@execbox/core` resolves those tools into a deterministic guest namespace.
+3. An executor runs guest JavaScript against that resolved namespace.
+4. Guest tool calls cross a host-controlled boundary and return structured JSON-compatible results.
+
+```mermaid
+sequenceDiagram
+    participant Host as Host app
+    participant Core as execbox core
+    participant Exec as Executor
+    participant Guest as Guest runtime
+
+    Host->>Core: resolveProvider() or openMcpToolProvider()
+    Core-->>Host: ResolvedToolProvider
+    Host->>Exec: execute(code, [provider], options?)
+    Exec->>Guest: boot fresh runtime
+    Guest->>Exec: await namespace.tool(input)
+    Exec->>Host: invoke resolved tool wrapper
+    Host-->>Exec: JSON-safe result or ExecuteError
+    Exec-->>Host: ExecuteResult
+```
+
+## Trust Model and Security Posture
+
+Execbox reduces accidental exposure, but it does not claim a hard security boundary for hostile code in its default deployment model.
+
+```mermaid
+flowchart LR
+    USER["Guest code author"]
+    GUEST["Guest JavaScript"]
+    PROVIDERS["Resolved providers"]
+    SYSTEMS["Host systems and APIs"]
+    MCP3P["Third-party MCP servers"]
+
+    USER --> GUEST
+    GUEST -->|tool inputs| PROVIDERS
+    PROVIDERS -->|capabilities| SYSTEMS
+    MCP3P -. optional wrapped dependency .-> PROVIDERS
+```
+
+Key implications:
+
+- The real capability boundary is the provider/tool surface, not the JavaScript syntax itself.
+- Fresh runtimes, schema validation, JSON-only boundaries, timeouts, memory limits, and bounded logs are defense-in-depth features.
+- In-process execution still shares the host process. Use a separate process, container, VM, or similar boundary when the code source is hostile or multi-tenant.
+- Wrapping third-party MCP servers is a separate dependency-trust decision from letting end users author guest code.
+
+## Current Architecture in One Paragraph
+
+Today, `@execbox/core` owns the stable execution contract, provider resolution, shared runner semantics, and MCP adapters. `@execbox/quickjs` and `@execbox/isolated-vm` each expose a runtime-specific reusable runner. `@execbox/process`, `@execbox/worker`, and `@execbox/remote` are transport adapters around the shared QuickJS protocol endpoint, while `@execbox/protocol` owns the transport boundary: message shapes plus the shared host session used to drive transport-backed execution without copying executor semantics.
