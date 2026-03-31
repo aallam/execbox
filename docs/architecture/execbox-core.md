@@ -2,6 +2,16 @@
 
 This page covers the parts of execbox that stay stable regardless of which executor package you choose.
 
+## Table of Contents
+
+- [Core Concepts](#core-concepts)
+- [Provider Resolution Pipeline](#provider-resolution-pipeline)
+- [Guest Code Normalization](#guest-code-normalization)
+- [Shared Runner Semantics](#shared-runner-semantics)
+- [Execution Contract](#execution-contract)
+- [Error Model](#error-model)
+- [Why the Core Stays Small](#why-the-core-stays-small)
+
 ## Core Concepts
 
 The core package exposes three main responsibilities:

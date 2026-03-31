@@ -56,10 +56,10 @@ Swap in `@execbox/remote` when you want the same API but a caller-managed remote
 
 ## Architecture Docs
 
-- [Execbox architecture overview](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/README.md)
-- [Execbox core architecture](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-core.md)
-- [Execbox executors](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-executors.md)
-- [Execbox MCP adapters and protocol](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-mcp-and-protocol.md)
+- [Execbox architecture overview](https://github.com/aallam/execbox/blob/main/docs/architecture/README.md)
+- [Execbox core architecture](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-core.md)
+- [Execbox executors](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-executors.md)
+- [Execbox MCP adapters and protocol](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-mcp-and-protocol.md)
 
 ## Exports
 

@@ -4,7 +4,20 @@ This page is the current message-level reference for `@execbox/protocol`.
 
 It describes the wire shapes and session semantics used today by transport-backed execbox runtimes such as process, worker, and remote execution. It is grounded in the current implementation and should be read as a practical reference, not as a formal RFC.
 
-For the higher-level control-flow explanation, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the normative implementation target, read [execbox-runner-compatibility-spec.md](./execbox-runner-compatibility-spec.md).
+For the higher-level control-flow explanation, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the normative runner specification, read [execbox-runner-specification.md](./execbox-runner-specification.md).
+
+## Table of Contents
+
+- [Purpose](#purpose)
+- [Message Directions](#message-directions)
+- [Message Catalog](#message-catalog)
+- [Correlation Rules](#correlation-rules)
+- [Provider Manifest Contract](#provider-manifest-contract)
+- [Session Lifecycle](#session-lifecycle)
+- [Cancellation And Failure Semantics](#cancellation-and-failure-semantics)
+- [JSON And Trust Boundaries](#json-and-trust-boundaries)
+- [Minimal Transcript](#minimal-transcript)
+- [Scope Of This Reference](#scope-of-this-reference)
 
 ## Purpose
 

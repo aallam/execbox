@@ -29,7 +29,7 @@ Runnable examples live in [`examples/`](./examples/) and are indexed in [`exampl
 
 ## Docs
 
-- [Execbox Architecture Overview](./docs/execbox/architecture/README.md)
+- [Execbox Architecture Overview](./docs/architecture/README.md)
 
 ## Development
 

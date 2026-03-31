@@ -15,7 +15,7 @@ This doc set is for two audiences:
 - Read [execbox-mcp-and-protocol.md](./execbox-mcp-and-protocol.md) for MCP wrapping and where `execbox-protocol` fits.
 - Read [execbox-remote-workflow.md](./execbox-remote-workflow.md) for the end-to-end remote execution control flow.
 - Read [execbox-protocol-reference.md](./execbox-protocol-reference.md) for the current protocol message catalog and session rules.
-- Read [execbox-runner-compatibility-spec.md](./execbox-runner-compatibility-spec.md) for the normative compatibility target for non-TypeScript runners.
+- Read [execbox-runner-specification.md](./execbox-runner-specification.md) for the normative runner specification for non-TypeScript runners.
 
 ## Package Map
 

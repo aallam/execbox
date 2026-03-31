@@ -21,9 +21,9 @@ QuickJS executor backend for `@execbox/core`.
 
 ## Architecture Docs
 
-- [Execbox architecture overview](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/README.md)
-- [Execbox executors](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-executors.md)
-- [Execbox MCP adapters and protocol](https://github.com/aallam/execbox/blob/main/docs/execbox/architecture/execbox-mcp-and-protocol.md)
+- [Execbox architecture overview](https://github.com/aallam/execbox/blob/main/docs/architecture/README.md)
+- [Execbox executors](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-executors.md)
+- [Execbox MCP adapters and protocol](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-mcp-and-protocol.md)
 
 ## Examples
 

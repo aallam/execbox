@@ -1,16 +1,32 @@
-# Execbox Runner Compatibility Spec
+# Execbox Runner Specification
 
-This page defines the compatibility target for transport-backed execbox runners.
+This page defines the runner specification for transport-backed execbox runners.
 
 Use it when you want to implement a non-TypeScript runner, such as a Go remote runner, without reverse-engineering the current TypeScript implementation. For the control-flow walkthrough, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the message catalog, read [execbox-protocol-reference.md](./execbox-protocol-reference.md).
 
+## Table of Contents
+
+- [Status And Scope](#status-and-scope)
+- [Core Model](#core-model)
+- [Session Model](#session-model)
+- [Inputs To The Runner](#inputs-to-the-runner)
+- [Guest Namespace Contract](#guest-namespace-contract)
+- [Tool Call Contract](#tool-call-contract)
+- [Serialization Contract](#serialization-contract)
+- [Logs](#logs)
+- [Final Result Contract](#final-result-contract)
+- [Cancellation And Transport Failure](#cancellation-and-transport-failure)
+- [Execution Id And Message Correlation](#execution-id-and-message-correlation)
+- [Minimal Success Transcript](#minimal-success-transcript)
+- [Minimal Cancellation Transcript](#minimal-cancellation-transcript)
+
 ## Status And Scope
 
-This is a normative compatibility spec for the current execbox runner contract.
+This is the normative runner specification for the current execbox runner contract.
 
 It defines:
 
-- the execution lifecycle a compatible runner must implement
+- the execution lifecycle a conforming runner must implement
 - what crosses the host/runner boundary
 - how guest-visible tools behave
 - how results, logs, cancellation, and failures must surface
@@ -21,7 +37,7 @@ It does not define:
 - authentication, tenancy, or deployment policy
 - how a runner internally embeds JavaScript
 
-A compatible runner may use a different language or engine internally, as long as its externally visible behavior matches this contract.
+A conforming runner may use a different language or engine internally, as long as its externally visible behavior matches this contract.
 
 ## Core Model
 
@@ -39,7 +55,7 @@ flowchart LR
         CAPS["Closures, clients, secrets"]
     end
 
-    subgraph Runner["Compatible runner"]
+    subgraph Runner["Conforming runner"]
         JS["Guest JavaScript"]
         PROXY["Injected async tool proxies"]
         LOGS["Captured logs"]
@@ -59,7 +75,7 @@ The runner never receives host closures or secrets. It only receives code, runti
 
 ## Session Model
 
-A compatible transport-backed runner is single-execution and single-session:
+A transport-backed runner covered by this specification is single-execution and single-session:
 
 - one transport session carries exactly one active execution
 - the transport is bidirectional and sustained for the lifetime of that execution
@@ -86,7 +102,7 @@ stateDiagram-v2
     Finished --> [*]
 ```
 
-Compatibility rules:
+Specification rules:
 
 - a successful session must end with exactly one `done`
 - `started` should be emitted once after the runner accepts `execute` and before any `tool_call` or `done`
@@ -107,7 +123,7 @@ The runner receives one `execute` message:
 }
 ```
 
-Compatibility requirements:
+Requirements:
 
 - `id` identifies the execution session
 - `code` is the full guest JavaScript program to run
@@ -146,7 +162,7 @@ the guest runtime must expose:
 await firecrawl.scrape_url(input);
 ```
 
-Compatibility requirements for injected tools:
+Injected-tool requirements:
 
 - each tool must be an async or Promise-returning function
 - only the first guest argument is transported as tool input
@@ -163,7 +179,7 @@ const page = await firecrawl.scrape_url({ url: "https://example.com" });
 const title = page.title ?? null;
 ```
 
-the compatible runner must:
+the conforming runner must:
 
 1. create a pending Promise for that tool call
 2. emit `tool_call`
@@ -188,7 +204,7 @@ Each guest tool invocation emits:
 }
 ```
 
-Compatibility rules:
+Specification rules:
 
 - `callId` must uniquely identify one tool invocation within the execution
 - `providerName` and `safeToolName` must match the injected namespace/tool pair
@@ -219,7 +235,7 @@ or:
 }
 ```
 
-Compatibility rules:
+Specification rules:
 
 - `tool_result.callId` must correlate exactly one pending tool Promise
 - a successful `tool_result` resolves the Promise to `result`
@@ -230,7 +246,7 @@ Compatibility rules:
 
 Every value that crosses the host/runner boundary must be transport-safe.
 
-The current execbox compatibility target allows:
+The current runner specification allows:
 
 - `undefined` for omitted tool input and successful expressions that evaluate to `undefined`
 - `null`
@@ -240,7 +256,7 @@ The current execbox compatibility target allows:
 - arrays of serializable values
 - plain objects with serializable values
 
-The compatibility target rejects:
+The runner specification rejects:
 
 - `bigint`
 - functions
@@ -249,7 +265,7 @@ The compatibility target rejects:
 - cyclic values
 - non-plain objects as transported results
 
-Compatibility requirements:
+Requirements:
 
 - non-serializable tool inputs must not be surfaced to the host as successful structured values
 - non-serializable tool results must surface as `serialization_error`
@@ -259,7 +275,7 @@ Compatibility requirements:
 
 The protocol types are defined as JavaScript values, but many real transports will serialize them as JSON.
 
-Compatibility guidance for JSON-backed transports:
+Guidance for JSON-backed transports:
 
 - omitted tool input may be represented by a missing `input` field and interpreted as `undefined`
 - a successful final result of `undefined` may be represented by an omitted `result` field when `ok: true`
@@ -269,7 +285,7 @@ Compatibility guidance for JSON-backed transports:
 
 Logs are captured runner-side and returned in the terminal `done` message as `string[]`.
 
-Compatibility requirements:
+Requirements:
 
 - expose `console.log`, `console.info`, `console.warn`, and `console.error`
 - each call appends one log line
@@ -279,7 +295,7 @@ Compatibility requirements:
 
 ### Truncation
 
-Log truncation is externally visible behavior and is part of compatibility:
+Log truncation is externally visible behavior and is part of this specification:
 
 - first apply `maxLogLines` by keeping only the earliest lines up to the limit
 - then apply `maxLogChars` cumulatively across those remaining lines
@@ -305,7 +321,7 @@ The runner must terminate with one `done` message:
 }
 ```
 
-Compatibility requirements:
+Requirements:
 
 - `id` must match the active execution id
 - exactly one of `result` or `error` must be present according to `ok`
@@ -315,7 +331,7 @@ Compatibility requirements:
 
 ### Stable Error Codes
 
-A compatible runner must use the current public error code set:
+A conforming runner must use the current public error code set:
 
 - `timeout`
 - `memory_limit`
@@ -327,7 +343,7 @@ A compatible runner must use the current public error code set:
 
 ### Error Mapping Rules
 
-Compatibility requirements for terminal failures:
+Terminal-failure requirements:
 
 - trusted host tool failures may surface as their trusted host code when uncaught by guest code
 - guest-thrown values must not be upgraded into trusted host errors solely because their text mentions timeout or memory
@@ -346,13 +362,13 @@ The host may send:
 }
 ```
 
-Compatibility requirements:
+Requirements:
 
 - if `id` matches the active execution, the runner must promptly abort execution
 - pending guest tool awaits should reject promptly so the execution can unwind
 - cancellation should result in a terminal timeout-shaped failure for the caller
 
-Host-session semantics that a compatible runner must tolerate:
+Host-session semantics that a conforming runner must tolerate:
 
 - `cancel` may arrive before any `tool_call`
 - `cancel` may arrive while the runner is waiting on a `tool_result`
@@ -361,7 +377,7 @@ Host-session semantics that a compatible runner must tolerate:
 
 ## Execution Id And Message Correlation
 
-Compatibility rules:
+Specification rules:
 
 - `id` identifies the execution session
 - `callId` identifies one tool invocation inside that session
@@ -388,26 +404,3 @@ Compatibility rules:
 {"type":"cancel","id":"exec-2"}
 {"type":"done","id":"exec-2","ok":false,"durationMs":1005,"logs":[],"error":{"code":"timeout","message":"Execution timed out"}}
 ```
-
-## Go Implementer Checklist
-
-A Go runner is compatible if it can do all of the following without consulting the TypeScript internals:
-
-- accept `execute`, `cancel`, and `tool_result`
-- emit `started`, `tool_call`, and `done`
-- inject guest namespaces and Promise-returning tool proxies from provider manifests
-- suspend and resume guest execution around tool awaits
-- preserve trusted host tool errors distinctly from guest-created errors
-- return the canonical `ExecuteResult` envelope with `logs: string[]`
-- enforce or faithfully surface timeout, memory, serialization, and runtime failures
-- operate as a single-execution bidirectional session with correct `id` and `callId` correlation
-
-Internal implementation details may differ, including:
-
-- language
-- JavaScript engine
-- transport implementation
-- UUID generation
-- scheduling strategy
-
-Those differences are acceptable as long as the externally visible session behavior matches this spec.
