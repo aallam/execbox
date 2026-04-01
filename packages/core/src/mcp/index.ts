@@ -4,6 +4,8 @@ export {
   getMcpToolSourceServerInfo,
   openMcpToolProvider,
   type CreateMcpToolProviderOptions,
+  type McpToolClientSource,
   type McpToolProviderHandle,
+  type McpToolServerSource,
   type McpToolSource,
 } from "./createMcpToolProvider";

@@ -1,7 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import * as z from "zod";
 
 import {
@@ -80,10 +80,15 @@ async function connectClient(server: McpServer): Promise<Client> {
 }
 
 describe("MCP adapters", () => {
-  it("creates a resolved MCP provider from an unconnected server", async () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("creates a resolved MCP provider from a connected client", async () => {
     const server = createUpstreamServer();
+    const client = await connectClient(server);
     const provider = await createMcpToolProvider(
-      { server },
+      { client },
       { namespace: "mcp" },
     );
 
@@ -114,6 +119,19 @@ describe("MCP adapters", () => {
         hits: ["quickjs"],
       },
     });
+  });
+
+  it("rejects createMcpToolProvider for local server sources and points callers to the handle API", async () => {
+    const upstreamServer = createUpstreamServer();
+
+    await expect(
+      createMcpToolProvider(
+        {
+          server: upstreamServer,
+        } as unknown as Parameters<typeof createMcpToolProvider>[0],
+        { namespace: "mcp" },
+      ),
+    ).rejects.toThrow(/openMcpToolProvider/);
   });
 
   it("wraps a connected client with both MCP code tools by default", async () => {
@@ -216,7 +234,7 @@ describe("MCP adapters", () => {
   it("allows overriding the internal client identity for local server sources", async () => {
     const upstreamServer = createUpstreamServer();
 
-    await createMcpToolProvider(
+    const handle = await openMcpToolProvider(
       { server: upstreamServer },
       {
         namespace: "mcp",
@@ -231,6 +249,8 @@ describe("MCP adapters", () => {
       name: "custom-provider-client",
       version: "3.1.4",
     });
+
+    await handle.close();
   });
 
   it("exposes an explicit cleanup handle for local server sources", async () => {
@@ -244,6 +264,20 @@ describe("MCP adapters", () => {
     expect(upstreamServer.isConnected()).toBe(true);
 
     await handle.close();
+
+    expect(upstreamServer.isConnected()).toBe(false);
+  });
+
+  it("closes owned local server resources when setup fails mid-connect", async () => {
+    const upstreamServer = createUpstreamServer();
+
+    vi.spyOn(Client.prototype, "connect").mockRejectedValueOnce(
+      new Error("client connect failed"),
+    );
+
+    await expect(
+      openMcpToolProvider({ server: upstreamServer }, { namespace: "mcp" }),
+    ).rejects.toThrow("client connect failed");
 
     expect(upstreamServer.isConnected()).toBe(false);
   });
@@ -285,7 +319,7 @@ describe("MCP adapters", () => {
   it("uses a neutral internal client identity when not configured", async () => {
     const upstreamServer = createUpstreamServer();
 
-    await createMcpToolProvider(
+    const handle = await openMcpToolProvider(
       { server: upstreamServer },
       { namespace: "mcp" },
     );
@@ -294,6 +328,8 @@ describe("MCP adapters", () => {
       name: "mcp-tool-client",
       version: "0.0.0",
     });
+
+    await handle.close();
   });
 
   it("supports single-tool mode and marks execution failures as MCP tool errors", async () => {

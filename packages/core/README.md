@@ -75,6 +75,8 @@ Swap in `@execbox/remote` when you want the same API but a caller-managed remote
   - `createMcpToolProvider`
   - `openMcpToolProvider`
   - `getMcpToolSourceServerInfo`
+  - `McpToolClientSource`
+  - `McpToolServerSource`
   - `codeMcpServer`
 
 ## Basic Usage
@@ -111,3 +113,7 @@ const result = await executor.execute(
 ## MCP Adapters
 
 Use `@execbox/core/mcp` when you want to wrap an MCP server or client into a tool provider, or expose code-execution tools from an MCP server. Wrapped tools preserve raw MCP `CallToolResult` envelopes so guest code can inspect `structuredContent` first and fall back to `content`.
+
+- `createMcpToolProvider({ client })` is the convenience API when the caller already owns the upstream MCP client lifecycle.
+- `openMcpToolProvider({ server | client })` returns an `McpToolProviderHandle` and is the required API when execbox owns a local `{ server }` connection.
+- `codeMcpServer()` owns any local wrapper connection it opens and releases it when the wrapper server closes.

@@ -11,7 +11,8 @@ Use this page as the overview. For the remote execution control flow, read [exec
 
 The MCP adapter layer lets execbox sit on either side of an MCP tool catalog:
 
-- `openMcpToolProvider()` / `createMcpToolProvider()` turn an MCP client or local server into a `ResolvedToolProvider`
+- `createMcpToolProvider({ client })` is the convenience path for caller-owned MCP client connections
+- `openMcpToolProvider({ client | server })` opens a wrapped provider handle and is required when execbox owns a local `{ server }` connection
 - `codeMcpServer()` exposes execbox execution back out as MCP tools such as `mcp_execute_code`, `mcp_search_tools`, and `mcp_code`
 
 ```mermaid
@@ -37,6 +38,12 @@ flowchart LR
 - generated namespace typings for the wrapped MCP surface
 - lifecycle ownership for locally opened in-memory MCP connections
 - optional wrapper server identity override when exposing execbox back out as MCP
+
+### Ownership Model
+
+- `{ client }` sources stay caller-owned. `createMcpToolProvider()` is the ergonomic helper for that path.
+- `{ server }` sources are execbox-owned. Callers must use `openMcpToolProvider()` and close the returned handle.
+- `codeMcpServer()` uses the same handle path internally and closes owned resources with the wrapper server.
 
 ## Protocol Role Today
 

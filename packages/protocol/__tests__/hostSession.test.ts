@@ -181,4 +181,80 @@ describe("runHostTransportSession", () => {
       ok: false,
     });
   });
+
+  it("times out promptly when the caller aborts and the transport stays silent", async () => {
+    vi.useFakeTimers();
+    const transport = new FakeTransport();
+    const controller = new AbortController();
+
+    const resultPromise = runHostTransportSession({
+      cancelGraceMs: 0,
+      code: "1 + 1",
+      executionId: "exec-abort",
+      providers: [],
+      runtimeOptions: {
+        ...runtimeOptions,
+        timeoutMs: 1_000,
+      },
+      signal: controller.signal,
+      transport,
+    });
+
+    controller.abort();
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(resultPromise).resolves.toMatchObject({
+      error: {
+        code: "timeout",
+      },
+      ok: false,
+    });
+    expect(transport.sent.map((message) => message.type)).toEqual([
+      "execute",
+      "cancel",
+    ]);
+    expect(transport.terminate).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(transport.sent.map((message) => message.type)).toEqual([
+      "execute",
+      "cancel",
+    ]);
+  });
+
+  it("keeps timeout as the final result when the transport closes after caller abort", async () => {
+    vi.useFakeTimers();
+    const transport = new FakeTransport();
+    const controller = new AbortController();
+
+    transport.terminate.mockImplementation(async () => {
+      transport.emitClose({
+        code: 24,
+        message: "Transport closed after caller abort",
+      });
+    });
+
+    const resultPromise = runHostTransportSession({
+      cancelGraceMs: 0,
+      code: "1 + 1",
+      executionId: "exec-abort-close",
+      providers: [],
+      runtimeOptions: {
+        ...runtimeOptions,
+        timeoutMs: 1_000,
+      },
+      signal: controller.signal,
+      transport,
+    });
+
+    controller.abort();
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(resultPromise).resolves.toMatchObject({
+      error: {
+        code: "timeout",
+      },
+      ok: false,
+    });
+  });
 });

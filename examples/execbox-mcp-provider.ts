@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import * as z from "zod";
 
-import { createMcpToolProvider } from "@execbox/core/mcp";
+import { openMcpToolProvider } from "@execbox/core/mcp";
 import { QuickJsExecutor } from "@execbox/quickjs";
 
 async function main(): Promise<void> {
@@ -29,25 +29,30 @@ async function main(): Promise<void> {
     }),
   );
 
-  const provider = await createMcpToolProvider({ server: upstreamServer });
-  const executor = new QuickJsExecutor();
-  const execution = await executor.execute(
-    '(await mcp.search_docs({ query: "quickjs" })).structuredContent',
-    [provider],
-  );
+  const handle = await openMcpToolProvider({ server: upstreamServer });
 
-  console.log("mcp provider example result");
-  console.log(
-    JSON.stringify(
-      {
-        execution,
-        namespace: provider.name,
-        originalToSafeName: provider.originalToSafeName,
-      },
-      null,
-      2,
-    ),
-  );
+  try {
+    const executor = new QuickJsExecutor();
+    const execution = await executor.execute(
+      '(await mcp.search_docs({ query: "quickjs" })).structuredContent',
+      [handle.provider],
+    );
+
+    console.log("mcp provider example result");
+    console.log(
+      JSON.stringify(
+        {
+          execution,
+          namespace: handle.provider.name,
+          originalToSafeName: handle.provider.originalToSafeName,
+        },
+        null,
+        2,
+      ),
+    );
+  } finally {
+    await handle.close();
+  }
 }
 
 void main();

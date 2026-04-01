@@ -33,6 +33,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "vitest run",
+    "test:dist-smoke": "node --import tsx scripts/test-dist-smoke.ts",
     "test:isolated-vm": "VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot ./node_modules/vitest/vitest.mjs run packages/isolated-vm/__tests__",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

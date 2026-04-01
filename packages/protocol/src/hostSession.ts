@@ -84,37 +84,9 @@ export async function runHostTransportSession(
   return await new Promise<ExecuteResult>((resolve) => {
     let finished = false;
     let timeoutTriggered = false;
+    let cancellationStarted = false;
     let forceTerminateTimer: NodeJS.Timeout | undefined;
     const cancelGraceMs = options.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS;
-    const timeoutTimer = setTimeout(() => {
-      if (finished) {
-        return;
-      }
-
-      timeoutTriggered = true;
-      abortController.abort();
-      send({
-        id: options.executionId,
-        type: "cancel",
-      });
-      forceTerminateTimer = setTimeout(() => {
-        if (finished) {
-          return;
-        }
-
-        void Promise.resolve(options.transport.terminate())
-          .catch(() => {})
-          .finally(() => {
-            if (finished) {
-              return;
-            }
-
-            finish(
-              toFailureResult(startedAt, true, getExecutionTimeoutMessage()),
-            );
-          });
-      }, cancelGraceMs);
-    }, options.runtimeOptions.timeoutMs + HOST_TIMEOUT_BACKSTOP_MS);
 
     const cleanup = () => {
       finished = true;
@@ -163,6 +135,41 @@ export async function runHostTransportSession(
         fail(error instanceof Error ? error.message : String(error));
       }
     };
+
+    const startCancellation = () => {
+      if (finished || cancellationStarted) {
+        return;
+      }
+
+      cancellationStarted = true;
+      timeoutTriggered = true;
+      abortController.abort();
+      send({
+        id: options.executionId,
+        type: "cancel",
+      });
+      forceTerminateTimer = setTimeout(() => {
+        if (finished) {
+          return;
+        }
+
+        void Promise.resolve(options.transport.terminate())
+          .catch(() => {})
+          .finally(() => {
+            if (finished) {
+              return;
+            }
+
+            finish(
+              toFailureResult(startedAt, true, getExecutionTimeoutMessage()),
+            );
+          });
+      }, cancelGraceMs);
+    };
+
+    const timeoutTimer = setTimeout(() => {
+      startCancellation();
+    }, options.runtimeOptions.timeoutMs + HOST_TIMEOUT_BACKSTOP_MS);
 
     const onMessage = (message: RunnerMessage) => {
       if (finished) {
@@ -213,21 +220,18 @@ export async function runHostTransportSession(
     };
 
     const onAbortSignal = () => {
-      if (finished) {
-        return;
-      }
-
-      abortController.abort();
-      send({
-        id: options.executionId,
-        type: "cancel",
-      });
+      startCancellation();
     };
 
     const offMessage = options.transport.onMessage(onMessage);
     const offError = options.transport.onError(onError);
     const offClose = options.transport.onClose(onClose);
     abortSignal?.addEventListener("abort", onAbortSignal, { once: true });
+
+    if (abortSignal?.aborted) {
+      startCancellation();
+      return;
+    }
 
     send({
       code: options.code,
