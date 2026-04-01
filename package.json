@@ -34,6 +34,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "vitest run",
     "test:dist-smoke": "node --import tsx scripts/test-dist-smoke.ts",
+    "test:security": "node ./node_modules/vitest/vitest.mjs run packages/core/__tests__/security/isJsonSerializable.test.ts packages/protocol/__tests__/hostSession.test.ts packages/protocol/__tests__/dispatcher.test.ts packages/quickjs/__tests__/protocolEndpoint.test.ts packages/remote/__tests__/runnerEndpoint.test.ts && node ./node_modules/vitest/vitest.mjs run packages/core/__tests__/mcp/penetration.test.ts packages/remote/__tests__/penetration.test.ts && node ./node_modules/vitest/vitest.mjs run packages/process/__tests__/penetration.test.ts && node ./node_modules/vitest/vitest.mjs run packages/worker/__tests__/penetration.test.ts && node ./node_modules/vitest/vitest.mjs run packages/process/__tests__/processExecutor.test.ts && node ./node_modules/vitest/vitest.mjs run packages/worker/__tests__/workerExecutorLifecycle.test.ts",
     "test:isolated-vm": "VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot ./node_modules/vitest/vitest.mjs run packages/isolated-vm/__tests__",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

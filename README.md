@@ -36,10 +36,11 @@ Runnable examples live in [`examples/`](./examples/) and are indexed in [`exampl
 ```bash
 npm install
 npm test
+npm run test:security
 npm run lint
 npm run build
 npm run typecheck
 npm run examples
 ```
 
-Use `npm run verify:isolated-vm` when working on the native executor package.
+Use `npm run verify:isolated-vm` when working on the native executor package. The required CI security lane also runs `npm run test:isolated-vm` on Node 24 with `--no-node-snapshot`.

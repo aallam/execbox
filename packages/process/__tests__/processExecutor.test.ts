@@ -15,6 +15,7 @@ class FakeChildProcess extends EventEmitter {
 }
 
 const state = vi.hoisted(() => ({
+  autoExitOnStart: true,
   child: undefined as FakeChildProcess | undefined,
   options: undefined as Record<string, unknown> | undefined,
 }));
@@ -25,9 +26,11 @@ vi.mock("node:child_process", () => ({
       const child = new FakeChildProcess();
       state.options = options;
       state.child = child;
-      queueMicrotask(() => {
-        child.emit("exit", 17, null);
-      });
+      if (state.autoExitOnStart) {
+        queueMicrotask(() => {
+          child.emit("exit", 17, null);
+        });
+      }
       return child;
     },
   ),
@@ -35,6 +38,7 @@ vi.mock("node:child_process", () => ({
 
 describe("ProcessExecutor", () => {
   beforeEach(() => {
+    state.autoExitOnStart = true;
     state.child = undefined;
     state.options = undefined;
   });
@@ -67,5 +71,74 @@ describe("ProcessExecutor", () => {
         "tsx",
       ]),
     });
+  });
+
+  it("force-kills a silent child process only once when execution times out", async () => {
+    vi.useFakeTimers();
+    state.autoExitOnStart = false;
+    const { ProcessExecutor } = await import("../src/index");
+    const executor = new ProcessExecutor({
+      cancelGraceMs: 0,
+      timeoutMs: 10,
+    });
+
+    const resultPromise = executor.execute("while (true) {}", []);
+    await vi.advanceTimersByTimeAsync(200);
+    const result = await resultPromise;
+
+    expect(result).toMatchObject({
+      error: {
+        code: "timeout",
+      },
+      ok: false,
+    });
+    expect(state.child?.kill).toHaveBeenCalledTimes(1);
+    expect(state.child?.kill).toHaveBeenCalledWith("SIGKILL");
+  });
+
+  it("does not create a child process when the caller signal is already aborted", async () => {
+    const { ProcessExecutor } = await import("../src/index");
+    const executor = new ProcessExecutor();
+    const controller = new AbortController();
+    controller.abort();
+
+    const result = await executor.execute("1 + 1", [], {
+      signal: controller.signal,
+    });
+
+    expect(result).toMatchObject({
+      error: {
+        code: "timeout",
+      },
+      ok: false,
+    });
+    expect(state.child).toBeUndefined();
+  });
+
+  it("force-kills a silent child process only once when the caller aborts", async () => {
+    vi.useFakeTimers();
+    state.autoExitOnStart = false;
+    const { ProcessExecutor } = await import("../src/index");
+    const executor = new ProcessExecutor({
+      cancelGraceMs: 0,
+      timeoutMs: 1_000,
+    });
+    const controller = new AbortController();
+
+    const resultPromise = executor.execute("while (true) {}", [], {
+      signal: controller.signal,
+    });
+    controller.abort();
+    await vi.advanceTimersByTimeAsync(0);
+    const result = await resultPromise;
+
+    expect(result).toMatchObject({
+      error: {
+        code: "timeout",
+      },
+      ok: false,
+    });
+    expect(state.child?.kill).toHaveBeenCalledTimes(1);
+    expect(state.child?.kill).toHaveBeenCalledWith("SIGKILL");
   });
 });

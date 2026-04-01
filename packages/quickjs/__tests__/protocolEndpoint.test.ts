@@ -132,4 +132,17 @@ describe("attachQuickJsProtocolEndpoint", () => {
       type: "done",
     });
   });
+
+  it("ignores malformed dispatcher messages without starting execution", async () => {
+    const port = new FakePort();
+
+    attachQuickJsProtocolEndpoint(port);
+    port.dispatch({
+      id: "exec-bad",
+      type: "execute",
+    } as unknown as DispatcherMessage);
+    await new Promise((resolve) => setTimeout(resolve, 25));
+
+    expect(port.sent).toEqual([]);
+  });
 });
