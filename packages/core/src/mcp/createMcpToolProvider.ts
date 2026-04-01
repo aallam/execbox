@@ -8,11 +8,25 @@ import type { ResolvedToolProvider, ToolProvider } from "../types";
 import { generateMcpWrappedToolTypes } from "./mcpWrappedToolTypes";
 
 /**
+ * Caller-owned MCP client source used by the convenience wrapper API.
+ */
+export type McpToolClientSource = {
+  client: Client;
+  serverInfo?: Implementation;
+};
+
+/**
+ * Local MCP server source that requires explicit lifecycle cleanup.
+ */
+export type McpToolServerSource = {
+  server: McpServer;
+  serverInfo?: Implementation;
+};
+
+/**
  * Source used to discover MCP tools for wrapping.
  */
-export type McpToolSource =
-  | { client: Client; serverInfo?: Implementation }
-  | { server: McpServer; serverInfo?: Implementation };
+export type McpToolSource = McpToolClientSource | McpToolServerSource;
 
 const DEFAULT_MCP_TOOL_CLIENT_INFO = {
   name: "mcp-tool-client",
@@ -93,11 +107,21 @@ async function openMcpToolClient(
     InMemoryTransport.createLinkedPair();
   const client = new Client(clientInfo);
   let closePromise: Promise<void> | undefined;
+  let serverConnected = false;
 
-  await Promise.all([
-    source.server.connect(serverTransport),
-    client.connect(clientTransport),
-  ]);
+  try {
+    await source.server.connect(serverTransport);
+    serverConnected = true;
+    await client.connect(clientTransport);
+  } catch (error) {
+    await Promise.allSettled([
+      Promise.resolve().then(() => client.close()),
+      serverConnected
+        ? Promise.resolve().then(() => source.server.close())
+        : Promise.resolve(),
+    ]);
+    throw error;
+  }
 
   return {
     client,
@@ -169,12 +193,18 @@ export async function openMcpToolProvider(
 }
 
 /**
- * Wraps MCP tools from a client or server as a resolved execution provider.
+ * Wraps MCP tools from a caller-owned MCP client as a resolved execution provider.
  */
 export async function createMcpToolProvider(
-  source: McpToolSource,
+  source: McpToolClientSource,
   options: CreateMcpToolProviderOptions = {},
 ): Promise<ResolvedToolProvider> {
+  if ("server" in (source as unknown as McpToolSource)) {
+    throw new Error(
+      "createMcpToolProvider() no longer accepts { server } sources. Use openMcpToolProvider() to receive a cleanup handle for owned local MCP server connections.",
+    );
+  }
+
   const handle = await openMcpToolProvider(source, options);
   return handle.provider;
 }
