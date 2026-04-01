@@ -112,7 +112,13 @@ function toJsonValue(value: unknown, message: string): unknown {
     return undefined;
   }
 
-  const jsonValue = JSON.stringify(value);
+  let jsonValue: string | undefined;
+
+  try {
+    jsonValue = JSON.stringify(value);
+  } catch {
+    throw new ExecuteFailure("serialization_error", message);
+  }
 
   if (jsonValue === undefined) {
     throw new ExecuteFailure("serialization_error", message);
@@ -327,16 +333,18 @@ function createBootstrapSource(
     "const __mcpRaiseNormalizedError = (error) => {",
     "  throw __mcpNormalizeHostError(error);",
     "};",
-    "const __mcpToJsonValue = (value) => {",
+    "const __mcpToJsonValue = (value, message) => {",
     "  if (typeof value === 'undefined') {",
     "    return undefined;",
     "  }",
-    "  const json = JSON.stringify(value);",
+    "  let json;",
+    "  try {",
+    "    json = JSON.stringify(value);",
+    "  } catch {",
+    "    throw __mcpCreateTrustedError('serialization_error', message);",
+    "  }",
     "  if (typeof json === 'undefined') {",
-    "    throw __mcpCreateTrustedError(",
-    "      'serialization_error',",
-    "      'Guest code returned a non-serializable value'",
-    "    );",
+    "    throw __mcpCreateTrustedError('serialization_error', message);",
     "  }",
     "  return JSON.parse(json);",
     "};",
@@ -356,7 +364,11 @@ function createBootstrapSource(
       lines.push(
         `globalThis.${provider.name}.${safeToolName} = async (input) => {`,
         "  try {",
-        `    return await ${hostReferenceName}.applySyncPromise(undefined, [input], { arguments: { copy: true }, timeout: ${timeoutMs} });`,
+        "    const normalizedInput = __mcpToJsonValue(",
+        "      input,",
+        "      'Guest code passed a non-serializable tool input'",
+        "    );",
+        `    return await ${hostReferenceName}.applySyncPromise(undefined, [normalizedInput], { arguments: { copy: true }, timeout: ${timeoutMs} });`,
         "  } catch (error) {",
         "    __mcpRaiseNormalizedError(error);",
         "  }",
@@ -376,7 +388,13 @@ function createExecutionSource(code: string): string {
     "return (async () => {",
     "  try {",
     "    const value = await __mcpUserFunction();",
-    "    return { ok: true, value: __mcpToJsonValue(value) };",
+    "    return {",
+    "      ok: true,",
+    "      value: __mcpToJsonValue(",
+    "        value,",
+    "        'Guest code returned a non-serializable value'",
+    "      )",
+    "    };",
     "  } catch (error) {",
     "    return { ok: false, error: __mcpNormalizeGuestError(error) };",
     "  }",
