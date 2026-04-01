@@ -6,6 +6,7 @@ import type {
   RunnerMessage,
   ToolCallResult,
 } from "@execbox/protocol";
+import { isDispatcherMessage } from "../../../protocol/src/messages.ts";
 
 import { runQuickJsSession } from "./index.ts";
 
@@ -98,6 +99,10 @@ export function attachQuickJsProtocolEndpoint(
   }
 
   const maybeDetach = port.onMessage((message: DispatcherMessage) => {
+    if (!isDispatcherMessage(message)) {
+      return;
+    }
+
     switch (message.type) {
       case "cancel":
         if (message.id === activeExecutionId) {

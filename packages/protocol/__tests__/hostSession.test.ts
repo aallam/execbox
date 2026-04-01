@@ -257,4 +257,152 @@ describe("runHostTransportSession", () => {
       ok: false,
     });
   });
+
+  it("fails with internal_error when the transport emits an error before done", async () => {
+    const transport = new FakeTransport();
+
+    transport.send.mockImplementation(async (message: DispatcherMessage) => {
+      transport.sent.push(message);
+
+      if (message.type === "execute") {
+        queueMicrotask(() => {
+          transport.emitMessage({
+            id: message.id,
+            type: "started",
+          });
+          transport.emit("error", new Error("Runner channel broke"));
+        });
+      }
+    });
+
+    await expect(
+      runHostTransportSession({
+        cancelGraceMs: 0,
+        code: "1 + 1",
+        executionId: "exec-error",
+        providers: [],
+        runtimeOptions,
+        transport,
+      }),
+    ).resolves.toMatchObject({
+      error: {
+        code: "internal_error",
+        message: "Runner channel broke",
+      },
+      ok: false,
+    });
+  });
+
+  it("fails with internal_error when the transport closes before done", async () => {
+    const transport = new FakeTransport();
+
+    transport.send.mockImplementation(async (message: DispatcherMessage) => {
+      transport.sent.push(message);
+
+      if (message.type === "execute") {
+        queueMicrotask(() => {
+          transport.emitClose({
+            code: 13,
+            message: "Runner transport closed early",
+          });
+        });
+      }
+    });
+
+    await expect(
+      runHostTransportSession({
+        cancelGraceMs: 0,
+        code: "1 + 1",
+        executionId: "exec-close",
+        providers: [],
+        runtimeOptions,
+        transport,
+      }),
+    ).resolves.toMatchObject({
+      error: {
+        code: "internal_error",
+        message: "Runner transport closed early",
+      },
+      ok: false,
+    });
+  });
+
+  it("ignores malformed runner messages until a valid done arrives", async () => {
+    const transport = new FakeTransport();
+
+    transport.send.mockImplementation(async (message: DispatcherMessage) => {
+      transport.sent.push(message);
+
+      if (message.type === "execute") {
+        queueMicrotask(() => {
+          transport.emitMessage({
+            id: message.id,
+            type: "started",
+          });
+          transport.emitMessage({
+            id: message.id,
+            type: "bogus",
+          } as unknown as RunnerMessage);
+          transport.emitMessage({
+            durationMs: 5,
+            id: message.id,
+            logs: [],
+            ok: true,
+            result: 2,
+            type: "done",
+          });
+        });
+      }
+    });
+
+    await expect(
+      runHostTransportSession({
+        cancelGraceMs: 0,
+        code: "1 + 1",
+        executionId: "exec-malformed",
+        providers: [],
+        runtimeOptions,
+        transport,
+      }),
+    ).resolves.toMatchObject({
+      ok: true,
+      result: 2,
+    });
+  });
+
+  it("normalizes successful done messages that omit an undefined result", async () => {
+    const transport = new FakeTransport();
+
+    transport.send.mockImplementation(async (message: DispatcherMessage) => {
+      transport.sent.push(message);
+
+      if (message.type === "execute") {
+        queueMicrotask(() => {
+          transport.emitMessage({
+            durationMs: 5,
+            id: message.id,
+            logs: ["12345", "67890"],
+            ok: true,
+            type: "done",
+          } as unknown as RunnerMessage);
+        });
+      }
+    });
+
+    await expect(
+      runHostTransportSession({
+        cancelGraceMs: 0,
+        code: 'console.log("12345"); console.log("67890");',
+        executionId: "exec-undefined-result",
+        providers: [],
+        runtimeOptions,
+        transport,
+      }),
+    ).resolves.toEqual({
+      durationMs: 5,
+      logs: ["12345", "67890"],
+      ok: true,
+      result: undefined,
+    });
+  });
 });

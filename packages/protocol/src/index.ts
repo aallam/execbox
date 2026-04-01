@@ -12,6 +12,7 @@ export type {
   ToolCallMessage,
   ToolResultMessage,
 } from "./messages";
+export { isDispatcherMessage, isRunnerMessage } from "./messages";
 export type { HostTransport, TransportCloseReason } from "./hostSession";
 export type {
   ExecutorRuntimeOptions,

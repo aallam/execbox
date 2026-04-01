@@ -47,9 +47,20 @@ function createRuntimeOptions(
 }
 
 function createWorkerTransport(worker: Worker): HostTransport {
+  let terminated = false;
+
+  const terminateWorker = async () => {
+    if (terminated) {
+      return;
+    }
+
+    terminated = true;
+    await worker.terminate().catch(() => {});
+  };
+
   return {
     dispose: async () => {
-      await worker.terminate().catch(() => {});
+      await terminateWorker();
     },
     onClose: (handler) => {
       const wrapped = (code: number) => {
@@ -76,7 +87,7 @@ function createWorkerTransport(worker: Worker): HostTransport {
       worker.postMessage(message);
     },
     terminate: async () => {
-      await worker.terminate().catch(() => {});
+      await terminateWorker();
     },
   };
 }

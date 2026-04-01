@@ -120,4 +120,39 @@ describe("attachQuickJsRemoteEndpoint", () => {
 
     expect(sent).toEqual([]);
   });
+
+  it("ignores malformed inbound payloads and still handles later execute messages", async () => {
+    const { emitMessage, port, sent } = createPort();
+    attachQuickJsRemoteEndpoint(port);
+
+    emitMessage({
+      id: "bad",
+      type: "execute",
+    } as unknown as ExecuteMessage);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(sent).toEqual([]);
+
+    emitMessage({
+      code: "1 + 1",
+      id: "good",
+      options: {
+        maxLogChars: 64_000,
+        maxLogLines: 100,
+        memoryLimitBytes: 64 * 1024 * 1024,
+        timeoutMs: 1_000,
+      },
+      providers: [],
+      type: "execute",
+    });
+    await waitFor(() =>
+      sent.some((message) => message.type === "done" && message.id === "good"),
+    );
+
+    expect(sent).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "good", type: "started" }),
+        expect.objectContaining({ id: "good", type: "done" }),
+      ]),
+    );
+  });
 });

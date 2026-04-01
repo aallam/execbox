@@ -66,10 +66,14 @@ const result = await executor.execute("await codemode.echo({ ok: true })", [
 ]);
 ```
 
-This package is verified through the opt-in workspace flow:
+This package is verified through the workspace security flows:
 
 ```bash
+npm run test:security
+npm run test:isolated-vm
 npm run verify:isolated-vm
 ```
+
+The required CI lane runs the isolated-vm suite on Node 24 with `--no-node-snapshot`, which is the best local environment to match when validating native-runtime changes.
 
 `isolated-vm` is not documented here as a hard security boundary. If process stability matters more than in-process performance, prefer process isolation around the executor.

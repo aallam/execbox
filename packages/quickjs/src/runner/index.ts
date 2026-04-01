@@ -248,12 +248,38 @@ function createToolHandle(
 ): QuickJSHandle {
   return context.newFunction(safeToolName, (...args) => {
     const deferred = context.newPromise();
-    const input = args[0] === undefined ? undefined : context.dump(args[0]);
     const disposeDeferred = () => {
       if (context.alive && deferred.alive) {
         deferred.dispose();
       }
     };
+    let input: unknown;
+
+    try {
+      input =
+        args[0] === undefined ? undefined : fromGuestHandle(context, args[0]);
+    } catch (error) {
+      const executeError = isExecuteFailure(error)
+        ? error
+        : new ExecuteFailure(
+            "serialization_error",
+            "Guest code passed a non-serializable tool input",
+          );
+      const errorHandle = createGuestErrorHandle(
+        context,
+        executeError.code,
+        executeError.message,
+        trustedHostErrorKey,
+      );
+
+      try {
+        deferred.reject(errorHandle);
+        return deferred.handle;
+      } finally {
+        errorHandle.dispose();
+        queueMicrotask(disposeDeferred);
+      }
+    }
     const onAbort = () => {
       signal.removeEventListener("abort", onAbort);
       if (!context.alive || !deferred.alive) {

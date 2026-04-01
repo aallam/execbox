@@ -73,6 +73,14 @@ function createUpstreamServer(state: HostileMcpHarness["state"]): McpServer {
   );
 
   tool(
+    "echo-any",
+    {
+      description: "Echo any JSON-safe input back to the guest.",
+    },
+    async (input: unknown) => input,
+  );
+
+  tool(
     "search-docs",
     {
       description: "Return a value from an adversarially named tool.",
@@ -191,6 +199,49 @@ function createUpstreamServer(state: HostileMcpHarness["state"]): McpServer {
       structuredContent: {
         items: Array.from({ length: args.count }, (_unused, index) => index),
       },
+    }),
+  );
+
+  tool(
+    "deep-payload",
+    {
+      description: "Return a deeper structured payload for boundary probes.",
+      inputSchema: {
+        depth: z.number().int().min(1).max(20),
+      },
+    },
+    async (args: { depth: number }) => {
+      let cursor: Record<string, unknown> = {
+        leaf: "x".repeat(128),
+        level: args.depth,
+      };
+
+      for (let level = args.depth - 1; level >= 0; level -= 1) {
+        cursor = {
+          child: cursor,
+          level,
+          siblings: Array.from({ length: 8 }, (_unused, index) => ({
+            index,
+            label: `${level}-${index}`.repeat(8),
+          })),
+        };
+      }
+
+      return {
+        content: [{ text: `generated depth ${args.depth}`, type: "text" }],
+        structuredContent: cursor,
+      };
+    },
+  );
+
+  tool(
+    "non-serializable-output",
+    {
+      description: "Return a host value that cannot cross the JSON boundary.",
+      inputSchema: {},
+    },
+    async () => ({
+      invalid: () => "not serializable",
     }),
   );
 

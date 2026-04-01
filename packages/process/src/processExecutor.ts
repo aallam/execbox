@@ -70,9 +70,20 @@ function createChildProcess(): ChildProcess {
 }
 
 function createProcessTransport(child: ChildProcess): HostTransport {
+  let terminated = false;
+
+  const terminateChild = () => {
+    if (terminated) {
+      return;
+    }
+
+    terminated = true;
+    child.kill("SIGKILL");
+  };
+
   return {
     dispose: () => {
-      child.kill("SIGKILL");
+      terminateChild();
     },
     onClose: (handler) => {
       const onDisconnect = () => {
@@ -123,7 +134,7 @@ function createProcessTransport(child: ChildProcess): HostTransport {
         });
       }),
     terminate: () => {
-      child.kill("SIGKILL");
+      terminateChild();
     },
   };
 }

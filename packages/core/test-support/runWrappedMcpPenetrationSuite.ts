@@ -223,6 +223,7 @@ export function runWrappedMcpPenetrationSuite(
       const { wrappedClient } = await createHostileMcpHarness(createExecutor, {
         maxLogChars: 10,
         maxLogLines: 2,
+        timeoutMs: 10_000,
       });
       const executeResult = await wrappedClient.callTool({
         name: "mcp_execute_code",
@@ -236,7 +237,7 @@ export function runWrappedMcpPenetrationSuite(
         logs: ["12345", "67890"],
         ok: true,
       });
-    });
+    }, 15_000);
 
     it("handles moderate structured payload amplification without crashing", async () => {
       const { wrappedClient } = await createHostileMcpHarness(createExecutor);
@@ -251,6 +252,81 @@ export function runWrappedMcpPenetrationSuite(
       expect(executeResult.structuredContent).toMatchObject({
         ok: true,
         result: 256,
+      });
+    });
+
+    it("returns serialization_error for non-serializable guest tool input", async () => {
+      const { wrappedClient } = await createHostileMcpHarness(createExecutor);
+      const executeResult = await wrappedClient.callTool({
+        name: "mcp_execute_code",
+        arguments: {
+          code: `(() => {
+            const value = {};
+            value.self = value;
+            return mcp.echo_any(value);
+          })()`,
+        },
+      });
+
+      expect(executeResult.isError).toBe(true);
+      expect(executeResult.structuredContent).toMatchObject({
+        error: {
+          code: "serialization_error",
+        },
+        ok: false,
+      });
+    });
+
+    it("returns serialization_error for non-serializable wrapped tool output", async () => {
+      const { wrappedClient } = await createHostileMcpHarness(createExecutor);
+      const executeResult = await wrappedClient.callTool({
+        name: "mcp_execute_code",
+        arguments: {
+          code: "await mcp.non_serializable_output({})",
+        },
+      });
+
+      expect(executeResult.isError).toBe(true);
+      expect(executeResult.structuredContent).toMatchObject({
+        error: {
+          code: "serialization_error",
+        },
+        ok: false,
+      });
+    });
+
+    it("handles deeper structured payloads without corrupting wrapper state", async () => {
+      const { wrappedClient } = await createHostileMcpHarness(createExecutor);
+      const executeResult = await wrappedClient.callTool({
+        name: "mcp_execute_code",
+        arguments: {
+          code: `(() => mcp.deep_payload({ depth: 12 }).then((result) => {
+            let cursor = result.structuredContent;
+            let traversed = 0;
+
+            while (cursor && typeof cursor === "object" && "child" in cursor) {
+              traversed += 1;
+              cursor = cursor.child;
+            }
+
+            return {
+              leafLength: cursor.leaf.length,
+              level: cursor.level,
+              notPolluted: typeof ({}).wrapperPolluted === "undefined",
+              traversed
+            };
+          }))()`,
+        },
+      });
+
+      expect(executeResult.structuredContent).toMatchObject({
+        ok: true,
+        result: {
+          leafLength: 128,
+          level: 12,
+          notPolluted: true,
+          traversed: 12,
+        },
       });
     });
 

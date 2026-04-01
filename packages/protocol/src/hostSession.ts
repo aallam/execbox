@@ -9,9 +9,11 @@ import {
 
 import type {
   DispatcherMessage,
+  DoneMessage,
   RunnerMessage,
   ToolCallMessage,
 } from "./messages";
+import { isRunnerMessage } from "./messages";
 
 const DEFAULT_CANCEL_GRACE_MS = 25;
 const HOST_TIMEOUT_BACKSTOP_MS = 100;
@@ -63,6 +65,24 @@ function toFailureResult(
     },
     logs: [],
     ok: false,
+  };
+}
+
+function normalizeDoneMessage(message: DoneMessage): ExecuteResult {
+  if (!message.ok) {
+    return {
+      durationMs: message.durationMs,
+      error: message.error,
+      logs: message.logs,
+      ok: false,
+    };
+  }
+
+  return {
+    durationMs: message.durationMs,
+    logs: message.logs,
+    ok: true,
+    result: message.result,
   };
 }
 
@@ -176,6 +196,10 @@ export async function runHostTransportSession(
         return;
       }
 
+      if (!isRunnerMessage(message)) {
+        return;
+      }
+
       if ("id" in message && message.id !== options.executionId) {
         return;
       }
@@ -207,8 +231,7 @@ export async function runHostTransportSession(
         return;
       }
 
-      const { id: _id, type: _type, ...result } = message;
-      finish(result);
+      finish(normalizeDoneMessage(message));
     };
 
     const onError = (error: Error) => {

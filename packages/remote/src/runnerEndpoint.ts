@@ -1,5 +1,6 @@
 import { attachQuickJsProtocolEndpoint } from "@execbox/quickjs/runner/protocol-endpoint";
-import type { DispatcherMessage, RunnerMessage } from "@execbox/protocol";
+import { type DispatcherMessage, type RunnerMessage } from "@execbox/protocol";
+import { isDispatcherMessage } from "../../protocol/src/messages.ts";
 
 import type { RemoteRunnerPort } from "./types";
 
@@ -13,7 +14,11 @@ export function attachQuickJsRemoteEndpoint(
   const detachProtocol = attachQuickJsProtocolEndpoint({
     onMessage(handler: (message: DispatcherMessage) => void): () => void {
       const maybeDetach = port.onMessage((message: unknown) => {
-        handler(message as DispatcherMessage);
+        if (!isDispatcherMessage(message)) {
+          return;
+        }
+
+        handler(message);
       });
 
       return () => {
