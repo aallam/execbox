@@ -1,5 +1,13 @@
 # @execbox/quickjs
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [8cd7b02]
+  - @execbox/core@0.2.0
+  - @execbox/protocol@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
