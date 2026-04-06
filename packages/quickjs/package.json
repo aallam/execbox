@@ -1,6 +1,6 @@
 {
   "name": "@execbox/quickjs",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "QuickJS executor for the execbox core package.",
   "license": "MIT",
   "type": "module",
@@ -54,8 +54,8 @@
   "homepage": "https://github.com/aallam/execbox/tree/main/packages/quickjs#readme",
   "bugs": "https://github.com/aallam/execbox/issues",
   "dependencies": {
-    "@execbox/core": "^0.2.0",
-    "@execbox/protocol": "^0.1.2",
+    "@execbox/core": "^0.3.0",
+    "@execbox/protocol": "^0.2.0",
     "quickjs-emscripten": "^0.31.0"
   }
 }
