@@ -46,7 +46,9 @@ const result = await executor.execute(
 attachQuickJsRemoteEndpoint(myRunnerPort);
 ```
 
-`RemoteExecutor` stays transport-agnostic. Your application owns the network stack and provides a fresh `HostTransport` per execution. `attachQuickJsRemoteEndpoint()` binds the shared QuickJS runner protocol to an app-provided remote port on the runner side.
+`RemoteExecutor` stays transport-agnostic. Your application owns the network stack and provides the `HostTransport` instances that execution runs on. `attachQuickJsRemoteEndpoint()` binds the shared QuickJS runner protocol to an app-provided remote port on the runner side.
+
+`RemoteExecutor` intentionally stays ephemeral. It asks `connectTransport()` for a fresh transport per `execute()` call and leaves any connection reuse policy to the caller-owned transport layer.
 
 ## Security Notes
 

@@ -12,13 +12,13 @@ import { runIsolatedVmSession } from "./runner/index";
 import type { IsolatedVmExecutorOptions } from "./types";
 
 /**
- * isolated-vm-backed executor for one-shot sandboxed JavaScript runs.
+ * isolated-vm-backed executor for ephemeral sandboxed JavaScript runs.
  */
 export class IsolatedVmExecutor implements Executor {
   private readonly options: IsolatedVmExecutorOptions;
 
   /**
-   * Creates an isolated-vm executor with one-shot runtime limits and host bridging configuration.
+   * Creates an isolated-vm executor with ephemeral runtime limits and host bridging configuration.
    */
   constructor(options: IsolatedVmExecutorOptions = {}) {
     this.options = options;

@@ -66,7 +66,9 @@ export interface QuickJsSessionRequest {
  * Options controlling one transport-backed QuickJS session.
  */
 export type QuickJsSessionOptions = QuickJsExecutorOptions &
-  ExecutorRuntimeOptions;
+  ExecutorRuntimeOptions & {
+    module?: QuickJSWASMModule;
+  };
 
 /**
  * Converts unexpected executor failures into stable public result errors.
@@ -386,6 +388,10 @@ export async function runQuickJsSession(
   options: QuickJsSessionOptions = {},
 ): Promise<ExecuteResult> {
   const loadModule = async () => {
+    if (options.module) {
+      return options.module;
+    }
+
     const loaded = options.loadModule
       ? await options.loadModule()
       : await loadDefaultModule();

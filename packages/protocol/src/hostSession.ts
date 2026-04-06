@@ -46,6 +46,7 @@ export interface HostTransportSessionOptions {
   cancelGraceMs?: number;
   code: string;
   executionId: string;
+  onSettled?: (result: ExecuteResult) => Promise<void> | void;
   providers: ResolvedToolProvider[];
   runtimeOptions: Required<ExecutorRuntimeOptions>;
   signal?: AbortSignal;
@@ -129,7 +130,11 @@ export async function runHostTransportSession(
       }
 
       cleanup();
-      void Promise.resolve(options.transport.dispose()).catch(() => {});
+      void Promise.resolve(options.onSettled?.(result))
+        .catch(() => {})
+        .finally(() => {
+          void Promise.resolve(options.transport.dispose()).catch(() => {});
+        });
       resolve(result);
     };
 

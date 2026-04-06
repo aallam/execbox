@@ -12,13 +12,13 @@ import { runQuickJsSession } from "./runner/index";
 import type { QuickJsExecutorOptions } from "./types";
 
 /**
- * QuickJS-backed executor for one-shot sandboxed JavaScript runs.
+ * QuickJS-backed executor for ephemeral sandboxed JavaScript runs.
  */
 export class QuickJsExecutor implements Executor {
   private readonly options: QuickJsExecutorOptions;
 
   /**
-   * Creates a QuickJS executor with one-shot runtime limits and host bridging configuration.
+   * Creates a QuickJS executor with ephemeral runtime limits and host bridging configuration.
    */
   constructor(options: QuickJsExecutorOptions = {}) {
     this.options = options;

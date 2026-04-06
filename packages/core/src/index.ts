@@ -1,4 +1,4 @@
-export type { Executor } from "./executor/executor";
+export type { Executor, ExecutorPoolOptions } from "./executor/executor";
 export {
   createTimeoutExecuteResult,
   createExecutionContext,

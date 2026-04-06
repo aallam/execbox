@@ -34,6 +34,21 @@ describe("WorkerExecutor lifecycle", () => {
     state.worker = undefined;
   });
 
+  it("returns internal_error when the worker exits before sending a result", async () => {
+    const { WorkerExecutor } = await import("../src/index");
+    const executor = new WorkerExecutor();
+
+    const result = await executor.execute("1 + 1", []);
+
+    expect(result).toMatchObject({
+      error: {
+        code: "internal_error",
+        message: "Worker exited unexpectedly with code 17",
+      },
+      ok: false,
+    });
+  });
+
   it("uses explicit source bootstrap conditions in repo source mode", async () => {
     const { WorkerExecutor } = await import("../src/index");
     const executor = new WorkerExecutor();

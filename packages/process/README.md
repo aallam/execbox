@@ -9,7 +9,7 @@ Child-process executor for `@execbox/core`, using the shared QuickJS runner behi
 
 - you want QuickJS semantics with a stronger lifecycle boundary than worker threads
 - you want to hard-kill the execution process on timeout
-- you are comfortable paying child-process startup overhead per execution
+- you want pooled child-process reuse by default, with explicit ephemeral opt-out when needed
 
 If you want the simplest default backend, use [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs) instead.
 
@@ -39,6 +39,62 @@ const result = await executor.execute("await tools.echo({ ok: true })", [
   provider,
 ]);
 ```
+
+## Pooling
+
+`ProcessExecutor` now defaults to pooled child-process reuse. Each `execute()` call still gets a fresh QuickJS runtime/context inside the child; only the outer child-process shell is reused.
+
+```ts
+const executor = new ProcessExecutor({
+  mode: "pooled",
+  pool: {
+    idleTimeoutMs: 30_000,
+    maxSize: 2,
+    prewarm: true,
+  },
+});
+
+await executor.prewarm?.(2);
+await executor.dispose?.();
+```
+
+Use `mode: "ephemeral"` to keep the previous behavior of creating a fresh child process for every execution, even if a `pool` config is present:
+
+```ts
+const executor = new ProcessExecutor({
+  mode: "ephemeral",
+});
+```
+
+Default pooled settings are:
+
+- `maxSize: 1`
+- `minSize: 0`
+- `idleTimeoutMs: 30_000`
+- `prewarm: false`
+
+Call `dispose()` in long-lived applications and tests when you want deterministic cleanup of pooled child processes.
+
+### Pooling Internals
+
+`ProcessExecutor` does not keep a QuickJS runtime alive between executions. The pooled resource is the outer child-process shell only.
+
+- the child process starts once and attaches the shared QuickJS protocol endpoint
+- each `execute()` call sends one execute message to that endpoint, which starts a fresh `runQuickJsSession()` inside the child
+- the parent acquires one pooled shell lease, runs `runHostTransportSession()` for that execution, then releases or evicts the lease when the session settles
+- pooled mode uses a borrowed transport wrapper because the host session always disposes its transport at the end of an execution, while the real pooled child must stay alive for reuse
+- if all pooled children are busy and the pool is already at `maxSize`, new executions wait in an internal FIFO queue until a shell is released or replaced
+
+Shell reuse rules are:
+
+- success returns the child to the pool
+- normal guest/tool/runtime failures also return it
+- `timeout` and `internal_error` evict it
+- idle children are evicted after `idleTimeoutMs`
+
+The transport wrapper also caches the first unexpected close reason and replays it to late listeners. That prevents pooled executions from hanging if the child exits before the host session has attached its close handler.
+
+Queue wait time is pool backpressure, not execution time. The configured execution timeout starts only after the lease has been acquired and the host transport session begins.
 
 ## Security Notes
 

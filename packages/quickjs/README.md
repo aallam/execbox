@@ -63,3 +63,5 @@ const result = await executor.execute("await codemode.echo({ ok: true })", [
 ```
 
 Each execution runs in a fresh QuickJS runtime with timeout handling, captured logs, and JSON-only result and tool boundaries.
+
+`QuickJsExecutor` intentionally stays ephemeral. Every `execute()` call creates a fresh QuickJS runtime/context, and the package does not expose a pooling API.

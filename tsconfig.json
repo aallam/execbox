@@ -31,6 +31,7 @@
     "packages/process/**/*.ts",
     "packages/worker/**/*.ts",
     "packages/isolated-vm/**/*.ts",
+    "scripts/**/*.ts",
     "vitest.config.ts"
   ],
   "exclude": ["**/node_modules", "packages/*/dist"]
