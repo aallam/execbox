@@ -139,6 +139,43 @@ The QuickJS-backed executors that benefit from pooling can keep the expensive ou
 
 Every `execute()` call still creates a fresh QuickJS runtime/context, reinjects providers, and discards guest globals afterward. Timeouts and internal transport failures evict the affected shell from the pool instead of returning it to circulation.
 
+### How The Pool Works
+
+Pooling is implemented at the host-shell layer, not at the QuickJS runtime layer.
+
+- `@execbox/protocol` exposes a small bounded async `createResourcePool()` helper that owns reusable shells, idle eviction, and `prewarm()` / `dispose()` support.
+- `ProcessExecutor` pools `ChildProcess` shells and `WorkerExecutor` pools `Worker` shells. Each shell owns one long-lived transport wrapper plus one attached QuickJS protocol endpoint.
+- The child/worker entrypoint only attaches `attachQuickJsProtocolEndpoint(...)` once. That endpoint accepts one active `execute` message at a time and starts a fresh `runQuickJsSession()` for each message.
+- Concurrency therefore comes from pool size, not from multiplexing several executions through one shell.
+
+At execution time the flow is:
+
+1. The executor resolves pooled mode unless `mode: "ephemeral"` disables it.
+2. The pooled path acquires one shell lease from the shared resource pool.
+3. The executor passes a borrowed transport wrapper into `runHostTransportSession()`.
+4. `runHostTransportSession()` drives the full execute/tool-call/cancel/done protocol for that one execution.
+5. When the host session settles, `onSettled` releases the lease back to the pool or evicts it.
+
+The borrowed transport wrapper matters because `runHostTransportSession()` always disposes the transport after a session ends. In pooled mode the executor must keep the underlying shell alive across executions, so it passes a wrapper whose `dispose()` is intentionally a no-op while still forwarding `send`, `onMessage`, `onError`, `onClose`, and `terminate`.
+
+### Reuse And Eviction Rules
+
+- Successful executions return the shell to the pool.
+- Normal guest/runtime/tool failures also return the shell, because they do not imply a poisoned host shell.
+- `timeout` and `internal_error` results evict the shell, because those outcomes mean the worker/child or transport state may no longer be trustworthy.
+- Idle pooled shells are evicted after `idleTimeoutMs`, down to `minSize`.
+- `dispose()` tears down the executor-owned pool and any idle shells it still owns.
+
+### Early Exit Handling
+
+Pooling exposed a transport race that did not matter in the old one-shot model: a child or worker could exit before the host session subscribed to close events. The pooled transport wrappers now retain the first close reason and replay it to later `onClose(...)` subscribers, so an early shell death still resolves as `internal_error` instead of hanging the execution.
+
+### What Is Not Pooled
+
+- `QuickJsExecutor` stays in-process and ephemeral because there is no expensive transport shell to reuse.
+- `RemoteExecutor` stays transport-factory based and ephemeral because transport ownership belongs to the caller.
+- `IsolatedVmExecutor` stays ephemeral because its hot path is fresh isolate/context creation rather than reusable worker/process startup.
+
 ## Choosing an Executor
 
 - Choose `QuickJsExecutor` when you want the default backend with the least operational friction.
