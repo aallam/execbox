@@ -425,7 +425,7 @@ export function runExecutorContractSuite(
     if (supportsPooling) {
       it("does not leak guest global state across pooled executions", async () => {
         const executor = createExecutor({
-          ...( { pool: { maxSize: 1 } } as object),
+          ...({ pool: { maxSize: 1 } } as object),
         } as ExecutorContractOptions);
         await (
           executor as { prewarm?(count?: number): Promise<void> }

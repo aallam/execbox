@@ -106,9 +106,7 @@ function createProcessShell(): ProcessShell {
 function createProcessTransport(child: ChildProcess): HostTransport {
   let terminated = false;
   let closeReason: TransportCloseReason | undefined;
-  const closeHandlers = new Set<
-    (reason?: TransportCloseReason) => void
-  >();
+  const closeHandlers = new Set<(reason?: TransportCloseReason) => void>();
   const errorHandlers = new Set<(error: Error) => void>();
   const messageHandlers = new Set<(message: RunnerMessage) => void>();
 
@@ -237,7 +235,9 @@ function resolvePoolOptions(
 }
 
 function isReusableResult(result: ExecuteResult): boolean {
-  return result.ok || !["internal_error", "timeout"].includes(result.error.code);
+  return (
+    result.ok || !["internal_error", "timeout"].includes(result.error.code)
+  );
 }
 
 /**
