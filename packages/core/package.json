@@ -1,6 +1,6 @@
 {
   "name": "@execbox/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Core execution contract, provider resolution, and MCP adapters.",
   "license": "MIT",
   "type": "module",
