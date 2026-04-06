@@ -40,6 +40,25 @@ const result = await executor.execute("await tools.echo({ ok: true })", [
 ]);
 ```
 
+## Pooling
+
+`WorkerExecutor` can reuse worker-thread shells between executions when you opt into pooling:
+
+```ts
+const executor = new WorkerExecutor({
+  pool: {
+    idleTimeoutMs: 30_000,
+    maxSize: 2,
+    prewarm: true,
+  },
+});
+
+await executor.prewarm?.(2);
+await executor.dispose?.();
+```
+
+Each execution still gets a fresh QuickJS runtime inside the worker. Pooling only reuses the worker shell.
+
 ## Security Notes
 
 - This package improves lifecycle isolation by moving the QuickJS runtime to a worker thread.

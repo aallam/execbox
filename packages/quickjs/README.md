@@ -63,3 +63,21 @@ const result = await executor.execute("await codemode.echo({ ok: true })", [
 ```
 
 Each execution runs in a fresh QuickJS runtime with timeout handling, captured logs, and JSON-only result and tool boundaries.
+
+## Pooling
+
+`QuickJsExecutor` accepts an optional `pool` config for host-side prewarming and lifecycle consistency with the transport-backed executors:
+
+```ts
+const executor = new QuickJsExecutor({
+  pool: {
+    maxSize: 1,
+    prewarm: true,
+  },
+});
+
+await executor.prewarm?.(1);
+await executor.dispose?.();
+```
+
+Pooling does not preserve guest globals or module state between executions. It only reuses the outer host-side shell.

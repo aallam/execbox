@@ -1,3 +1,5 @@
+import type { ExecutorPoolOptions } from "@execbox/core";
+
 /**
  * Optional V8 heap limits used only as a backstop for worker thread safety.
  */
@@ -19,6 +21,8 @@ export interface WorkerExecutorOptions {
   maxLogLines?: number;
   /** Guest memory limit in bytes enforced by QuickJS inside the worker. */
   memoryLimitBytes?: number;
+  /** Optional host-side shell pooling controls. */
+  pool?: ExecutorPoolOptions;
   /** Wall-clock execution timeout in milliseconds. */
   timeoutMs?: number;
   /** Optional Node worker heap limits used as a backstop only. */

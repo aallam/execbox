@@ -16,6 +16,17 @@ export function runExecutorContractSuite(
   createExecutor: ExecutorFactory,
 ): void {
   describe(label, () => {
+    it("exposes lifecycle methods for pooled execution", async () => {
+      const executor = createExecutor();
+
+      expect(typeof (executor as { dispose?: unknown }).dispose).toBe(
+        "function",
+      );
+      expect(typeof (executor as { prewarm?: unknown }).prewarm).toBe(
+        "function",
+      );
+    });
+
     it("returns simple expression results", async () => {
       const executor = createExecutor();
       const result = await executor.execute("1 + 1", []);
@@ -383,6 +394,33 @@ export function runExecutorContractSuite(
 
     it("does not leak guest global state across executions", async () => {
       const executor = createExecutor();
+      const firstResult = await executor.execute(
+        "globalThis.__execboxLeak = 123; 'stored'",
+        [],
+      );
+      const secondResult = await executor.execute(
+        "typeof globalThis.__execboxLeak",
+        [],
+      );
+
+      expect(firstResult).toMatchObject({
+        ok: true,
+        result: "stored",
+      });
+      expect(secondResult).toMatchObject({
+        ok: true,
+        result: "undefined",
+      });
+    });
+
+    it("does not leak guest global state across pooled executions", async () => {
+      const executor = createExecutor({
+        ...( { pool: { maxSize: 1 } } as object),
+      } as ExecutorContractOptions);
+      await (executor as { prewarm?(count?: number): Promise<void> }).prewarm?.(
+        1,
+      );
+
       const firstResult = await executor.execute(
         "globalThis.__execboxLeak = 123; 'stored'",
         [],

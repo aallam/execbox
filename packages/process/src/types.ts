@@ -1,3 +1,5 @@
+import type { ExecutorPoolOptions } from "@execbox/core";
+
 /**
  * Options for constructing a {@link ProcessExecutor}.
  */
@@ -10,6 +12,8 @@ export interface ProcessExecutorOptions {
   maxLogLines?: number;
   /** Guest memory limit in bytes enforced by QuickJS inside the child process. */
   memoryLimitBytes?: number;
+  /** Optional host-side shell pooling controls. */
+  pool?: ExecutorPoolOptions;
   /** Wall-clock execution timeout in milliseconds. */
   timeoutMs?: number;
 }

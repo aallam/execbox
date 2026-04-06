@@ -40,6 +40,25 @@ const result = await executor.execute("await tools.echo({ ok: true })", [
 ]);
 ```
 
+## Pooling
+
+`ProcessExecutor` can keep child processes warm between executions when you opt into pooling:
+
+```ts
+const executor = new ProcessExecutor({
+  pool: {
+    idleTimeoutMs: 30_000,
+    maxSize: 2,
+    prewarm: true,
+  },
+});
+
+await executor.prewarm?.(2);
+await executor.dispose?.();
+```
+
+Each execution still gets a fresh QuickJS runtime inside the child. Pooling only reuses the child-process shell.
+
 ## Security Notes
 
 - This package improves lifecycle isolation by moving the QuickJS runtime to a fresh child process.

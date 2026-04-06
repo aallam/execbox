@@ -11,6 +11,8 @@ Secure code execution for [Model Context Protocol](https://modelcontextprotocol.
 
 Execbox turns host tool catalogs into callable guest namespaces, supports MCP wrapping on both sides of the boundary, and lets you choose where guest JavaScript runs: in-process, in a worker, in a child process, or behind your own remote transport.
 
+QuickJS-backed executors can now reuse host-side shells with opt-in pooling. Pooled mode keeps the guest guarantee the same, with a fresh QuickJS runtime/context on every `execute()` call, while reusing expensive outer resources such as workers, child processes, or reusable remote transports.
+
 ## Package Map
 
 | Package                                           | npm                                                                                                                                   | What it is for                                                 |
@@ -30,6 +32,7 @@ Runnable examples live in [`examples/`](./examples/) and are indexed in [`exampl
 ## Docs
 
 - [Execbox Architecture Overview](./docs/architecture/README.md)
+- [QuickJS Pooling Baseline](./docs/performance/quickjs-pooling-baseline.md)
 
 ## Development
 
@@ -41,6 +44,7 @@ npm run lint
 npm run build
 npm run typecheck
 npm run examples
+npm run benchmark:quickjs-pooling
 ```
 
 Use `npm run verify:isolated-vm` when working on the native executor package. The required CI security lane also runs `npm run test:isolated-vm` on Node 24 with `--no-node-snapshot`.

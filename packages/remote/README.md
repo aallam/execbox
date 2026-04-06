@@ -46,7 +46,28 @@ const result = await executor.execute(
 attachQuickJsRemoteEndpoint(myRunnerPort);
 ```
 
-`RemoteExecutor` stays transport-agnostic. Your application owns the network stack and provides a fresh `HostTransport` per execution. `attachQuickJsRemoteEndpoint()` binds the shared QuickJS runner protocol to an app-provided remote port on the runner side.
+`RemoteExecutor` stays transport-agnostic. Your application owns the network stack and provides the `HostTransport` instances that execution runs on. `attachQuickJsRemoteEndpoint()` binds the shared QuickJS runner protocol to an app-provided remote port on the runner side.
+
+## Pooling
+
+`RemoteExecutor` can now pool reusable transports when you opt in:
+
+```ts
+const executor = new RemoteExecutor({
+  connectTransport: async () => myReusableHostTransport,
+  pool: {
+    idleTimeoutMs: 30_000,
+    maxSize: 2,
+    prewarm: true,
+  },
+  timeoutMs: 1_000,
+});
+
+await executor.prewarm?.(2);
+await executor.dispose?.();
+```
+
+When pooling is enabled, `connectTransport()` may supply a transport that can survive multiple execution sessions. Guest state is still fresh per `execute()` call; only the transport shell is reused.
 
 ## Security Notes
 

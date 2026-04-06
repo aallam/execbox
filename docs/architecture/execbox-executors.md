@@ -130,6 +130,17 @@ The four executors expose the same public result shape, but they enforce limits 
 - Worker-backed QuickJS improves lifecycle isolation and hard-stop behavior, but not process-level trust isolation.
 - Worker and process executors now share the same host-session and child-endpoint semantics, so most behavioral differences come from the transport boundary rather than from duplicated executor logic.
 
+## Pooled QuickJS Shells
+
+The QuickJS-backed executors now support an opt-in pooled mode. Pooling does not reuse guest runtime state. Instead, it keeps the expensive outer shell warm:
+
+- `QuickJsExecutor`: preloaded module/shell lifecycle
+- `WorkerExecutor`: reusable worker threads
+- `ProcessExecutor`: reusable child processes
+- `RemoteExecutor`: reusable caller-supplied transports
+
+Every `execute()` call still creates a fresh QuickJS runtime/context, reinjects providers, and discards guest globals afterward. Timeouts and internal transport failures evict the affected shell from the pool instead of returning it to circulation.
+
 ## Choosing an Executor
 
 - Choose `QuickJsExecutor` when you want the default backend with the least operational friction.
