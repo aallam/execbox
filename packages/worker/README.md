@@ -83,6 +83,7 @@ Call `dispose()` in long-lived applications and tests when you want deterministi
 - each `execute()` call sends one execute message to that endpoint, which starts a fresh `runQuickJsSession()` inside the worker
 - the parent acquires one pooled shell lease, runs `runHostTransportSession()` for that execution, then releases or evicts the lease when the session settles
 - pooled mode uses a borrowed transport wrapper because the host session always disposes its transport at the end of an execution, while the real pooled worker must stay alive for reuse
+- if all pooled workers are busy and the pool is already at `maxSize`, new executions wait in an internal FIFO queue until a shell is released or replaced
 
 Shell reuse rules are:
 
@@ -92,6 +93,8 @@ Shell reuse rules are:
 - idle workers are evicted after `idleTimeoutMs`
 
 The transport wrapper also caches the first unexpected close reason and replays it to late listeners. That prevents pooled executions from hanging if the worker exits before the host session has attached its close handler.
+
+Queue wait time is pool backpressure, not execution time. The configured execution timeout starts only after the lease has been acquired and the host transport session begins.
 
 ## Security Notes
 
