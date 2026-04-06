@@ -9,7 +9,7 @@ Worker-thread executor for `@execbox/core`, using the shared QuickJS runner behi
 
 - you want QuickJS semantics without running the runtime on the main thread
 - you want a worker termination backstop for timeouts
-- you are comfortable paying worker startup overhead per execution
+- you want pooled worker reuse by default, with explicit ephemeral opt-out when needed
 
 If you want the simplest default backend, use [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs) instead.
 
@@ -42,10 +42,11 @@ const result = await executor.execute("await tools.echo({ ok: true })", [
 
 ## Pooling
 
-`WorkerExecutor` can reuse worker-thread shells between executions when you opt into pooling:
+`WorkerExecutor` now defaults to pooled worker reuse. Each `execute()` call still gets a fresh QuickJS runtime/context inside the worker; only the outer worker shell is reused.
 
 ```ts
 const executor = new WorkerExecutor({
+  mode: "pooled",
   pool: {
     idleTimeoutMs: 30_000,
     maxSize: 2,
@@ -57,7 +58,22 @@ await executor.prewarm?.(2);
 await executor.dispose?.();
 ```
 
-Each execution still gets a fresh QuickJS runtime inside the worker. Pooling only reuses the worker shell.
+Use `mode: "ephemeral"` to keep the previous behavior of creating a fresh worker for every execution, even if a `pool` config is present:
+
+```ts
+const executor = new WorkerExecutor({
+  mode: "ephemeral",
+});
+```
+
+Default pooled settings are:
+
+- `maxSize: 1`
+- `minSize: 0`
+- `idleTimeoutMs: 30_000`
+- `prewarm: false`
+
+Call `dispose()` in long-lived applications and tests when you want deterministic cleanup of pooled workers.
 
 ## Security Notes
 

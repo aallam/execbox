@@ -9,6 +9,7 @@ import {
   type HostTransport,
   type ResourcePool,
   type RunnerMessage,
+  type TransportCloseReason,
 } from "@execbox/protocol";
 import {
   createTimeoutExecuteResult,
@@ -25,6 +26,12 @@ const DEFAULT_CANCEL_GRACE_MS = 25;
 const DEFAULT_MAX_LOG_CHARS = 64_000;
 const DEFAULT_MAX_LOG_LINES = 100;
 const DEFAULT_MEMORY_LIMIT_BYTES = 64 * 1024 * 1024;
+const DEFAULT_POOL_OPTIONS: Required<ExecutorPoolOptions> = {
+  idleTimeoutMs: 30_000,
+  maxSize: 1,
+  minSize: 0,
+  prewarm: false,
+};
 const DEFAULT_TIMEOUT_MS = 5000;
 
 interface WorkerShell {
@@ -67,6 +74,12 @@ function createBorrowedTransport(transport: HostTransport): HostTransport {
 
 function createWorkerTransport(worker: Worker): HostTransport {
   let terminated = false;
+  let closeReason: TransportCloseReason | undefined;
+  const closeHandlers = new Set<
+    (reason?: TransportCloseReason) => void
+  >();
+  const errorHandlers = new Set<(error: Error) => void>();
+  const messageHandlers = new Set<(message: RunnerMessage) => void>();
 
   const terminateWorker = async () => {
     if (terminated) {
@@ -77,30 +90,63 @@ function createWorkerTransport(worker: Worker): HostTransport {
     await worker.terminate().catch(() => {});
   };
 
+  const notifyClose = (reason: TransportCloseReason) => {
+    if (closeReason) {
+      return;
+    }
+
+    closeReason = reason;
+    for (const handler of closeHandlers) {
+      handler(reason);
+    }
+  };
+
+  const onExit = (code: number) => {
+    notifyClose({
+      code,
+      message: `Worker exited unexpectedly with code ${code}`,
+    });
+  };
+  const onError = (error: Error) => {
+    for (const handler of errorHandlers) {
+      handler(error);
+    }
+  };
+  const onMessage = (message: unknown) => {
+    for (const handler of messageHandlers) {
+      handler(message as RunnerMessage);
+    }
+  };
+
+  worker.on("exit", onExit);
+  worker.on("error", onError);
+  worker.on("message", onMessage);
+
   return {
     dispose: async () => {
+      worker.off("exit", onExit);
+      worker.off("error", onError);
+      worker.off("message", onMessage);
       await terminateWorker();
     },
     onClose: (handler) => {
-      const wrapped = (code: number) => {
-        handler({
-          code,
-          message: `Worker exited unexpectedly with code ${code}`,
+      closeHandlers.add(handler);
+      if (closeReason) {
+        queueMicrotask(() => {
+          if (closeHandlers.has(handler)) {
+            handler(closeReason);
+          }
         });
-      };
-      worker.on("exit", wrapped);
-      return () => worker.off("exit", wrapped);
+      }
+      return () => closeHandlers.delete(handler);
     },
     onError: (handler) => {
-      worker.on("error", handler);
-      return () => worker.off("error", handler);
+      errorHandlers.add(handler);
+      return () => errorHandlers.delete(handler);
     },
     onMessage: (handler) => {
-      const wrapped = (message: unknown) => {
-        handler(message as RunnerMessage);
-      };
-      worker.on("message", wrapped);
-      return () => worker.off("message", wrapped);
+      messageHandlers.add(handler);
+      return () => messageHandlers.delete(handler);
     },
     send: (message) => {
       worker.postMessage(message);
@@ -135,6 +181,19 @@ function getPrewarmCount(pool: ExecutorPoolOptions | undefined): number {
   return Math.max(1, Math.min(pool.minSize ?? 1, pool.maxSize));
 }
 
+function resolvePoolOptions(
+  options: WorkerExecutorOptions,
+): ExecutorPoolOptions | undefined {
+  if (options.mode === "ephemeral") {
+    return undefined;
+  }
+
+  return {
+    ...DEFAULT_POOL_OPTIONS,
+    ...options.pool,
+  };
+}
+
 function isReusableResult(result: ExecuteResult): boolean {
   return result.ok || !["internal_error", "timeout"].includes(result.error.code);
 }
@@ -154,17 +213,19 @@ export class WorkerExecutor implements Executor {
   constructor(options: WorkerExecutorOptions = {}) {
     this.cancelGraceMs = options.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS;
     this.options = options;
-    if (options.pool) {
+    const poolOptions = resolvePoolOptions(options);
+
+    if (poolOptions) {
       this.pool = createResourcePool({
         create: async () => createWorkerShell(options),
         destroy: async (shell) => {
           await shell.transport.dispose();
         },
-        idleTimeoutMs: options.pool.idleTimeoutMs,
-        maxSize: options.pool.maxSize,
-        minSize: options.pool.minSize,
+        idleTimeoutMs: poolOptions.idleTimeoutMs,
+        maxSize: poolOptions.maxSize,
+        minSize: poolOptions.minSize,
       });
-      const prewarmCount = getPrewarmCount(options.pool);
+      const prewarmCount = getPrewarmCount(poolOptions);
       if (prewarmCount > 0) {
         this.warmup = this.pool.prewarm(prewarmCount);
       }
@@ -186,7 +247,8 @@ export class WorkerExecutor implements Executor {
   }
 
   /**
-   * Executes JavaScript inside a fresh worker thread running QuickJS.
+   * Executes JavaScript inside a fresh QuickJS runtime running in either a
+   * pooled or ephemeral worker shell.
    */
   async execute(
     code: string,

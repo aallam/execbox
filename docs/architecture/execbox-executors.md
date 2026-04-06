@@ -8,9 +8,9 @@ This page explains how the current executor packages differ and what trade-offs 
 | ---------------------- | -------------------------------------- | --------------------------------- | ------------------------------------------------ | ---------------------------------------------------- |
 | `@execbox/quickjs`     | Fresh in-process QuickJS runtime       | Shared runner callback            | No native addon, simple install, default backend | Still in-process                                     |
 | `@execbox/remote`      | App-defined remote transport boundary  | Shared host session + transport   | Same API across a remote boundary                | You own transport/runtime deployment                 |
-| `@execbox/process`     | Child process + fresh QuickJS runtime  | Shared host session + IPC         | Hard-kill process termination, stronger split    | Process startup overhead, still not a container/VM   |
+| `@execbox/process`     | Child process + fresh QuickJS runtime  | Shared host session + IPC         | Hard-kill process termination, pooled by default | Still not a container/VM; ephemeral mode is slower   |
 | `@execbox/isolated-vm` | Fresh in-process `isolated-vm` context | Shared runner callback + ivm refs | Native V8 isolate semantics, no worker startup   | Native addon, `--no-node-snapshot`, still in-process |
-| `@execbox/worker`      | Worker thread + fresh QuickJS runtime  | Shared host session + messages    | Hard-stop worker termination, off-thread runtime | Worker startup overhead, still same OS process       |
+| `@execbox/worker`      | Worker thread + fresh QuickJS runtime  | Shared host session + messages    | Hard-stop worker termination, pooled by default  | Still same OS process; ephemeral mode is slower      |
 
 ```mermaid
 flowchart LR
@@ -69,7 +69,7 @@ This is a cleaner maintainability point than the previous design: the package st
 
 ## Worker-Backed QuickJS
 
-`WorkerExecutor` uses a worker thread for lifecycle isolation, but it does not invent a second scripting model. It loads the same QuickJS session runner used by the in-process QuickJS executor, reuses the shared QuickJS protocol endpoint inside the worker, and uses the shared `execbox-protocol` host session on the parent side.
+`WorkerExecutor` uses a worker thread for lifecycle isolation, but it does not invent a second scripting model. It loads the same QuickJS session runner used by the in-process QuickJS executor, reuses the shared QuickJS protocol endpoint inside the worker, and uses the shared `execbox-protocol` host session on the parent side. By default it keeps a worker shell warm between executions; `mode: "ephemeral"` restores the old fresh-worker-per-call lifecycle.
 
 ```mermaid
 sequenceDiagram
@@ -90,7 +90,7 @@ sequenceDiagram
 
 ## Process-Backed QuickJS
 
-`ProcessExecutor` uses a fresh child process per execution, but otherwise follows the same message-driven model as the worker executor. It loads the same QuickJS session runner used by the in-process QuickJS executor, reuses the same QuickJS protocol endpoint inside the child, and uses the shared `execbox-protocol` host session on the parent side.
+`ProcessExecutor` uses the same message-driven model as the worker executor, but runs it behind a child-process boundary. It loads the same QuickJS session runner used by the in-process QuickJS executor, reuses the same QuickJS protocol endpoint inside the child, and uses the shared `execbox-protocol` host session on the parent side. By default it keeps a child-process shell warm between executions; `mode: "ephemeral"` restores the old fresh-child-per-call lifecycle.
 
 ```mermaid
 sequenceDiagram
@@ -132,12 +132,10 @@ The four executors expose the same public result shape, but they enforce limits 
 
 ## Pooled QuickJS Shells
 
-The QuickJS-backed executors now support an opt-in pooled mode. Pooling does not reuse guest runtime state. Instead, it keeps the expensive outer shell warm:
+The QuickJS-backed executors that benefit from pooling can keep the expensive outer shell warm without reusing guest runtime state:
 
-- `QuickJsExecutor`: preloaded module/shell lifecycle
-- `WorkerExecutor`: reusable worker threads
-- `ProcessExecutor`: reusable child processes
-- `RemoteExecutor`: reusable caller-supplied transports
+- `WorkerExecutor`: pooled-by-default reusable worker threads, with `mode: "ephemeral"` opt-out
+- `ProcessExecutor`: pooled-by-default reusable child processes, with `mode: "ephemeral"` opt-out
 
 Every `execute()` call still creates a fresh QuickJS runtime/context, reinjects providers, and discards guest globals afterward. Timeouts and internal transport failures evict the affected shell from the pool instead of returning it to circulation.
 
@@ -145,6 +143,6 @@ Every `execute()` call still creates a fresh QuickJS runtime/context, reinjects 
 
 - Choose `QuickJsExecutor` when you want the default backend with the least operational friction.
 - Choose `RemoteExecutor` when you want the same execution API but need the runtime to live behind an application-defined transport boundary.
-- Choose `ProcessExecutor` when you want the QuickJS semantics in a fresh child process with a hard-kill timeout path.
+- Choose `ProcessExecutor` when you want the QuickJS semantics behind a child-process boundary with a hard-kill timeout path and low-latency pooled reuse by default.
 - Choose `IsolatedVmExecutor` when you explicitly want `isolated-vm` and can support its native/runtime constraints.
-- Choose `WorkerExecutor` when you want the QuickJS semantics but prefer the runtime to live off the main thread with a hard-stop termination path.
+- Choose `WorkerExecutor` when you want the QuickJS semantics off the main thread with a hard-stop termination path and low-latency pooled reuse by default.

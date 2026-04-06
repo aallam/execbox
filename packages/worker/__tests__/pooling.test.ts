@@ -50,16 +50,27 @@ describe("WorkerExecutor pooling", () => {
     state.workers = [];
   });
 
-  it("reuses one worker for sequential pooled executions", async () => {
+  it("reuses one worker for sequential executions by default", async () => {
+    const { WorkerExecutor } = await import("../src/index");
+    const executor = new WorkerExecutor();
+
+    await executor.execute("1 + 1", []);
+    await executor.execute("1 + 1", []);
+
+    expect(state.workers).toHaveLength(1);
+  });
+
+  it("uses a fresh worker per execution in ephemeral mode", async () => {
     const { WorkerExecutor } = await import("../src/index");
     const executor = new WorkerExecutor({
+      mode: "ephemeral",
       pool: { maxSize: 1 },
     } as never);
 
     await executor.execute("1 + 1", []);
     await executor.execute("1 + 1", []);
 
-    expect(state.workers).toHaveLength(1);
+    expect(state.workers).toHaveLength(2);
   });
 
   it("evicts a pooled worker after a timeout result", async () => {

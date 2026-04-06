@@ -1,5 +1,5 @@
 import type { HostTransport, TransportCloseReason } from "@execbox/protocol";
-import type { ExecutorPoolOptions, ExecutorRuntimeOptions } from "@execbox/core";
+import type { ExecutorRuntimeOptions } from "@execbox/core";
 
 /**
  * Factory that creates a fresh transport connection for one remote execution.
@@ -26,5 +26,4 @@ export interface RemoteRunnerPort {
 export interface RemoteExecutorOptions extends ExecutorRuntimeOptions {
   cancelGraceMs?: number;
   connectTransport: RemoteTransportFactory;
-  pool?: ExecutorPoolOptions;
 }

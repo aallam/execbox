@@ -5,16 +5,7 @@ import {
   type Executor,
   type ResolvedToolProvider,
 } from "@execbox/core";
-import type {
-  DispatcherMessage,
-  HostTransport,
-  RunnerMessage,
-  TransportCloseReason,
-} from "@execbox/protocol";
-import { attachQuickJsProtocolEndpoint } from "@execbox/quickjs/runner/protocol-endpoint";
 import { ProcessExecutor } from "@execbox/process";
-import { QuickJsExecutor } from "@execbox/quickjs";
-import { RemoteExecutor } from "@execbox/remote";
 import { WorkerExecutor } from "@execbox/worker";
 
 interface BenchmarkCase {
@@ -25,7 +16,7 @@ interface BenchmarkCase {
 
 interface BenchmarkVariant {
   createExecutor: () => Executor;
-  mode: "one-shot" | "pooled";
+  mode: "ephemeral" | "pooled";
   name: string;
 }
 
@@ -65,77 +56,6 @@ function percentile(samples: number[], rank: number): number {
 
 function formatMs(value: number): string {
   return `${value.toFixed(2)}ms`;
-}
-
-function createLoopbackRemoteTransport(): HostTransport {
-  const closeHandlers = new Set<(reason?: TransportCloseReason) => void>();
-  const errorHandlers = new Set<(error: Error) => void>();
-  const hostMessageHandlers = new Set<(message: RunnerMessage) => void>();
-  const runnerMessageHandlers = new Set<
-    (message: DispatcherMessage) => void
-  >();
-  let closed = false;
-
-  const detachRunner = attachQuickJsProtocolEndpoint({
-    onMessage(handler) {
-      runnerMessageHandlers.add(handler);
-      return () => runnerMessageHandlers.delete(handler);
-    },
-    send(message) {
-      queueMicrotask(() => {
-        for (const handler of hostMessageHandlers) {
-          handler(message);
-        }
-      });
-    },
-  });
-
-  const emitClose = (reason?: TransportCloseReason) => {
-    if (closed) {
-      return;
-    }
-
-    closed = true;
-    for (const handler of closeHandlers) {
-      handler(reason);
-    }
-    detachRunner();
-  };
-
-  return {
-    dispose() {
-      emitClose({ message: "Remote transport disposed" });
-    },
-    onClose(handler) {
-      closeHandlers.add(handler);
-      return () => closeHandlers.delete(handler);
-    },
-    onError(handler) {
-      errorHandlers.add(handler);
-      return () => errorHandlers.delete(handler);
-    },
-    onMessage(handler) {
-      hostMessageHandlers.add(handler);
-      return () => hostMessageHandlers.delete(handler);
-    },
-    send(message) {
-      if (closed) {
-        for (const handler of errorHandlers) {
-          handler(new Error("Remote transport is closed"));
-        }
-        return;
-      }
-
-      queueMicrotask(() => {
-        for (const handler of runnerMessageHandlers) {
-          handler(message);
-        }
-      });
-    },
-    terminate() {
-      emitClose({ message: "Remote transport terminated" });
-    },
-  };
 }
 
 async function runBenchmarkCase(
@@ -230,18 +150,8 @@ const pooledConfig = {
 
 const variants: BenchmarkVariant[] = [
   {
-    createExecutor: () => new QuickJsExecutor(),
-    mode: "one-shot",
-    name: "quickjs",
-  },
-  {
-    createExecutor: () => new QuickJsExecutor(pooledConfig),
-    mode: "pooled",
-    name: "quickjs",
-  },
-  {
-    createExecutor: () => new ProcessExecutor(),
-    mode: "one-shot",
+    createExecutor: () => new ProcessExecutor({ mode: "ephemeral" }),
+    mode: "ephemeral",
     name: "process",
   },
   {
@@ -250,31 +160,14 @@ const variants: BenchmarkVariant[] = [
     name: "process",
   },
   {
-    createExecutor: () => new WorkerExecutor(),
-    mode: "one-shot",
+    createExecutor: () => new WorkerExecutor({ mode: "ephemeral" }),
+    mode: "ephemeral",
     name: "worker",
   },
   {
     createExecutor: () => new WorkerExecutor(pooledConfig),
     mode: "pooled",
     name: "worker",
-  },
-  {
-    createExecutor: () =>
-      new RemoteExecutor({
-        connectTransport: async () => createLoopbackRemoteTransport(),
-      }),
-    mode: "one-shot",
-    name: "remote",
-  },
-  {
-    createExecutor: () =>
-      new RemoteExecutor({
-        connectTransport: async () => createLoopbackRemoteTransport(),
-        ...pooledConfig,
-      }),
-    mode: "pooled",
-    name: "remote",
   },
 ];
 

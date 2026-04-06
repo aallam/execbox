@@ -1,2 +1,2 @@
 export { ProcessExecutor } from "./processExecutor";
-export type { ProcessExecutorOptions } from "./types";
+export type { ProcessExecutorMode, ProcessExecutorOptions } from "./types";

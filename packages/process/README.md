@@ -9,7 +9,7 @@ Child-process executor for `@execbox/core`, using the shared QuickJS runner behi
 
 - you want QuickJS semantics with a stronger lifecycle boundary than worker threads
 - you want to hard-kill the execution process on timeout
-- you are comfortable paying child-process startup overhead per execution
+- you want pooled child-process reuse by default, with explicit ephemeral opt-out when needed
 
 If you want the simplest default backend, use [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs) instead.
 
@@ -42,10 +42,11 @@ const result = await executor.execute("await tools.echo({ ok: true })", [
 
 ## Pooling
 
-`ProcessExecutor` can keep child processes warm between executions when you opt into pooling:
+`ProcessExecutor` now defaults to pooled child-process reuse. Each `execute()` call still gets a fresh QuickJS runtime/context inside the child; only the outer child-process shell is reused.
 
 ```ts
 const executor = new ProcessExecutor({
+  mode: "pooled",
   pool: {
     idleTimeoutMs: 30_000,
     maxSize: 2,
@@ -57,7 +58,22 @@ await executor.prewarm?.(2);
 await executor.dispose?.();
 ```
 
-Each execution still gets a fresh QuickJS runtime inside the child. Pooling only reuses the child-process shell.
+Use `mode: "ephemeral"` to keep the previous behavior of creating a fresh child process for every execution, even if a `pool` config is present:
+
+```ts
+const executor = new ProcessExecutor({
+  mode: "ephemeral",
+});
+```
+
+Default pooled settings are:
+
+- `maxSize: 1`
+- `minSize: 0`
+- `idleTimeoutMs: 30_000`
+- `prewarm: false`
+
+Call `dispose()` in long-lived applications and tests when you want deterministic cleanup of pooled child processes.
 
 ## Security Notes
 

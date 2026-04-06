@@ -52,16 +52,27 @@ describe("ProcessExecutor pooling", () => {
     state.transports = [];
   });
 
-  it("reuses one child process for sequential pooled executions", async () => {
+  it("reuses one child process for sequential executions by default", async () => {
+    const { ProcessExecutor } = await import("../src/index");
+    const executor = new ProcessExecutor();
+
+    await executor.execute("1 + 1", []);
+    await executor.execute("1 + 1", []);
+
+    expect(state.children).toHaveLength(1);
+  });
+
+  it("uses a fresh child process per execution in ephemeral mode", async () => {
     const { ProcessExecutor } = await import("../src/index");
     const executor = new ProcessExecutor({
+      mode: "ephemeral",
       pool: { maxSize: 1 },
     } as never);
 
     await executor.execute("1 + 1", []);
     await executor.execute("1 + 1", []);
 
-    expect(state.children).toHaveLength(1);
+    expect(state.children).toHaveLength(2);
   });
 
   it("evicts a pooled child after a timeout result", async () => {
