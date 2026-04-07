@@ -5,6 +5,8 @@ Worker-thread executor for `@execbox/core`, using the shared QuickJS runner behi
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fworker?style=flat-square)](https://www.npmjs.com/package/@execbox/worker)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
 
+Docs: https://execbox.aallam.com
+
 ## Choose `execbox-worker` When
 
 - you want QuickJS semantics without running the runtime on the main thread

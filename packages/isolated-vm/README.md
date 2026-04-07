@@ -5,6 +5,8 @@
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fisolated-vm?style=flat-square)](https://www.npmjs.com/package/@execbox/isolated-vm)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
 
+Docs: https://execbox.aallam.com
+
 ## Choose `isolated-vm` When
 
 - you explicitly want the `isolated-vm` runtime instead of QuickJS

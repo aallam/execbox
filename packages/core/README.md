@@ -5,6 +5,8 @@ Executor-agnostic core for guest JavaScript that can call host tools directly or
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fcore?style=flat-square)](https://www.npmjs.com/package/@execbox/core)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
 
+Docs: https://execbox.aallam.com
+
 ## What You Get
 
 - Resolve host tools into deterministic guest namespaces with name sanitization.

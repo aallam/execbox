@@ -5,6 +5,8 @@ Child-process executor for `@execbox/core`, using the shared QuickJS runner behi
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fprocess?style=flat-square)](https://www.npmjs.com/package/@execbox/process)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
 
+Docs: https://execbox.aallam.com
+
 ## Choose `execbox-process` When
 
 - you want QuickJS semantics with a stronger lifecycle boundary than worker threads

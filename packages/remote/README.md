@@ -5,6 +5,8 @@ Transport-backed remote executor for `@execbox/core`.
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fremote?style=flat-square)](https://www.npmjs.com/package/@execbox/remote)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
 
+Docs: https://execbox.aallam.com
+
 ## Choose `execbox-remote` When
 
 - you want execbox execution to live outside the application process
