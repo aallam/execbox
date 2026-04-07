@@ -11,8 +11,6 @@ Secure code execution for [Model Context Protocol](https://modelcontextprotocol.
 
 Execbox turns host tool catalogs into callable guest namespaces, supports MCP wrapping on both sides of the boundary, and lets you choose where guest JavaScript runs: in-process, in a worker, in a child process, or behind your own remote transport.
 
-The transport-backed QuickJS executors that benefit from pooling reuse host-side shells. `@execbox/process` and `@execbox/worker` default to pooled shells while still creating a fresh QuickJS runtime/context on every `execute()` call. `@execbox/quickjs` and `@execbox/remote` stay ephemeral.
-
 ## Package Map
 
 | Package                                           | npm                                                                                                                                   | What it is for                                                 |
