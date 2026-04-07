@@ -5,6 +5,8 @@ Transport-safe messages and host-session helpers for transport-backed execbox ru
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fprotocol?style=flat-square)](https://www.npmjs.com/package/@execbox/protocol)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
 
+Docs: https://execbox.aallam.com
+
 ## What This Package Is For
 
 This is a low-level package for building transport-backed execbox runtimes. It does not execute guest code by itself.

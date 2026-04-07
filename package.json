@@ -19,6 +19,9 @@
   "scripts": {
     "build": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && npm run build --workspace @execbox/isolated-vm",
     "clean": "rm -rf coverage dist packages/*/dist",
+    "docs:build": "vitepress build docs",
+    "docs:dev": "vitepress dev docs",
+    "docs:preview": "vitepress preview docs",
     "example:execbox": "node --import tsx examples/execbox-basic.ts",
     "example:execbox-isolated-vm": "NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot --import tsx examples/execbox-isolated-vm-basic.ts",
     "example:execbox-mcp-provider": "node --import tsx examples/execbox-mcp-provider.ts",
@@ -51,11 +54,14 @@
     "eslint-plugin-jsdoc": "^62.8.0",
     "eslint-plugin-security": "^4.0.0",
     "globals": "^17.4.0",
+    "mermaid": "^11.14.0",
     "prettier": "^3.0.0",
     "tsdown": "^0.16.8",
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.55.0",
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-mermaid": "^2.0.17",
     "vitest": "^3.2.4"
   }
 }
