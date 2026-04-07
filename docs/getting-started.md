@@ -1,6 +1,6 @@
 # Getting Started
 
-Execbox works best when you start small: define one provider, run one snippet, then choose a stronger boundary only when your deployment needs it.
+Execbox works best when you start with QuickJS, get one provider flow working, and then choose a stronger boundary only when your deployment needs it.
 
 ## Requirements
 
@@ -46,7 +46,7 @@ console.log(result);
 
 ## Which package should I use?
 
-- Use `@execbox/quickjs` first unless you already know you need a stronger boundary.
+- Use `@execbox/quickjs` first unless you already know you need a separate runtime boundary.
 - Use `@execbox/process` when you want QuickJS semantics in a separate child process.
 - Use `@execbox/worker` when you want QuickJS off the main thread with pooled workers.
 - Use `@execbox/remote` when your runtime already lives behind an application-owned transport.

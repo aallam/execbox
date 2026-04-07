@@ -1,6 +1,6 @@
 # Security & Boundaries
 
-Execbox reduces accidental exposure, but it does not market itself as a hard security boundary for hostile code in its default deployment model.
+Execbox provides defense-in-depth controls for guest code execution. The isolation level you get depends on the executor and deployment boundary you choose.
 
 ## What execbox does provide
 
@@ -21,7 +21,7 @@ Execbox reduces accidental exposure, but it does not market itself as a hard sec
 
 The provider/tool surface is the capability boundary.
 
-If guest code can call a dangerous tool, guest code can exercise that authority. Execbox changes how tool access is exposed and controlled; it does not erase the authority behind the tool itself.
+Providers are explicit capability grants. If guest code can call a dangerous tool, guest code can exercise that authority. Execbox changes how tool access is exposed and controlled; it does not erase the authority behind the tool itself.
 
 ## Choosing the right boundary
 

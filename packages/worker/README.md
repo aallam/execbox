@@ -100,8 +100,8 @@ Queue wait time is pool backpressure, not execution time. The configured executi
 
 ## Security Notes
 
-- This package improves lifecycle isolation by moving the QuickJS runtime to a worker thread.
-- It is still same-process execution and is not documented as a hard hostile-code boundary.
+- This package moves the QuickJS runtime to a worker thread for better lifecycle isolation.
+- It remains same-process execution, so hard isolation depends on a stronger boundary than a worker thread alone.
 - Providers remain the real capability boundary.
 - Internally it is a thin transport adapter over the shared `execbox-protocol` host session and the shared QuickJS protocol endpoint.
 

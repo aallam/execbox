@@ -11,7 +11,7 @@ Docs: https://execbox.aallam.com
 
 - you want execbox execution to live outside the application process
 - you already own the transport and runtime deployment shape
-- you want to keep the same `Executor` API while swapping in a stronger boundary
+- you want to keep the same `Executor` API while placing execution behind an application-defined boundary
 
 ## Install
 
@@ -21,9 +21,11 @@ npm install @execbox/core @execbox/remote
 
 ## Usage
 
+Host side:
+
 ```ts
 import { resolveProvider } from "@execbox/core";
-import { RemoteExecutor, attachQuickJsRemoteEndpoint } from "@execbox/remote";
+import { RemoteExecutor } from "@execbox/remote";
 
 const provider = resolveProvider({
   name: "tools",
@@ -44,6 +46,12 @@ const result = await executor.execute(
   [provider],
   { timeoutMs: 250 },
 );
+```
+
+Runner side:
+
+```ts
+import { attachQuickJsRemoteEndpoint } from "@execbox/remote";
 
 attachQuickJsRemoteEndpoint(myRunnerPort);
 ```
@@ -54,8 +62,8 @@ attachQuickJsRemoteEndpoint(myRunnerPort);
 
 ## Security Notes
 
-- This package improves the process boundary by moving execution behind a caller-supplied transport.
-- It is still not a hard security boundary by itself. Your actual trust boundary depends on the remote runtime you deploy.
+- This package moves execution behind a caller-supplied transport.
+- The actual trust boundary depends on the remote runtime and operational controls you deploy behind that transport.
 - Providers remain the capability boundary.
 - The package is intentionally small: it does not create servers, own authentication, or prescribe an HTTP/WebSocket framework.
 

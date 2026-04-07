@@ -122,7 +122,7 @@ The four executors expose the same public result shape, but they enforce limits 
 
 ## Security and Operational Trade-offs
 
-- All four executors are documented as best-effort isolation, not hard hostile-code boundaries.
+- All four executors provide defense-in-depth measures, not standalone hard hostile-code boundaries.
 - QuickJS is the easiest operational default and has the cleanest shared runtime story.
 - Remote execution keeps the same executor API while moving the runtime behind an app-defined boundary, but execbox deliberately does not ship the network stack for you.
 - Process-backed QuickJS gives a stronger lifecycle split than worker threads, but it is still not equivalent to a container or VM boundary.

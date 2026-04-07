@@ -39,7 +39,7 @@ npm install @execbox/core @execbox/isolated-vm
 
 - Each execution gets a fresh `isolated-vm` context with JSON-only tool and result boundaries.
 - In the default deployment model, provider definitions are controlled by the host application, while hostile users control guest code and tool inputs.
-- This package is still in-process execution. It should not be marketed or relied on as a hard security boundary for hostile code.
+- This package is still in-process execution. It is not a substitute for a separate trust boundary such as a container or VM.
 - Providers remain the real capability boundary. If a tool is dangerous, guest code can invoke it.
 
 ## Architecture Docs
@@ -78,4 +78,4 @@ npm run verify:isolated-vm
 
 The required CI lane runs the isolated-vm suite on Node 24 with `--no-node-snapshot`, which is the best local environment to match when validating native-runtime changes.
 
-`isolated-vm` is not documented here as a hard security boundary. If process stability matters more than in-process performance, prefer process isolation around the executor.
+If process stability and trust separation matter more than in-process performance, prefer process or remote isolation around the executor.

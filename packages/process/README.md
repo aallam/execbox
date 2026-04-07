@@ -101,7 +101,7 @@ Queue wait time is pool backpressure, not execution time. The configured executi
 ## Security Notes
 
 - This package improves lifecycle isolation by moving the QuickJS runtime to a fresh child process.
-- It is still not documented as a hard hostile-code boundary equivalent to a container or VM.
+- It strengthens the lifecycle boundary, but it is still not equivalent to a container or VM for hostile code.
 - Providers remain the real capability boundary.
 - Internally it is a thin transport adapter over the shared `execbox-protocol` host session and the shared QuickJS protocol endpoint.
 

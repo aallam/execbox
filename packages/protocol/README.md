@@ -38,7 +38,7 @@ npm install @execbox/core @execbox/protocol
 
 - This package is protocol glue, not a sandbox.
 - It does not provide isolation by itself.
-- The host tool surface remains the real capability boundary.
+- The host tool surface remains the capability boundary.
 - Worker/process lifecycle isolation comes from the surrounding executor package, not from this package alone.
 
 ## Architecture Docs
