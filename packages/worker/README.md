@@ -42,7 +42,7 @@ const result = await executor.execute("await tools.echo({ ok: true })", [
 
 ## Pooling
 
-`WorkerExecutor` now defaults to pooled worker reuse. Each `execute()` call still gets a fresh QuickJS runtime/context inside the worker; only the outer worker shell is reused.
+`WorkerExecutor` defaults to pooled worker reuse. Each `execute()` call still gets a fresh QuickJS runtime/context inside the worker; only the outer worker shell is reused.
 
 ```ts
 const executor = new WorkerExecutor({
@@ -58,7 +58,7 @@ await executor.prewarm?.(2);
 await executor.dispose?.();
 ```
 
-Use `mode: "ephemeral"` to keep the previous behavior of creating a fresh worker for every execution, even if a `pool` config is present:
+Use `mode: "ephemeral"` when you want a fresh worker for every execution, even if a `pool` config is present:
 
 ```ts
 const executor = new WorkerExecutor({

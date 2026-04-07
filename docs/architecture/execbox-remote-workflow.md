@@ -1,6 +1,6 @@
 # Execbox Remote Execution Workflow
 
-This page explains how `@execbox/remote` fits into the current execbox architecture, with emphasis on where code runs, when the transport is opened, and how guest tool calls pause and resume.
+This page explains how `@execbox/remote` fits into the execbox architecture, with emphasis on where code runs, when the transport is opened, and how guest tool calls pause and resume.
 
 Use this page when you want the control-flow story. For the wire-format reference, read [execbox-protocol-reference.md](./execbox-protocol-reference.md). For the normative runner specification, read [execbox-runner-specification.md](./execbox-runner-specification.md).
 

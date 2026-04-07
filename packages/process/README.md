@@ -42,7 +42,7 @@ const result = await executor.execute("await tools.echo({ ok: true })", [
 
 ## Pooling
 
-`ProcessExecutor` now defaults to pooled child-process reuse. Each `execute()` call still gets a fresh QuickJS runtime/context inside the child; only the outer child-process shell is reused.
+`ProcessExecutor` defaults to pooled child-process reuse. Each `execute()` call still gets a fresh QuickJS runtime/context inside the child; only the outer child-process shell is reused.
 
 ```ts
 const executor = new ProcessExecutor({
@@ -58,7 +58,7 @@ await executor.prewarm?.(2);
 await executor.dispose?.();
 ```
 
-Use `mode: "ephemeral"` to keep the previous behavior of creating a fresh child process for every execution, even if a `pool` config is present:
+Use `mode: "ephemeral"` when you want a fresh child process for every execution, even if a `pool` config is present:
 
 ```ts
 const executor = new ProcessExecutor({
