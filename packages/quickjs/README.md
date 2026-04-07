@@ -18,8 +18,8 @@ Docs: https://execbox.aallam.com
 - Each execution gets a fresh QuickJS runtime with no ambient Node globals injected by execbox.
 - Tool calls cross a JSON-only bridge, and executor timeouts propagate abort signals to in-flight provider work.
 - In the default deployment model, provider definitions are controlled by the host application, while hostile users control guest code and tool inputs.
-- This package is not presented as a hard security boundary for hostile code. It is best-effort in-process isolation.
-- If you need a stronger boundary, run execbox behind a separate process or container.
+- This package is designed for host-controlled deployments and does not by itself create a hard isolation boundary for hostile code.
+- If you need a stronger boundary, move execution into a separate process, container, or remote runtime.
 
 ## Architecture Docs
 

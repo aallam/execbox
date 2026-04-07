@@ -50,7 +50,7 @@ Swap in `@execbox/remote` when you want the same API but a caller-managed remote
 ## Security Posture
 
 - Execbox gives you fresh execution state, JSON-only tool boundaries, schema validation, timeout handling, memory limits, and bounded logs.
-- Execbox does not give you a hard security boundary for hostile code by itself. The actual boundary depends on which executor you pair it with.
+- Hard isolation depends on the executor and deployment boundary you pair with `@execbox/core`.
 - Providers are explicit capability grants. Every tool you expose is authority you are handing to guest code.
 - In the default deployment model, provider and MCP tool definitions are controlled by the application, not by the end user.
 - Third-party MCP integrations should be reviewed as dependency-trust decisions, not folded into the primary end-user attacker model.

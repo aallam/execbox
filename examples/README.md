@@ -5,7 +5,7 @@ Runnable examples for the `@execbox/*` package family.
 [![Examples](https://img.shields.io/badge/examples-runnable-0ea5e9?style=flat-square)](https://github.com/aallam/execbox/tree/main/examples)
 [![CI](https://img.shields.io/github/actions/workflow/status/aallam/execbox/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/aallam/execbox/actions/workflows/ci.yml)
 
-## Run Them
+## Run the examples
 
 ```bash
 npm install
@@ -19,6 +19,8 @@ The `isolated-vm` example stays on its own lane because it depends on the native
 npm run example:execbox-isolated-vm
 npm run verify:isolated-vm
 ```
+
+See the public [Examples docs](https://execbox.aallam.com/examples) for when to start with each example.
 
 ## Execbox
 

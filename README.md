@@ -2,7 +2,7 @@
 
 # execbox
 
-Secure code execution for [Model Context Protocol](https://modelcontextprotocol.io/) tools and wrapped MCP servers.
+Portable code execution for [Model Context Protocol](https://modelcontextprotocol.io/) tools and wrapped MCP servers.
 
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
 [![Docs](https://img.shields.io/badge/docs-site-0ea5e9?style=flat-square)](https://execbox.aallam.com)
@@ -10,7 +10,7 @@ Secure code execution for [Model Context Protocol](https://modelcontextprotocol.
 
 </div>
 
-Execbox turns host tool catalogs into callable guest namespaces, supports MCP wrapping on both sides of the boundary, and lets you choose where guest JavaScript runs: in-process, in a worker, in a child process, or behind your own remote transport.
+Execbox turns host tool catalogs into callable guest namespaces, supports MCP wrapping on both sides of the boundary, and lets you place guest JavaScript where it fits your deployment: in-process, in a worker, in a child process, or behind your own remote transport.
 
 ## Package Map
 

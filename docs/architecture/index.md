@@ -56,11 +56,11 @@ At a high level, execbox always follows the same model:
 
 ## Trust model and security posture
 
-Execbox reduces accidental exposure, but it does not claim a hard security boundary for hostile code in its default deployment model.
+Execbox provides defense-in-depth controls around guest execution, but hard isolation still depends on the executor and deployment boundary you choose.
 
 Key implications:
 
-- The real capability boundary is the provider/tool surface, not the JavaScript syntax itself.
+- The provider/tool surface is the capability boundary, not the JavaScript syntax itself.
 - Fresh runtimes, schema validation, JSON-only boundaries, timeouts, memory limits, and bounded logs are defense-in-depth features.
 - In-process execution still shares the host process. Use a separate process, container, VM, or similar boundary when the code source is hostile or multi-tenant.
 - Wrapping third-party MCP servers is a separate dependency-trust decision from letting end users author guest code.

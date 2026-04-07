@@ -6,7 +6,7 @@ titleTemplate: false
 hero:
   name: execbox
   text: Portable code execution for MCP tools
-  tagline: Turn host tool catalogs into callable code, choose the execution boundary that fits your deployment, and keep your security claims honest.
+  tagline: Turn host tool catalogs into callable code, add defense-in-depth controls around guest execution, and choose the boundary that fits your deployment.
   actions:
     - theme: brand
       text: Getting Started
@@ -49,10 +49,10 @@ That split gives you one execution contract across QuickJS, worker-thread, child
 
 ## Security posture
 
-Execbox is intentionally conservative about its claims:
+Execbox provides defense-in-depth controls around guest code execution:
 
 - It provides fresh runtimes, JSON-only boundaries, schema validation, bounded logs, and execution limits.
-- It does **not** claim a hard security boundary for hostile code in its default deployment model.
-- The real capability boundary is the provider/tool surface you expose.
+- Hard isolation depends on the executor and deployment boundary you choose.
+- The provider/tool surface is the capability boundary.
 
 Read [Security](/security) before deciding which executor to use in production.
