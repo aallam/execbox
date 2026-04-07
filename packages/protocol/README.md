@@ -9,15 +9,14 @@ Transport-safe messages and host-session helpers for transport-backed execbox ru
 
 This is a low-level package for building transport-backed execbox runtimes. It does not execute guest code by itself.
 
-It currently provides:
+It provides:
 
 - runner/dispatcher message types
-- a shared host transport session for worker/process-style executors
-- the same host transport session shape used by `@execbox/remote`
+- a shared host transport session for process, worker, and remote executors
+- a reusable async resource pool for host-side shell reuse
 - transport-facing access to the shared manifest and dispatcher model from `@execbox/core`
 
-Most application code should use `@execbox/core` plus an executor package directly instead of importing this package.
-Treat this package as experimental and transport-internal while the execution architecture is still evolving.
+Most application code should use `@execbox/core` plus an executor package directly instead of importing this package. Reach for `@execbox/protocol` when you are building a transport-backed executor, a runner endpoint, or another host-side transport integration on top of the execbox execution model.
 
 ## Used By
 
@@ -25,7 +24,7 @@ Treat this package as experimental and transport-internal while the execution ar
 - `@execbox/process`
 - `@execbox/remote`
 
-`@execbox/quickjs` and `@execbox/isolated-vm` use the shared runner semantics from `@execbox/core` directly and do not currently depend on this package.
+`@execbox/quickjs` and `@execbox/isolated-vm` use the shared runner semantics from `@execbox/core` directly and do not depend on this package because they do not cross a transport boundary.
 
 ## Install
 

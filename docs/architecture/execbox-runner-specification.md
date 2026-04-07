@@ -2,7 +2,7 @@
 
 This page defines the runner specification for transport-backed execbox runners.
 
-Use it when you want to implement a non-TypeScript runner, such as a Go remote runner, without reverse-engineering the current TypeScript implementation. For the control-flow walkthrough, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the message catalog, read [execbox-protocol-reference.md](./execbox-protocol-reference.md).
+Use it when you want to implement a non-TypeScript runner, such as a Go remote runner, without reverse-engineering the shipped TypeScript implementation. For the control-flow walkthrough, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the message catalog, read [execbox-protocol-reference.md](./execbox-protocol-reference.md).
 
 ## Table of Contents
 

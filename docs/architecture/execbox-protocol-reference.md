@@ -1,8 +1,8 @@
 # Execbox Protocol Reference
 
-This page is the current message-level reference for `@execbox/protocol`.
+This page is the message-level reference for `@execbox/protocol`.
 
-It describes the wire shapes and session semantics used today by transport-backed execbox runtimes such as process, worker, and remote execution. It is grounded in the current implementation and should be read as a practical reference, not as a formal RFC.
+It describes the wire shapes and session semantics used by transport-backed execbox runtimes such as process, worker, and remote execution. It is grounded in the shipped implementation and should be read as a practical reference, not as a formal RFC.
 
 For the higher-level control-flow explanation, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the normative runner specification, read [execbox-runner-specification.md](./execbox-runner-specification.md).
 
@@ -163,7 +163,7 @@ Final message for the execution.
   id: string;
   ok: boolean;
   durationMs: number;
-  logs: Array<{ level: string; message: string }>;
+  logs: string[];
   result?: unknown;
   error?: {
     code: string;
@@ -181,7 +181,7 @@ Two ids are used for different scopes:
 - `id` tracks one full execution session
 - `callId` tracks one tool invocation inside that execution
 
-Current host-session behavior:
+Host-session behavior:
 
 - runner messages with an `id` that does not match the active session are ignored
 - `tool_result` is correlated by `callId`
@@ -233,7 +233,7 @@ Not every execution emits `tool_call`, but every successful protocol session is 
 
 ## Cancellation And Failure Semantics
 
-Current host-session behavior:
+Host-session behavior:
 
 - caller abort or timeout sends `cancel`
 - host also aborts its own tool-dispatch signal immediately

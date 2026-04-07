@@ -45,31 +45,31 @@ flowchart LR
     THREAD --> RUNNER
 ```
 
-## QuickJS Today
+## QuickJS
 
 `QuickJsExecutor` is the default reference implementation for execbox. It uses the shared runner semantics from `@execbox/core`: providers are converted to manifests, host tool calls are dispatched through the shared dispatcher helper, and the reusable QuickJS runner turns them back into guest-visible async functions.
 
 That design gives QuickJS two useful properties:
 
 - the runtime semantics are centralized in one runner implementation
-- the same guest/tool-call model can be reused behind a worker or future transport boundary
+- the same guest/tool-call model can be reused behind worker, process, and remote transport boundaries
 
-## isolated-vm Today
+## isolated-vm
 
-`IsolatedVmExecutor` now follows the same high-level runner contract as QuickJS, but keeps its native bridge internally. The reusable `runIsolatedVmSession()` runner accepts manifests and an `onToolCall` callback, then implements the runtime-specific bridge with `setSync()` / `applySyncPromise()` inside the `isolated-vm` context.
+`IsolatedVmExecutor` follows the same high-level runner contract as QuickJS, but keeps its native bridge internally. The reusable `runIsolatedVmSession()` runner accepts manifests and an `onToolCall` callback, then implements the runtime-specific bridge with `setSync()` / `applySyncPromise()` inside the `isolated-vm` context.
 
 That means:
 
-- it does not currently depend on `execbox-protocol`
+- it does not depend on `execbox-protocol`
 - it avoids the extra message loop used by worker-backed execution
 - its runtime-specific bridge logic still lives in the executor package itself
-- it is now aligned with the same runner-level shape used by QuickJS and worker-backed execution
+- it aligns to the same runner-level shape used by QuickJS and transport-backed execution
 
-This is a cleaner maintainability point than the previous design: the package still keeps the native bridge where it belongs, but the executor no longer owns a separate copy of the host-side manifest and tool-dispatch semantics.
+The package keeps its native bridge where it belongs while still sharing the same host-side manifest and tool-dispatch model as the other executors.
 
 ## Worker-Backed QuickJS
 
-`WorkerExecutor` uses a worker thread for lifecycle isolation, but it does not invent a second scripting model. It loads the same QuickJS session runner used by the in-process QuickJS executor, reuses the shared QuickJS protocol endpoint inside the worker, and uses the shared `execbox-protocol` host session on the parent side. By default it keeps a worker shell warm between executions; `mode: "ephemeral"` restores the old fresh-worker-per-call lifecycle.
+`WorkerExecutor` uses a worker thread for lifecycle isolation, but it does not invent a second scripting model. It loads the same QuickJS session runner used by the in-process QuickJS executor, reuses the shared QuickJS protocol endpoint inside the worker, and uses the shared `execbox-protocol` host session on the parent side. By default it keeps a worker shell warm between executions; `mode: "ephemeral"` switches to a fresh worker per execution.
 
 ```mermaid
 sequenceDiagram
@@ -90,7 +90,7 @@ sequenceDiagram
 
 ## Process-Backed QuickJS
 
-`ProcessExecutor` uses the same message-driven model as the worker executor, but runs it behind a child-process boundary. It loads the same QuickJS session runner used by the in-process QuickJS executor, reuses the same QuickJS protocol endpoint inside the child, and uses the shared `execbox-protocol` host session on the parent side. By default it keeps a child-process shell warm between executions; `mode: "ephemeral"` restores the old fresh-child-per-call lifecycle.
+`ProcessExecutor` uses the same message-driven model as the worker executor, but runs it behind a child-process boundary. It loads the same QuickJS session runner used by the in-process QuickJS executor, reuses the same QuickJS protocol endpoint inside the child, and uses the shared `execbox-protocol` host session on the parent side. By default it keeps a child-process shell warm between executions; `mode: "ephemeral"` switches to a fresh child process per execution.
 
 ```mermaid
 sequenceDiagram
@@ -123,12 +123,12 @@ The four executors expose the same public result shape, but they enforce limits 
 ## Security and Operational Trade-offs
 
 - All four executors are documented as best-effort isolation, not hard hostile-code boundaries.
-- QuickJS is the easiest operational default and has the cleanest shared runtime story today.
+- QuickJS is the easiest operational default and has the cleanest shared runtime story.
 - Remote execution keeps the same executor API while moving the runtime behind an app-defined boundary, but execbox deliberately does not ship the network stack for you.
 - Process-backed QuickJS gives a stronger lifecycle split than worker threads, but it is still not equivalent to a container or VM boundary.
 - `isolated-vm` is the most specialized option and carries the most environment-specific operational requirements.
 - Worker-backed QuickJS improves lifecycle isolation and hard-stop behavior, but not process-level trust isolation.
-- Worker and process executors now share the same host-session and child-endpoint semantics, so most behavioral differences come from the transport boundary rather than from duplicated executor logic.
+- Worker and process executors share the same host-session and child-endpoint semantics, so most behavioral differences come from the transport boundary rather than from duplicated executor logic.
 
 ## Pooled QuickJS Shells
 
@@ -170,7 +170,7 @@ If all shells are busy and the pool is already at `maxSize`, the next `acquire()
 
 ### Early Exit Handling
 
-Pooling exposed a transport race that did not matter in the old one-shot model: a child or worker could exit before the host session subscribed to close events. The pooled transport wrappers now retain the first close reason and replay it to later `onClose(...)` subscribers, so an early shell death still resolves as `internal_error` instead of hanging the execution.
+In pooled mode, a child or worker can exit before the host session subscribes to close events. The pooled transport wrappers retain the first close reason and replay it to later `onClose(...)` subscribers, so an early shell death still resolves as `internal_error` instead of hanging the execution.
 
 ### What Is Not Pooled
 

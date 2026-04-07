@@ -79,7 +79,7 @@ The practical effect is that all executors can treat guest code as “an async f
 
 ## Shared Runner Semantics
 
-The core package now also owns the small runner-level contract that sits between resolved providers and runtime-specific runners.
+The core package owns the small runner-level contract that sits between resolved providers and runtime-specific runners.
 
 That contract is intentionally transport-neutral:
 
@@ -106,7 +106,7 @@ This seam is what lets execbox share semantics across:
 
 - the in-process QuickJS executor
 - the in-process `isolated-vm` executor
-- the worker-backed QuickJS executor
+- transport-backed executors that reuse the same manifest and dispatcher model through `@execbox/protocol`
 
 without forcing every runtime through the same transport implementation.
 
@@ -194,7 +194,7 @@ The core package does not own QuickJS, `isolated-vm`, worker threads, or transpo
 - direct in-process runtimes
 - worker-backed runtimes
 - MCP wrapper servers
-- future process or remote execution models
+- process or remote execution models
 
 The consequence is deliberate separation between:
 
