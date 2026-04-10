@@ -21,6 +21,7 @@ export default withMermaid(
         { link: "/getting-started", text: "Getting Started" },
         { link: "/examples", text: "Examples" },
         { link: "/architecture/", text: "Architecture" },
+        { link: "/performance/", text: "Performance" },
         { link: "/security", text: "Security" },
       ],
       search: {
@@ -51,6 +52,12 @@ export default withMermaid(
               },
             ],
             text: "Architecture",
+          },
+        ],
+        "/performance/": [
+          {
+            items: [{ link: "/performance/", text: "Overview" }],
+            text: "Performance",
           },
         ],
       },
