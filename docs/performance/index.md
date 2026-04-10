@@ -6,14 +6,14 @@ This page summarizes practical performance guidance for choosing and configuring
 
 Each executor makes a different trade-off between isolation strength, startup cost, and steady-state latency.
 
-| Executor                      | Isolation                                                    | Relative Latency                                                                 | Best For                                                              |
-| ----------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `QuickJsExecutor`             | In-process QuickJS runtime                                   | Fastest steady-state path                                                        | Trusted code and the lowest possible latency                          |
-| `WorkerExecutor` (pooled)     | Worker thread shell with a fresh guest runtime per execution | Low latency after startup                                                        | General use when you want strong local isolation with good throughput |
-| `ProcessExecutor` (pooled)    | Child-process shell with a fresh guest runtime per execution | Low latency after startup, but typically wider tails than worker pooled           | Cases where process isolation matters more than tail latency          |
-| `WorkerExecutor` (ephemeral)  | Fresh worker per execution                                   | High startup cost                                                                | Per-execution host isolation when you accept much higher latency      |
-| `ProcessExecutor` (ephemeral) | Fresh child process per execution                            | Highest startup cost                                                             | Strict per-execution process boundaries                               |
-| `RemoteExecutor`              | Network transport                                            | Depends on the transport and remote host                                         | Remote isolation, remote capacity, or remote scheduling               |
+| Executor                      | Isolation                                                    | Relative Latency                                                        | Best For                                                              |
+| ----------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `QuickJsExecutor`             | In-process QuickJS runtime                                   | Fastest steady-state path                                               | Trusted code and the lowest possible latency                          |
+| `WorkerExecutor` (pooled)     | Worker thread shell with a fresh guest runtime per execution | Low latency after startup                                               | General use when you want strong local isolation with good throughput |
+| `ProcessExecutor` (pooled)    | Child-process shell with a fresh guest runtime per execution | Low latency after startup, but typically wider tails than worker pooled | Cases where process isolation matters more than tail latency          |
+| `WorkerExecutor` (ephemeral)  | Fresh worker per execution                                   | High startup cost                                                       | Per-execution host isolation when you accept much higher latency      |
+| `ProcessExecutor` (ephemeral) | Fresh child process per execution                            | Highest startup cost                                                    | Strict per-execution process boundaries                               |
+| `RemoteExecutor`              | Network transport                                            | Depends on the transport and remote host                                | Remote isolation, remote capacity, or remote scheduling               |
 
 ## Practical Characteristics
 
@@ -29,14 +29,14 @@ Tool calls still pay for host dispatch, serialization, and the round-trip back i
 
 ### First execution is different from steady state
 
-Fresh executors are slower than steady-state pooled executors because they still need to stand up the host shell and the guest runtime. Use `prewarm()` on pooled worker or process executors when you want warm shells ready before traffic arrives.
-
-Do not rely on `prewarm()` as a guaranteed first-request speedup on every machine. Its main role is to bring pooled shells online ahead of demand so the first live request does not need to pay that setup cost itself.
+Fresh executors are slower than steady-state pooled executors because they still need to stand up the host shell and the guest runtime. Use `prewarm()` on pooled worker or process executors when you want those costs paid before traffic arrives; it now warms both the outer shell and a real no-op guest execution path.
 
 ## Pool Sizing
 
 Pool `maxSize` is the main throughput control for pooled worker and process executors.
 
+- `WorkerExecutor` now starts with a CPU-aware default pool size based on available parallelism, capped at `4`.
+- `ProcessExecutor` keeps a conservative default pool size of `1`.
 - Size the pool to the concurrency you actually expect, not just to the default.
 - When requests outnumber available pooled shells, extra work queues behind the pool and latency rises quickly.
 - `WorkerExecutor` generally gives the best throughput and tighter tail latency for local execution workloads.

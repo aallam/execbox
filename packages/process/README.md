@@ -60,6 +60,8 @@ await executor.prewarm?.(2);
 await executor.dispose?.();
 ```
 
+`prewarm()` now creates the pooled child processes and runs one no-op QuickJS session through each child so the first live request can reuse an already-initialized guest startup path.
+
 Use `mode: "ephemeral"` when you want a fresh child process for every execution, even if a `pool` config is present:
 
 ```ts
@@ -83,6 +85,7 @@ Call `dispose()` in long-lived applications and tests when you want deterministi
 
 - the child process starts once and attaches the shared QuickJS protocol endpoint
 - each `execute()` call sends one execute message to that endpoint, which starts a fresh `runQuickJsSession()` inside the child
+- `prewarm()` first creates pooled shells, then runs one no-op execution through each child so QuickJS startup happens before live traffic
 - the parent acquires one pooled shell lease, runs `runHostTransportSession()` for that execution, then releases or evicts the lease when the session settles
 - pooled mode uses a borrowed transport wrapper because the host session always disposes its transport at the end of an execution, while the real pooled child must stay alive for reuse
 - if all pooled children are busy and the pool is already at `maxSize`, new executions wait in an internal FIFO queue until a shell is released or replaced

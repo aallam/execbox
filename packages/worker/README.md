@@ -60,6 +60,8 @@ await executor.prewarm?.(2);
 await executor.dispose?.();
 ```
 
+`prewarm()` now does real work: it creates the pooled worker shells and runs one no-op QuickJS session through each shell so the first live request can avoid paying that guest startup path itself.
+
 Use `mode: "ephemeral"` when you want a fresh worker for every execution, even if a `pool` config is present:
 
 ```ts
@@ -70,7 +72,7 @@ const executor = new WorkerExecutor({
 
 Default pooled settings are:
 
-- `maxSize: 1`
+- `maxSize: min(os.availableParallelism(), 4)` with a fallback of `1`
 - `minSize: 0`
 - `idleTimeoutMs: 30_000`
 - `prewarm: false`
@@ -83,6 +85,7 @@ Call `dispose()` in long-lived applications and tests when you want deterministi
 
 - the worker starts once and attaches the shared QuickJS protocol endpoint
 - each `execute()` call sends one execute message to that endpoint, which starts a fresh `runQuickJsSession()` inside the worker
+- `prewarm()` first creates pooled shells, then runs one no-op execution through each shell so QuickJS startup happens before live traffic
 - the parent acquires one pooled shell lease, runs `runHostTransportSession()` for that execution, then releases or evicts the lease when the session settles
 - pooled mode uses a borrowed transport wrapper because the host session always disposes its transport at the end of an execution, while the real pooled worker must stay alive for reuse
 - if all pooled workers are busy and the pool is already at `maxSize`, new executions wait in an internal FIFO queue until a shell is released or replaced

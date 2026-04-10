@@ -9,6 +9,9 @@ export default withMermaid(
     base: "/",
     cleanUrls: true,
     lastUpdated: true,
+    sitemap: {
+      hostname: "https://execbox.aallam.com",
+    },
     mermaid: {
       securityLevel: "loose",
     },

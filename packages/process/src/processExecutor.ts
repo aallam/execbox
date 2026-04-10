@@ -33,6 +33,7 @@ const DEFAULT_POOL_OPTIONS: Required<ExecutorPoolOptions> = {
   minSize: 0,
   prewarm: false,
 };
+const DEFAULT_PREWARM_CODE = "undefined";
 const DEFAULT_TIMEOUT_MS = 5000;
 
 interface ProcessShell {
@@ -240,6 +241,26 @@ function isReusableResult(result: ExecuteResult): boolean {
   );
 }
 
+function getWarmupTarget(
+  count: number | undefined,
+  poolOptions: ExecutorPoolOptions,
+): number {
+  return Math.max(
+    0,
+    Math.min(count ?? poolOptions.minSize ?? 0, poolOptions.maxSize),
+  );
+}
+
+function toWarmupError(result: ExecuteResult): Error {
+  if (result.ok) {
+    return new Error("Failed to prewarm pooled child process");
+  }
+
+  return new Error(
+    `Failed to prewarm pooled child process: ${result.error.message}`,
+  );
+}
+
 /**
  * Child-process executor that runs guest code inside a dedicated QuickJS runtime per call.
  */
@@ -247,6 +268,7 @@ export class ProcessExecutor implements Executor {
   private readonly cancelGraceMs: number;
   private readonly options: ProcessExecutorOptions;
   private readonly pool: ResourcePool<ProcessShell> | undefined;
+  private readonly poolOptions: ExecutorPoolOptions | undefined;
   private readonly warmup: Promise<void> | undefined;
 
   /**
@@ -256,6 +278,7 @@ export class ProcessExecutor implements Executor {
     this.cancelGraceMs = options.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS;
     this.options = options;
     const poolOptions = resolvePoolOptions(options);
+    this.poolOptions = poolOptions;
 
     if (poolOptions) {
       this.pool = createResourcePool({
@@ -269,7 +292,7 @@ export class ProcessExecutor implements Executor {
       });
       const prewarmCount = getPrewarmCount(poolOptions);
       if (prewarmCount > 0) {
-        this.warmup = this.pool.prewarm(prewarmCount);
+        this.warmup = this.warmPool(prewarmCount);
       }
     }
   }
@@ -285,7 +308,80 @@ export class ProcessExecutor implements Executor {
    * Preloads pooled child-process shells when pooling is enabled.
    */
   async prewarm(count?: number): Promise<void> {
-    await this.pool?.prewarm(count);
+    if (!this.pool || !this.poolOptions) {
+      return;
+    }
+
+    const target = getWarmupTarget(count, this.poolOptions);
+    if (target <= 0) {
+      return;
+    }
+
+    await this.warmPool(target);
+  }
+
+  private async runTransportSession(
+    transport: HostTransport,
+    code: string,
+    providers: ResolvedToolProvider[],
+    options: ExecutionOptions = {},
+    onSettled?: (result: ExecuteResult) => Promise<void> | void,
+  ): Promise<ExecuteResult> {
+    return await runHostTransportSession({
+      cancelGraceMs: this.cancelGraceMs,
+      code,
+      executionId: randomUUID(),
+      onSettled,
+      providers,
+      runtimeOptions: createRuntimeOptions(this.options, options),
+      signal: options.signal,
+      transport,
+    });
+  }
+
+  private async warmPool(count: number): Promise<void> {
+    if (!this.pool) {
+      return;
+    }
+
+    await this.pool.prewarm(count);
+
+    const leases = [];
+    try {
+      for (let index = 0; index < count; index += 1) {
+        leases.push(await this.pool.acquire());
+      }
+    } catch (error) {
+      await Promise.allSettled(
+        leases.map(async (lease) => await lease.release(false)),
+      );
+      throw error;
+    }
+
+    const results = await Promise.allSettled(
+      leases.map(async (lease) => {
+        let reusable = false;
+
+        try {
+          const result = await this.runTransportSession(
+            createBorrowedTransport(lease.value.transport),
+            DEFAULT_PREWARM_CODE,
+            [],
+          );
+          reusable = result.ok;
+          if (!result.ok) {
+            throw toWarmupError(result);
+          }
+        } finally {
+          await lease.release(reusable);
+        }
+      }),
+    );
+
+    const rejected = results.find((result) => result.status === "rejected");
+    if (rejected?.status === "rejected") {
+      throw rejected.reason;
+    }
   }
 
   /**
@@ -305,18 +401,15 @@ export class ProcessExecutor implements Executor {
     if (this.pool) {
       const lease = await this.pool.acquire();
 
-      return await runHostTransportSession({
-        cancelGraceMs: this.cancelGraceMs,
+      return await this.runTransportSession(
+        createBorrowedTransport(lease.value.transport),
         code,
-        executionId: randomUUID(),
-        onSettled: async (result) => {
+        providers,
+        options,
+        async (result) => {
           await lease.release(isReusableResult(result));
         },
-        providers,
-        runtimeOptions: createRuntimeOptions(this.options, options),
-        signal: options.signal,
-        transport: createBorrowedTransport(lease.value.transport),
-      });
+      );
     }
 
     let child: ChildProcess;
@@ -335,14 +428,11 @@ export class ProcessExecutor implements Executor {
       };
     }
 
-    return await runHostTransportSession({
-      cancelGraceMs: this.cancelGraceMs,
+    return await this.runTransportSession(
+      createProcessTransport(child),
       code,
-      executionId: randomUUID(),
       providers,
-      runtimeOptions: createRuntimeOptions(this.options, options),
-      signal: options.signal,
-      transport: createProcessTransport(child),
-    });
+      options,
+    );
   }
 }
