@@ -10,6 +10,8 @@ export default tseslint.config(
   {
     ignores: [
       ".worktrees/**",
+      "docs/.vitepress/cache/**",
+      "docs/.vitepress/dist/**",
       "dist/**",
       "node_modules/**",
       "package-lock.json",

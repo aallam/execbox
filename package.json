@@ -29,7 +29,7 @@
     "example:execbox-process": "node --import tsx examples/execbox-process.ts",
     "example:execbox-remote": "node --import tsx examples/execbox-remote.ts",
     "example:execbox-worker": "node --import tsx examples/execbox-worker.ts",
-    "benchmark:quickjs-pooling": "node --import tsx scripts/benchmark-quickjs-pooling.ts",
+    "benchmark": "node --expose-gc --import tsx benchmarks/benchmark.ts",
     "examples": "npm run example:execbox && npm run example:execbox-process && npm run example:execbox-remote && npm run example:execbox-worker && npm run example:execbox-mcp-provider && npm run example:execbox-mcp-server",
     "examples:isolated-vm": "npm run example:execbox-isolated-vm",
     "format": "prettier --write .",

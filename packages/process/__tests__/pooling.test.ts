@@ -11,9 +11,15 @@ class FakeChildProcess extends EventEmitter {
 }
 
 const state = vi.hoisted(() => ({
+  blockExecutions: false,
+  blockedResolvers: [] as Array<() => void>,
   children: [] as FakeChildProcess[],
   results: [] as ExecuteResult[],
-  transports: [] as unknown[],
+  sessions: [] as Array<{
+    code: string;
+    providersCount: number;
+    transport: unknown;
+  }>,
 }));
 
 vi.mock("node:child_process", () => ({
@@ -31,7 +37,16 @@ vi.mock("@execbox/protocol", async (importOriginal) => {
     ...actual,
     getNodeTransportExecArgv: vi.fn(() => []),
     runHostTransportSession: vi.fn(async (options) => {
-      state.transports.push(options.transport);
+      state.sessions.push({
+        code: options.code,
+        providersCount: options.providers.length,
+        transport: options.transport,
+      });
+      if (state.blockExecutions) {
+        await new Promise<void>((resolve) => {
+          state.blockedResolvers.push(resolve);
+        });
+      }
       const result = state.results.shift() ?? {
         durationMs: 0,
         logs: [],
@@ -47,9 +62,11 @@ vi.mock("@execbox/protocol", async (importOriginal) => {
 
 describe("ProcessExecutor pooling", () => {
   beforeEach(() => {
+    state.blockExecutions = false;
+    state.blockedResolvers = [];
     state.children = [];
     state.results = [];
-    state.transports = [];
+    state.sessions = [];
   });
 
   it("reuses one child process for sequential executions by default", async () => {
@@ -73,6 +90,62 @@ describe("ProcessExecutor pooling", () => {
     await executor.execute("1 + 1", []);
 
     expect(state.children).toHaveLength(2);
+  });
+
+  it("runs real warmup sessions before the first pooled execution", async () => {
+    const { ProcessExecutor } = await import("../src/index");
+    const executor = new ProcessExecutor({
+      pool: { maxSize: 2, prewarm: 2 },
+    } as never);
+
+    await executor.execute("1 + 1", []);
+
+    expect(state.children).toHaveLength(2);
+    expect(state.sessions).toHaveLength(3);
+    expect(state.sessions[0]).toMatchObject({
+      code: "undefined",
+      providersCount: 0,
+    });
+    expect(state.sessions[1]).toMatchObject({
+      code: "undefined",
+      providersCount: 0,
+    });
+    expect(state.sessions[2]).toMatchObject({
+      code: "1 + 1",
+      providersCount: 0,
+    });
+  });
+
+  it("rejects failed explicit prewarm and evicts the broken child", async () => {
+    const { ProcessExecutor } = await import("../src/index");
+    const executor = new ProcessExecutor({
+      pool: { maxSize: 1 },
+    } as never);
+    state.results = [
+      {
+        durationMs: 0,
+        error: {
+          code: "internal_error",
+          message: "warmup failed",
+        },
+        logs: [],
+        ok: false,
+      },
+      {
+        durationMs: 0,
+        logs: [],
+        ok: true,
+        result: 1,
+      },
+    ];
+
+    await expect(executor.prewarm(1)).rejects.toThrow("warmup failed");
+    await executor.execute("1 + 1", []);
+
+    expect(state.children).toHaveLength(2);
+    expect(state.sessions).toHaveLength(2);
+    expect(state.sessions[0]?.code).toBe("undefined");
+    expect(state.sessions[1]?.code).toBe("1 + 1");
   });
 
   it("evicts a pooled child after a timeout result", async () => {

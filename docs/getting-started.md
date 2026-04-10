@@ -36,10 +36,9 @@ const provider = resolveProvider({
 });
 
 const executor = new QuickJsExecutor();
-const result = await executor.execute(
-  `await tools.greet({ name: "World" })`,
-  [provider],
-);
+const result = await executor.execute(`await tools.greet({ name: "World" })`, [
+  provider,
+]);
 
 console.log(result);
 ```
