@@ -1,6 +1,6 @@
 {
   "name": "@execbox/process",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Child-process executor for the execbox core package.",
   "license": "MIT",
   "type": "module",
