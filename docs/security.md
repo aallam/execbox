@@ -2,7 +2,7 @@
 
 Execbox provides defense-in-depth controls for guest code execution. The isolation level you get depends on the executor and deployment boundary you choose.
 
-## What execbox does provide
+## What execbox provides
 
 - Fresh execution state per call
 - JSON-only tool and result boundaries
@@ -11,7 +11,7 @@ Execbox provides defense-in-depth controls for guest code execution. The isolati
 - Timeout and memory controls
 - Abort propagation into in-flight host tool work
 
-## What execbox does not claim
+## Important boundaries
 
 - A hard security boundary for hostile or multi-tenant code by default
 - That in-process runtimes are equivalent to a container, VM, or separate trust domain
