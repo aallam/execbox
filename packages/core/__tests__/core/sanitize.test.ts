@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeToolName } from "@execbox/core";
+import { sanitizeIdentifier, sanitizeToolName } from "@execbox/core";
 
 describe("sanitizeToolName", () => {
   it("replaces punctuation and spaces with underscores", () => {
@@ -16,5 +16,19 @@ describe("sanitizeToolName", () => {
 
   it("falls back to an underscore for empty names", () => {
     expect(sanitizeToolName("")).toBe("_");
+  });
+});
+
+describe("sanitizeIdentifier", () => {
+  it("removes leading and trailing replacement underscores", () => {
+    expect(sanitizeIdentifier("  ---tool name---  ")).toBe("tool_name");
+  });
+
+  it("preserves internal underscores while trimming the edges", () => {
+    expect(sanitizeIdentifier("tool---name")).toBe("tool_name");
+  });
+
+  it("falls back to an underscore when all characters are trimmed away", () => {
+    expect(sanitizeIdentifier("---")).toBe("_");
   });
 });
