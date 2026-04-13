@@ -39,6 +39,23 @@ const RESERVED_WORDS = new Set([
   "yield",
 ]);
 
+const UNDERSCORE_CHAR_CODE = 95;
+
+function trimEdgeUnderscores(value: string): string {
+  let start = 0;
+  let end = value.length;
+
+  while (start < end && value.charCodeAt(start) === UNDERSCORE_CHAR_CODE) {
+    start += 1;
+  }
+
+  while (end > start && value.charCodeAt(end - 1) === UNDERSCORE_CHAR_CODE) {
+    end -= 1;
+  }
+
+  return value.slice(start, end);
+}
+
 /**
  * Returns whether the value is a valid JavaScript identifier.
  */
@@ -69,12 +86,11 @@ export function assertValidIdentifier(
  * Converts a raw identifier-like value into a safe JavaScript identifier.
  */
 export function sanitizeIdentifier(value: string): string {
-  const sanitized = value
-    .trim()
-    .replace(/[^A-Za-z0-9_$]+/g, "_")
-    .replace(/^_+|_+$/g, "");
+  const sanitized = value.trim().replace(/[^A-Za-z0-9_$]+/g, "_");
 
-  let safeName = sanitized.length > 0 ? sanitized : "_";
+  const trimmed = trimEdgeUnderscores(sanitized);
+
+  let safeName = trimmed.length > 0 ? trimmed : "_";
 
   if (/^[0-9]/.test(safeName)) {
     safeName = `_${safeName}`;
