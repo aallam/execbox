@@ -53,6 +53,14 @@ describe("run-api-extractor", () => {
         configFilePath: "packages/worker/api-extractor.json",
         workspace: "@execbox/worker",
       },
+      {
+        configFilePath: "packages/isolated-vm/api-extractor.json",
+        workspace: "@execbox/isolated-vm",
+      },
+      {
+        configFilePath: "packages/isolated-vm/api-extractor.runner.json",
+        workspace: "@execbox/isolated-vm",
+      },
     ]);
   });
 
@@ -93,10 +101,10 @@ describe("run-api-extractor", () => {
     };
 
     expect(packageJson.scripts["api:check"]).toBe(
-      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && node --import tsx scripts/run-api-extractor.ts",
+      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && npm run build --workspace @execbox/isolated-vm && node --import tsx scripts/run-api-extractor.ts",
     );
     expect(packageJson.scripts["api:update"]).toBe(
-      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && node --import tsx scripts/run-api-extractor.ts --local",
+      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && npm run build --workspace @execbox/isolated-vm && node --import tsx scripts/run-api-extractor.ts --local",
     );
 
     expect(
@@ -244,6 +252,36 @@ describe("run-api-extractor", () => {
     });
 
     expect(
+      JSON.parse(
+        readFileSync(
+          path.join(repoRoot, "packages/isolated-vm/api-extractor.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      apiReport: {
+        enabled: true,
+        reportFileName: "execbox-isolated-vm.api.md",
+      },
+      mainEntryPointFilePath: "<projectFolder>/dist/index.d.ts",
+    });
+
+    expect(
+      JSON.parse(
+        readFileSync(
+          path.join(repoRoot, "packages/isolated-vm/api-extractor.runner.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      apiReport: {
+        enabled: true,
+        reportFileName: "execbox-isolated-vm-runner.api.md",
+      },
+      mainEntryPointFilePath: "<projectFolder>/dist/runner/index.d.ts",
+    });
+
+    expect(
       readFileSync(
         path.join(repoRoot, "packages/core/etc/execbox-core.api.md"),
         "utf8",
@@ -300,6 +338,24 @@ describe("run-api-extractor", () => {
     expect(
       readFileSync(
         path.join(repoRoot, "packages/worker/etc/execbox-worker.api.md"),
+        "utf8",
+      ),
+    ).toContain("## API Report File");
+    expect(
+      readFileSync(
+        path.join(
+          repoRoot,
+          "packages/isolated-vm/etc/execbox-isolated-vm.api.md",
+        ),
+        "utf8",
+      ),
+    ).toContain("## API Report File");
+    expect(
+      readFileSync(
+        path.join(
+          repoRoot,
+          "packages/isolated-vm/etc/execbox-isolated-vm-runner.api.md",
+        ),
         "utf8",
       ),
     ).toContain("## API Report File");

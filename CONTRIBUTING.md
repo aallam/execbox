@@ -26,7 +26,7 @@ This guide is for both humans and coding agents. Agent-specific operating instru
 
 Choose the smallest verification set that covers your change, and include the commands you ran in your PR or handoff notes when the context would help reviewers.
 
-- Public API changes to `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/process`, or `@execbox/worker`: run `npm run api:check`
+- Public API changes to `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/process`, `@execbox/worker`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`: run `npm run api:check`
 
 ## Changesets
 

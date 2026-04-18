@@ -43,6 +43,14 @@ export const apiExtractorTargets: ApiExtractorTarget[] = [
     configFilePath: "packages/worker/api-extractor.json",
     workspace: "@execbox/worker",
   },
+  {
+    configFilePath: "packages/isolated-vm/api-extractor.json",
+    workspace: "@execbox/isolated-vm",
+  },
+  {
+    configFilePath: "packages/isolated-vm/api-extractor.runner.json",
+    workspace: "@execbox/isolated-vm",
+  },
 ];
 
 export function createApiExtractorArgs(options: {
