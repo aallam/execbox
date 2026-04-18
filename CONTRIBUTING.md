@@ -20,6 +20,7 @@ This guide is for both humans and coding agents. Agent-specific operating instru
 ## Verification
 
 - General code changes: `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`
+- Package export, manifest, or published type-resolution changes: `npm run package:check`
 - Docs site changes: `npm run docs:build`
 - Security or execution-boundary changes: `npm run test:security`
 - `@execbox/isolated-vm` changes: `npm run test:isolated-vm` or `npm run verify:isolated-vm`

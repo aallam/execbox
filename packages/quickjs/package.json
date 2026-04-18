@@ -13,19 +13,28 @@
   "exports": {
     ".": {
       "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
+      "types": {
+        "import": "./dist/index.d.ts",
+        "require": "./dist/index.d.cts"
+      },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./runner": {
       "source": "./src/runner/index.ts",
-      "types": "./dist/runner/index.d.ts",
+      "types": {
+        "import": "./dist/runner/index.d.ts",
+        "require": "./dist/runner/index.d.cts"
+      },
       "import": "./dist/runner/index.js",
       "require": "./dist/runner/index.cjs"
     },
     "./runner/protocol-endpoint": {
       "source": "./src/runner/protocolEndpoint.ts",
-      "types": "./dist/runner/protocolEndpoint.d.ts",
+      "types": {
+        "import": "./dist/runner/protocolEndpoint.d.ts",
+        "require": "./dist/runner/protocolEndpoint.d.cts"
+      },
       "import": "./dist/runner/protocolEndpoint.js",
       "require": "./dist/runner/protocolEndpoint.cjs"
     }

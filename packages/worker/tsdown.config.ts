@@ -6,6 +6,11 @@ const DTS_BANNER = `/**
  */`;
 
 export default defineConfig({
+  attw: {
+    enabled: "ci-only",
+    level: "error",
+    profile: "node16",
+  },
   clean: true,
   dts: {
     banner: DTS_BANNER,
@@ -14,6 +19,10 @@ export default defineConfig({
   fixedExtension: false,
   format: ["esm", "cjs"],
   platform: "node",
+  publint: {
+    enabled: "ci-only",
+    level: "error",
+  },
   sourcemap: true,
   target: "node20",
 });

@@ -34,8 +34,8 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Build
-        run: npm run build
+      - name: Package validation
+        run: npm run package:check
 
       - name: Check API reports
         run: npm run api:check

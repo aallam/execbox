@@ -14,6 +14,7 @@
 - Type-check: `npm run typecheck`
 - Test default workspace lanes: `npm test`
 - Build published packages: `npm run build`
+- Validate published package metadata and type resolution: `npm run package:check`
 - Build docs site: `npm run docs:build`
 - Run security-focused suites: `npm run test:security`
 - Run isolated-vm tests only when needed: `npm run test:isolated-vm`
@@ -30,6 +31,7 @@
 ## Testing Instructions
 
 - For most code changes, run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
+- If you change package exports, manifest fields, or published type-resolution behavior, also run `npm run package:check`.
 - If you change the public API of `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/process`, `@execbox/worker`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`, also run `npm run api:check`.
 - If you change docs site content, navigation, or VitePress config, also run `npm run docs:build`.
 - If you touch execution boundaries, timeout handling, abort propagation, schema validation, or log/memory controls, also run `npm run test:security`.
