@@ -30,7 +30,7 @@
 ## Testing Instructions
 
 - For most code changes, run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
-- If you change the public API of `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, or `@execbox/quickjs/runner/protocol-endpoint`, also run `npm run api:check`.
+- If you change the public API of `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/process`, or `@execbox/worker`, also run `npm run api:check`.
 - If you change docs site content, navigation, or VitePress config, also run `npm run docs:build`.
 - If you touch execution boundaries, timeout handling, abort propagation, schema validation, or log/memory controls, also run `npm run test:security`.
 - If you touch `@execbox/isolated-vm` or codepaths guarded by `VITEST_INCLUDE_ISOLATED_VM`, run `npm run test:isolated-vm` or `npm run verify:isolated-vm`.
@@ -46,7 +46,7 @@
 - Use Conventional Commits for git commit messages, for example `docs: add agent and contributor guides` or `fix(worker): handle timeout classification`.
 - Published package releases are managed with Changesets and GitHub Actions.
 - Add a `.changeset/*.md` entry when a change affects published package behavior, public APIs, or release notes for one or more `@execbox/*` packages.
-- If you intentionally change a checked-in API report for `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, or `@execbox/quickjs/runner/protocol-endpoint`, update it with `npm run api:update` in the same change as the code and changeset.
+- If you intentionally change a checked-in API report for `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/process`, or `@execbox/worker`, update it with `npm run api:update` in the same change as the code and changeset.
 - Skip a changeset for docs-only, examples-only, CI-only, or internal maintenance changes that do not affect published package behavior.
 
 ## Useful References

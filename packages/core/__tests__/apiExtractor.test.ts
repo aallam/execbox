@@ -41,6 +41,18 @@ describe("run-api-extractor", () => {
         configFilePath: "packages/quickjs/api-extractor.protocol-endpoint.json",
         workspace: "@execbox/quickjs",
       },
+      {
+        configFilePath: "packages/remote/api-extractor.json",
+        workspace: "@execbox/remote",
+      },
+      {
+        configFilePath: "packages/process/api-extractor.json",
+        workspace: "@execbox/process",
+      },
+      {
+        configFilePath: "packages/worker/api-extractor.json",
+        workspace: "@execbox/worker",
+      },
     ]);
   });
 
@@ -81,10 +93,10 @@ describe("run-api-extractor", () => {
     };
 
     expect(packageJson.scripts["api:check"]).toBe(
-      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && node --import tsx scripts/run-api-extractor.ts",
+      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && node --import tsx scripts/run-api-extractor.ts",
     );
     expect(packageJson.scripts["api:update"]).toBe(
-      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && node --import tsx scripts/run-api-extractor.ts --local",
+      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && node --import tsx scripts/run-api-extractor.ts --local",
     );
 
     expect(
@@ -187,6 +199,51 @@ describe("run-api-extractor", () => {
     });
 
     expect(
+      JSON.parse(
+        readFileSync(
+          path.join(repoRoot, "packages/remote/api-extractor.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      apiReport: {
+        enabled: true,
+        reportFileName: "execbox-remote.api.md",
+      },
+      mainEntryPointFilePath: "<projectFolder>/dist/index.d.ts",
+    });
+
+    expect(
+      JSON.parse(
+        readFileSync(
+          path.join(repoRoot, "packages/process/api-extractor.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      apiReport: {
+        enabled: true,
+        reportFileName: "execbox-process.api.md",
+      },
+      mainEntryPointFilePath: "<projectFolder>/dist/index.d.ts",
+    });
+
+    expect(
+      JSON.parse(
+        readFileSync(
+          path.join(repoRoot, "packages/worker/api-extractor.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      apiReport: {
+        enabled: true,
+        reportFileName: "execbox-worker.api.md",
+      },
+      mainEntryPointFilePath: "<projectFolder>/dist/index.d.ts",
+    });
+
+    expect(
       readFileSync(
         path.join(repoRoot, "packages/core/etc/execbox-core.api.md"),
         "utf8",
@@ -225,6 +282,24 @@ describe("run-api-extractor", () => {
           repoRoot,
           "packages/quickjs/etc/execbox-quickjs-runner-protocol-endpoint.api.md",
         ),
+        "utf8",
+      ),
+    ).toContain("## API Report File");
+    expect(
+      readFileSync(
+        path.join(repoRoot, "packages/remote/etc/execbox-remote.api.md"),
+        "utf8",
+      ),
+    ).toContain("## API Report File");
+    expect(
+      readFileSync(
+        path.join(repoRoot, "packages/process/etc/execbox-process.api.md"),
+        "utf8",
+      ),
+    ).toContain("## API Report File");
+    expect(
+      readFileSync(
+        path.join(repoRoot, "packages/worker/etc/execbox-worker.api.md"),
         "utf8",
       ),
     ).toContain("## API Report File");

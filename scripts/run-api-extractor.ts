@@ -31,6 +31,18 @@ export const apiExtractorTargets: ApiExtractorTarget[] = [
     configFilePath: "packages/quickjs/api-extractor.protocol-endpoint.json",
     workspace: "@execbox/quickjs",
   },
+  {
+    configFilePath: "packages/remote/api-extractor.json",
+    workspace: "@execbox/remote",
+  },
+  {
+    configFilePath: "packages/process/api-extractor.json",
+    workspace: "@execbox/process",
+  },
+  {
+    configFilePath: "packages/worker/api-extractor.json",
+    workspace: "@execbox/worker",
+  },
 ];
 
 export function createApiExtractorArgs(options: {
