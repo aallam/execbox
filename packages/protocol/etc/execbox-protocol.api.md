@@ -4,8 +4,10 @@
 
 ```ts
 
+import { createToolCallDispatcher } from '@execbox/core';
 import { ExecuteResult } from '@execbox/core';
 import { ExecutorRuntimeOptions } from '@execbox/core';
+import { extractProviderManifests } from '@execbox/core';
 import { ProviderManifest } from '@execbox/core';
 import { ProviderToolManifest } from '@execbox/core';
 import { ResolvedToolProvider } from '@execbox/core';
@@ -23,21 +25,31 @@ export interface CancelMessage {
 // @public
 export function createResourcePool<T>(options: ResourcePoolOptions<T>): ResourcePool<T>;
 
-// Warning: (ae-forgotten-export) The symbol "ResolvedToolProvider$1" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ToolCall$2" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ToolCallResult$2" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function createToolCallDispatcher(providers: ResolvedToolProvider$1[], signal: AbortSignal): (call: ToolCall$2) => Promise<ToolCallResult$2>;
+export { createToolCallDispatcher }
 
 // @public
 export type DispatcherMessage = CancelMessage | ExecuteMessage | ToolResultMessage;
 
-// Warning: (ae-forgotten-export) The symbol "DoneSuccessMessage" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "DoneFailureMessage" needs to be exported by the entry point index.d.ts
-//
+// @public
+export type DoneFailureMessage = {
+    id: string;
+    type: "done";
+} & Extract<ExecuteResult, {
+    ok: false;
+}>;
+
 // @public
 export type DoneMessage = DoneSuccessMessage | DoneFailureMessage;
+
+// @public
+export type DoneSuccessMessage<T = unknown> = {
+    durationMs: number;
+    id: string;
+    logs: string[];
+    ok: true;
+    result?: T;
+    type: "done";
+};
 
 // @public
 export interface ExecuteMessage {
@@ -55,10 +67,7 @@ export interface ExecuteMessage {
 
 export { ExecutorRuntimeOptions }
 
-// Warning: (ae-forgotten-export) The symbol "ProviderManifest$2" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function extractProviderManifests(providers: ResolvedToolProvider$1[]): ProviderManifest$2[];
+export { extractProviderManifests }
 
 // @public
 export function getNodeTransportExecArgv(moduleUrl: string): string[] | undefined;
@@ -77,6 +86,26 @@ export interface HostTransport {
     send(message: DispatcherMessage): Promise<void> | void;
     // (undocumented)
     terminate(): Promise<void> | void;
+}
+
+// @public
+export interface HostTransportSessionOptions {
+    // (undocumented)
+    cancelGraceMs?: number;
+    // (undocumented)
+    code: string;
+    // (undocumented)
+    executionId: string;
+    // (undocumented)
+    onSettled?: (result: ExecuteResult) => Promise<void> | void;
+    // (undocumented)
+    providers: ResolvedToolProvider[];
+    // (undocumented)
+    runtimeOptions: Required<ExecutorRuntimeOptions>;
+    // (undocumented)
+    signal?: AbortSignal;
+    // (undocumented)
+    transport: HostTransport;
 }
 
 // @public
@@ -121,8 +150,6 @@ export interface ResourcePoolOptions<T> {
     minSize?: number;
 }
 
-// Warning: (ae-forgotten-export) The symbol "HostTransportSessionOptions" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function runHostTransportSession(options: HostTransportSessionOptions): Promise<ExecuteResult>;
 
@@ -164,7 +191,5 @@ export interface TransportCloseReason {
     // (undocumented)
     signal?: NodeJS.Signals | null;
 }
-
-// (No @packageDocumentation comment for this package)
 
 ```

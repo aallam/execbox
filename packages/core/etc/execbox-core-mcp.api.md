@@ -13,7 +13,6 @@ export function codeMcpServer(source: McpToolSource, options: CodeMcpServerOptio
 
 // @public
 export interface CodeMcpServerOptions extends CreateMcpToolProviderOptions {
-    // Warning: (ae-forgotten-export) The symbol "Executor" needs to be exported by the entry point index.d.ts
     executor: Executor;
     maxTextChars?: number;
     mode?: "both" | "single" | "split";
@@ -25,8 +24,6 @@ export interface CodeMcpServerOptions extends CreateMcpToolProviderOptions {
     serverInfo?: Implementation;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ResolvedToolProvider" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function createMcpToolProvider(source: McpToolClientSource, options?: CreateMcpToolProviderOptions): Promise<ResolvedToolProvider>;
 
@@ -37,7 +34,60 @@ export interface CreateMcpToolProviderOptions {
 }
 
 // @public
+export interface ExecuteError {
+    code: ExecuteErrorCode;
+    message: string;
+}
+
+// @public
+export type ExecuteErrorCode = "timeout" | "memory_limit" | "validation_error" | "tool_error" | "runtime_error" | "serialization_error" | "internal_error";
+
+// @public
+export type ExecuteResult<T = unknown> = {
+    durationMs: number;
+    logs: string[];
+    ok: true;
+    result: T;
+} | {
+    durationMs: number;
+    error: ExecuteError;
+    logs: string[];
+    ok: false;
+};
+
+// @public
+export interface ExecutionOptions extends ExecutorRuntimeOptions {
+    // (undocumented)
+    signal?: AbortSignal;
+}
+
+// @public
+export interface Executor {
+    // (undocumented)
+    dispose?(): Promise<void> | void;
+    // (undocumented)
+    execute(code: string, providers: ResolvedToolProvider[], options?: ExecutionOptions): Promise<ExecuteResult>;
+    // (undocumented)
+    prewarm?(count?: number): Promise<void>;
+}
+
+// @public
+export interface ExecutorRuntimeOptions {
+    // (undocumented)
+    maxLogChars?: number;
+    // (undocumented)
+    maxLogLines?: number;
+    // (undocumented)
+    memoryLimitBytes?: number;
+    // (undocumented)
+    timeoutMs?: number;
+}
+
+// @public
 export function getMcpToolSourceServerInfo(source: McpToolSource): Implementation | undefined;
+
+// @public
+export type JsonSchema = Record<string, unknown>;
 
 // @public
 export type McpToolClientSource = {
@@ -64,6 +114,31 @@ export type McpToolSource = McpToolClientSource | McpToolServerSource;
 // @public
 export function openMcpToolProvider(source: McpToolSource, options?: CreateMcpToolProviderOptions): Promise<McpToolProviderHandle>;
 
-// (No @packageDocumentation comment for this package)
+// @public
+export interface ResolvedToolDescriptor {
+    description?: string;
+    execute: (input: unknown, context: ToolExecutionContext) => Promise<unknown>;
+    inputSchema?: JsonSchema;
+    originalName: string;
+    outputSchema?: JsonSchema;
+    safeName: string;
+}
+
+// @public
+export interface ResolvedToolProvider {
+    name: string;
+    originalToSafeName: Record<string, string>;
+    safeToOriginalName: Record<string, string>;
+    tools: Record<string, ResolvedToolDescriptor>;
+    types: string;
+}
+
+// @public
+export interface ToolExecutionContext {
+    originalToolName: string;
+    providerName: string;
+    safeToolName: string;
+    signal: AbortSignal;
+}
 
 ```

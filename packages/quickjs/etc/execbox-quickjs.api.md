@@ -21,6 +21,4 @@ export interface QuickJsExecutorOptions extends ExecutorRuntimeOptions {
     loadModule?: () => Promise<unknown> | unknown;
 }
 
-// (No @packageDocumentation comment for this package)
-
 ```

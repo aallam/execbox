@@ -21,6 +21,4 @@ export interface IsolatedVmExecutorOptions extends ExecutorRuntimeOptions {
     loadModule?: () => Promise<unknown> | unknown;
 }
 
-// (No @packageDocumentation comment for this package)
-
 ```

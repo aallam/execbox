@@ -1,3 +1,7 @@
+/**
+ * @packageDocumentation
+ * Public API for the `@execbox/quickjs/runner` entrypoint.
+ */
 import { randomUUID } from "node:crypto";
 
 import {
@@ -14,20 +18,20 @@ import {
 
 import {
   ExecuteFailure,
-  type ExecutorRuntimeOptions,
   formatConsoleLine,
   getExecutionTimeoutMessage,
   isExecuteFailure,
   isKnownExecuteErrorCode,
   normalizeCode,
   normalizeThrownMessage,
-  type ProviderManifest,
-  type ToolCall,
-  type ToolCallResult,
   truncateLogs,
   type ExecuteError,
   type ExecuteResult,
-} from "../../../core/src/runtime.ts";
+  type ExecutorRuntimeOptions,
+  type ProviderManifest,
+  type ToolCall,
+  type ToolCallResult,
+} from "@execbox/core";
 
 import {
   createGuestErrorHandle,
@@ -35,6 +39,8 @@ import {
   toGuestHandle,
 } from "../quickjsBridge.ts";
 import type { QuickJsExecutorOptions } from "../types.ts";
+
+export type { QuickJsExecutorOptions } from "../types.ts";
 
 const DEFAULT_MEMORY_LIMIT_BYTES = 64 * 1024 * 1024;
 const DEFAULT_TIMEOUT_MS = 5000;

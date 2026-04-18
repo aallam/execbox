@@ -18,6 +18,4 @@ export interface QuickJsProtocolPort {
     send(message: RunnerMessage): void;
 }
 
-// (No @packageDocumentation comment for this package)
-
 ```

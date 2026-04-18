@@ -44,6 +44,4 @@ export interface RemoteRunnerPort {
 // @public
 export type RemoteTransportFactory = () => HostTransport | Promise<HostTransport>;
 
-// (No @packageDocumentation comment for this package)
-
 ```

@@ -1,3 +1,7 @@
+/**
+ * @packageDocumentation
+ * Public API for the `@execbox/quickjs/runner/protocol-endpoint` entrypoint.
+ */
 import { randomUUID } from "node:crypto";
 
 import type {
@@ -6,7 +10,7 @@ import type {
   RunnerMessage,
   ToolCallResult,
 } from "@execbox/protocol";
-import { isDispatcherMessage } from "../../../protocol/src/messages.ts";
+import { isDispatcherMessage } from "@execbox/protocol";
 
 import { runQuickJsSession } from "./index.ts";
 

@@ -1,3 +1,7 @@
+/**
+ * @packageDocumentation
+ * Public API for the `@execbox/protocol` package.
+ */
 export { createToolCallDispatcher } from "./dispatcher";
 export { runHostTransportSession } from "./hostSession";
 export { extractProviderManifests } from "./manifest";
@@ -6,7 +10,9 @@ export { createResourcePool } from "./resourcePool";
 export type {
   CancelMessage,
   DispatcherMessage,
+  DoneFailureMessage,
   DoneMessage,
+  DoneSuccessMessage,
   ExecuteMessage,
   RunnerMessage,
   StartedMessage,
@@ -14,7 +20,11 @@ export type {
   ToolResultMessage,
 } from "./messages";
 export { isDispatcherMessage, isRunnerMessage } from "./messages";
-export type { HostTransport, TransportCloseReason } from "./hostSession";
+export type {
+  HostTransport,
+  HostTransportSessionOptions,
+  TransportCloseReason,
+} from "./hostSession";
 export type {
   ResourcePool,
   ResourcePoolLease,

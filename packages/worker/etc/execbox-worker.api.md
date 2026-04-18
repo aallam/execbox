@@ -43,6 +43,4 @@ export interface WorkerResourceLimits {
     stackSizeMb?: number;
 }
 
-// (No @packageDocumentation comment for this package)
-
 ```

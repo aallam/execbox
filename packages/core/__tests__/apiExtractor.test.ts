@@ -360,4 +360,29 @@ describe("run-api-extractor", () => {
       ),
     ).toContain("## API Report File");
   });
+
+  it("commits warning-free API reports with package documentation", () => {
+    const reportPaths = [
+      "packages/core/etc/execbox-core.api.md",
+      "packages/core/etc/execbox-core-mcp.api.md",
+      "packages/protocol/etc/execbox-protocol.api.md",
+      "packages/quickjs/etc/execbox-quickjs.api.md",
+      "packages/quickjs/etc/execbox-quickjs-runner.api.md",
+      "packages/quickjs/etc/execbox-quickjs-runner-protocol-endpoint.api.md",
+      "packages/remote/etc/execbox-remote.api.md",
+      "packages/process/etc/execbox-process.api.md",
+      "packages/worker/etc/execbox-worker.api.md",
+      "packages/isolated-vm/etc/execbox-isolated-vm.api.md",
+      "packages/isolated-vm/etc/execbox-isolated-vm-runner.api.md",
+    ];
+
+    for (const reportPath of reportPaths) {
+      const report = readFileSync(path.join(repoRoot, reportPath), "utf8");
+
+      expect(report, reportPath).not.toContain("Warning:");
+      expect(report, reportPath).not.toContain(
+        "(No @packageDocumentation comment for this package)",
+      );
+    }
+  });
 });

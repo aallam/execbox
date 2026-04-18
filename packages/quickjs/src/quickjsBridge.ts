@@ -1,9 +1,6 @@
 import type { QuickJSContext, QuickJSHandle } from "quickjs-emscripten";
 
-import {
-  ExecuteFailure,
-  type ExecuteErrorCode,
-} from "../../core/src/runtime.ts";
+import { ExecuteFailure, type ExecuteErrorCode } from "@execbox/core";
 
 /**
  * Creates a guest-visible error object that carries a trusted host error code marker.

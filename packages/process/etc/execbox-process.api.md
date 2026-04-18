@@ -32,6 +32,4 @@ export interface ProcessExecutorOptions {
     timeoutMs?: number;
 }
 
-// (No @packageDocumentation comment for this package)
-
 ```

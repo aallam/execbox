@@ -4,13 +4,19 @@
 
 ```ts
 
+import { ExecuteResult } from '@execbox/core';
 import { ExecutorRuntimeOptions } from '@execbox/core';
+import { ProviderManifest } from '@execbox/core';
+import { ToolCall } from '@execbox/core';
+import { ToolCallResult } from '@execbox/core';
 
-// Warning: (ae-forgotten-export) The symbol "IsolatedVmExecutorOptions" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ExecutorRuntimeOptions_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type IsolatedVmSessionOptions = IsolatedVmExecutorOptions & ExecutorRuntimeOptions_2;
+export interface IsolatedVmExecutorOptions extends ExecutorRuntimeOptions {
+    loadModule?: () => Promise<unknown> | unknown;
+}
+
+// @public
+export type IsolatedVmSessionOptions = IsolatedVmExecutorOptions & ExecutorRuntimeOptions;
 
 // @public
 export interface IsolatedVmSessionRequest {
@@ -20,24 +26,15 @@ export interface IsolatedVmSessionRequest {
     code: string;
     // (undocumented)
     onStarted?: () => void;
-    // Warning: (ae-forgotten-export) The symbol "ToolCall" needs to be exported by the entry point index.d.ts
-    // Warning: (ae-forgotten-export) The symbol "ToolCallResult" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     onToolCall: (call: ToolCall) => Promise<ToolCallResult> | ToolCallResult;
-    // Warning: (ae-forgotten-export) The symbol "ProviderManifest" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     providers: ProviderManifest[];
     // (undocumented)
     signal?: AbortSignal;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ExecuteResult" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function runIsolatedVmSession(request: IsolatedVmSessionRequest, options?: IsolatedVmSessionOptions): Promise<ExecuteResult>;
-
-// (No @packageDocumentation comment for this package)
 
 ```

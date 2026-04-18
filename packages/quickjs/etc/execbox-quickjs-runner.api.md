@@ -4,14 +4,20 @@
 
 ```ts
 
+import { ExecuteResult } from '@execbox/core';
 import { ExecutorRuntimeOptions } from '@execbox/core';
+import { ProviderManifest } from '@execbox/core';
 import { QuickJSWASMModule } from 'quickjs-emscripten';
+import { ToolCall } from '@execbox/core';
+import { ToolCallResult } from '@execbox/core';
 
-// Warning: (ae-forgotten-export) The symbol "QuickJsExecutorOptions" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ExecutorRuntimeOptions_2" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type QuickJsSessionOptions = QuickJsExecutorOptions & ExecutorRuntimeOptions_2 & {
+export interface QuickJsExecutorOptions extends ExecutorRuntimeOptions {
+    loadModule?: () => Promise<unknown> | unknown;
+}
+
+// @public
+export type QuickJsSessionOptions = QuickJsExecutorOptions & ExecutorRuntimeOptions & {
     module?: QuickJSWASMModule;
 };
 
@@ -23,13 +29,8 @@ export interface QuickJsSessionRequest {
     code: string;
     // (undocumented)
     onStarted?: () => void;
-    // Warning: (ae-forgotten-export) The symbol "ToolCall" needs to be exported by the entry point index.d.ts
-    // Warning: (ae-forgotten-export) The symbol "ToolCallResult" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     onToolCall: (call: ToolCall) => Promise<ToolCallResult> | ToolCallResult;
-    // Warning: (ae-forgotten-export) The symbol "ProviderManifest" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     providers: ProviderManifest[];
     // (undocumented)
@@ -39,11 +40,7 @@ export interface QuickJsSessionRequest {
 // @public
 export type QuickJsSessionToolCall = ToolCall;
 
-// Warning: (ae-forgotten-export) The symbol "ExecuteResult" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function runQuickJsSession(request: QuickJsSessionRequest, options?: QuickJsSessionOptions): Promise<ExecuteResult>;
-
-// (No @packageDocumentation comment for this package)
 
 ```

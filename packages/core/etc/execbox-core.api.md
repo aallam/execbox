@@ -229,6 +229,4 @@ export function truncateLogs(logs: string[], maxLogLines: number, maxLogChars: n
 // @public
 export type TypegenToolDescriptor = Pick<ResolvedToolDescriptor, "description" | "inputSchema" | "outputSchema"> & Partial<Pick<ResolvedToolDescriptor, "execute">>;
 
-// (No @packageDocumentation comment for this package)
-
 ```
