@@ -17,8 +17,10 @@
     "packages/isolated-vm"
   ],
   "scripts": {
+    "api:check": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && node --import tsx scripts/run-api-extractor.ts",
+    "api:update": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && node --import tsx scripts/run-api-extractor.ts --local",
     "build": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && npm run build --workspace @execbox/isolated-vm",
-    "clean": "rm -rf coverage dist packages/*/dist",
+    "clean": "rm -rf coverage dist packages/*/dist packages/*/temp",
     "docs:build": "vitepress build docs",
     "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",
@@ -48,6 +50,7 @@
     "@changesets/cli": "^2.29.8",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
     "@eslint/js": "^9.39.2",
+    "@microsoft/api-extractor": "^7.58.5",
     "@types/node": "^22.0.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",

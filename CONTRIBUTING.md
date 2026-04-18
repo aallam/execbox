@@ -26,11 +26,14 @@ This guide is for both humans and coding agents. Agent-specific operating instru
 
 Choose the smallest verification set that covers your change, and include the commands you ran in your PR or handoff notes when the context would help reviewers.
 
+- Public API changes to `@execbox/core`, `@execbox/core/mcp`, or `@execbox/protocol`: run `npm run api:check`
+
 ## Changesets
 
 - Add a `.changeset/*.md` file for user-facing changes to published `@execbox/*` packages.
 - Skip changesets for docs-only, examples-only, CI-only, or internal refactors that do not change published package behavior.
 - Keep the changeset summary focused on the externally visible change.
+- If you intentionally change a checked-in API report, update the report baseline with `npm run api:update` and add the corresponding changeset in the same change.
 
 ## Commits
 

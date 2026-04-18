@@ -4,6 +4,7 @@ dist/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
 packages/*/dist/
+packages/*/temp/
 coverage/
 *.tsbuildinfo
 .env

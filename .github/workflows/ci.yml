@@ -37,6 +37,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Check API reports
+        run: npm run api:check
+
   security:
     runs-on: ubuntu-latest
 
