@@ -17,8 +17,8 @@
     "packages/isolated-vm"
   ],
   "scripts": {
-    "api:check": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && node --import tsx scripts/run-api-extractor.ts",
-    "api:update": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && node --import tsx scripts/run-api-extractor.ts --local",
+    "api:check": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && node --import tsx scripts/run-api-extractor.ts",
+    "api:update": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && node --import tsx scripts/run-api-extractor.ts --local",
     "build": "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && npm run build --workspace @execbox/remote && npm run build --workspace @execbox/process && npm run build --workspace @execbox/worker && npm run build --workspace @execbox/isolated-vm",
     "clean": "rm -rf coverage dist packages/*/dist packages/*/temp",
     "docs:build": "vitepress build docs",

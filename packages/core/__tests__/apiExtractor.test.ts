@@ -29,6 +29,18 @@ describe("run-api-extractor", () => {
         configFilePath: "packages/protocol/api-extractor.json",
         workspace: "@execbox/protocol",
       },
+      {
+        configFilePath: "packages/quickjs/api-extractor.json",
+        workspace: "@execbox/quickjs",
+      },
+      {
+        configFilePath: "packages/quickjs/api-extractor.runner.json",
+        workspace: "@execbox/quickjs",
+      },
+      {
+        configFilePath: "packages/quickjs/api-extractor.protocol-endpoint.json",
+        workspace: "@execbox/quickjs",
+      },
     ]);
   });
 
@@ -69,10 +81,10 @@ describe("run-api-extractor", () => {
     };
 
     expect(packageJson.scripts["api:check"]).toBe(
-      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && node --import tsx scripts/run-api-extractor.ts",
+      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && node --import tsx scripts/run-api-extractor.ts",
     );
     expect(packageJson.scripts["api:update"]).toBe(
-      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && node --import tsx scripts/run-api-extractor.ts --local",
+      "npm run build --workspace @execbox/core && npm run build --workspace @execbox/protocol && npm run build --workspace @execbox/quickjs && node --import tsx scripts/run-api-extractor.ts --local",
     );
 
     expect(
@@ -126,6 +138,55 @@ describe("run-api-extractor", () => {
     });
 
     expect(
+      JSON.parse(
+        readFileSync(
+          path.join(repoRoot, "packages/quickjs/api-extractor.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      apiReport: {
+        enabled: true,
+        reportFileName: "execbox-quickjs.api.md",
+      },
+      mainEntryPointFilePath: "<projectFolder>/dist/index.d.ts",
+    });
+
+    expect(
+      JSON.parse(
+        readFileSync(
+          path.join(repoRoot, "packages/quickjs/api-extractor.runner.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      apiReport: {
+        enabled: true,
+        reportFileName: "execbox-quickjs-runner.api.md",
+      },
+      mainEntryPointFilePath: "<projectFolder>/dist/runner/index.d.ts",
+    });
+
+    expect(
+      JSON.parse(
+        readFileSync(
+          path.join(
+            repoRoot,
+            "packages/quickjs/api-extractor.protocol-endpoint.json",
+          ),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      apiReport: {
+        enabled: true,
+        reportFileName: "execbox-quickjs-runner-protocol-endpoint.api.md",
+      },
+      mainEntryPointFilePath:
+        "<projectFolder>/dist/runner/protocolEndpoint.d.ts",
+    });
+
+    expect(
       readFileSync(
         path.join(repoRoot, "packages/core/etc/execbox-core.api.md"),
         "utf8",
@@ -140,6 +201,30 @@ describe("run-api-extractor", () => {
     expect(
       readFileSync(
         path.join(repoRoot, "packages/protocol/etc/execbox-protocol.api.md"),
+        "utf8",
+      ),
+    ).toContain("## API Report File");
+    expect(
+      readFileSync(
+        path.join(repoRoot, "packages/quickjs/etc/execbox-quickjs.api.md"),
+        "utf8",
+      ),
+    ).toContain("## API Report File");
+    expect(
+      readFileSync(
+        path.join(
+          repoRoot,
+          "packages/quickjs/etc/execbox-quickjs-runner.api.md",
+        ),
+        "utf8",
+      ),
+    ).toContain("## API Report File");
+    expect(
+      readFileSync(
+        path.join(
+          repoRoot,
+          "packages/quickjs/etc/execbox-quickjs-runner-protocol-endpoint.api.md",
+        ),
         "utf8",
       ),
     ).toContain("## API Report File");
