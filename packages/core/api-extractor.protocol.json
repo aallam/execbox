@@ -1,25 +1,33 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
-  "mainEntryPointFilePath": "<projectFolder>/dist/index.d.ts",
+  "mainEntryPointFilePath": "<projectFolder>/dist/protocol/index.d.ts",
   "apiReport": {
     "enabled": true,
-    "reportFileName": "execbox-protocol.api.md",
+    "reportFileName": "execbox-core-protocol.api.md",
     "reportFolder": "<projectFolder>/etc",
     "reportTempFolder": "<projectFolder>/temp/api-extractor"
   },
   "docModel": {
     "enabled": false
   },
-  "dtsRollup": {
-    "enabled": false
+  "compiler": {
+    "tsconfigFilePath": "<projectFolder>/tsconfig.json"
   },
-  "tsdocMetadata": {
+  "dtsRollup": {
     "enabled": false
   },
   "messages": {
     "extractorMessageReporting": {
       "ae-missing-release-tag": {
         "logLevel": "none"
+      },
+      "default": {
+        "logLevel": "warning"
+      }
+    },
+    "tsdocMessageReporting": {
+      "default": {
+        "logLevel": "warning"
       }
     }
   }

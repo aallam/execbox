@@ -12,7 +12,7 @@ This doc set is for two audiences:
 - Start here for the package map, trust model, and overall flow.
 - Read [Core](/architecture/execbox-core) for provider resolution, execution contracts, and error handling.
 - Read [Executors](/architecture/execbox-executors) for QuickJS host modes, remote execution, and `isolated-vm` trade-offs.
-- Read [MCP And Protocol](/architecture/execbox-mcp-and-protocol) for MCP wrapping and where `execbox-protocol` fits.
+- Read [MCP And Protocol](/architecture/execbox-mcp-and-protocol) for MCP wrapping and where `@execbox/core/protocol` fits.
 - Read [Remote Workflow](/architecture/execbox-remote-workflow) for the end-to-end remote execution control flow.
 - Read [Protocol Reference](/architecture/execbox-protocol-reference) for the protocol message catalog and session rules.
 - Read [Runner Specification](/architecture/execbox-runner-specification) for the normative runner specification for non-TypeScript runners.
@@ -26,7 +26,7 @@ flowchart LR
     QJS["@execbox/quickjs<br/>QuickJS executor + reusable runner"]
     REM["@execbox/remote<br/>transport-backed remote executor"]
     IVM["@execbox/isolated-vm<br/>in-process isolated-vm executor + reusable runner"]
-    PROTO["@execbox/protocol<br/>transport messages + shared host session"]
+    PROTO["@execbox/core/protocol<br/>transport messages + shared host session"]
     MCP["MCP sources and wrapped servers"]
 
     APP --> CORE

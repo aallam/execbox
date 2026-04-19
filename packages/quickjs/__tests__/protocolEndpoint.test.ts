@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import type { DispatcherMessage, RunnerMessage } from "@execbox/protocol";
+import type { DispatcherMessage, RunnerMessage } from "@execbox/core/protocol";
 
 import { attachQuickJsProtocolEndpoint } from "../src/runner/protocolEndpoint";
 
@@ -63,7 +63,7 @@ describe("attachQuickJsProtocolEndpoint", () => {
     );
 
     expect(source).toContain(
-      'import { isDispatcherMessage } from "../../../protocol/src/messages.ts";',
+      'import { isDispatcherMessage } from "../../../core/src/protocol/messages.ts";',
     );
   });
 

@@ -45,7 +45,6 @@
   "bugs": "https://github.com/aallam/execbox/issues",
   "dependencies": {
     "@execbox/core": "^0.3.1",
-    "@execbox/protocol": "^0.3.0",
     "@execbox/quickjs": "^0.3.0"
   }
 }

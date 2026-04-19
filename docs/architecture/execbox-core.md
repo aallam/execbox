@@ -106,7 +106,7 @@ This seam is what lets execbox share semantics across:
 
 - the in-process QuickJS executor
 - the in-process `isolated-vm` executor
-- transport-backed executors that reuse the same manifest and dispatcher model through `@execbox/protocol`
+- transport-backed executors that reuse the same manifest and dispatcher model through `@execbox/core/protocol`
 
 without forcing every runtime through the same transport implementation.
 
@@ -199,7 +199,7 @@ The core package does not own QuickJS, `isolated-vm`, worker threads, or transpo
 The consequence is deliberate separation between:
 
 - core execution and runner semantics in `@execbox/core`
-- transport/session mechanics in `@execbox/protocol`
+- transport/session mechanics in `@execbox/core/protocol`
 - runtime-specific bridge code in executor packages
 
 That split keeps the public contract stable without forcing every backend through identical plumbing.

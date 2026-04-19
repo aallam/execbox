@@ -1,6 +1,6 @@
-# Execbox Protocol Reference
+# Execbox Core Protocol Reference
 
-This page is the message-level reference for `@execbox/protocol`.
+This page is the message-level reference for `@execbox/core/protocol`.
 
 It describes the wire shapes and session semantics used by transport-backed execbox runtimes such as hosted QuickJS and remote execution. It is grounded in the shipped implementation and should be read as a practical reference, not as a formal RFC.
 

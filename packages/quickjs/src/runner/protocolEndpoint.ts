@@ -8,11 +8,11 @@ import type {
   DispatcherMessage,
   ExecuteMessage,
   RunnerMessage,
-} from "@execbox/protocol";
+} from "@execbox/core/protocol";
 import type { ToolCallResult } from "@execbox/core";
 // This entrypoint is executed directly from source in worker/process tests before
 // workspace packages are built, so its runtime validator must stay source-local.
-import { isDispatcherMessage } from "../../../protocol/src/messages.ts";
+import { isDispatcherMessage } from "../../../core/src/protocol/messages.ts";
 
 import { runQuickJsSession } from "./index.ts";
 

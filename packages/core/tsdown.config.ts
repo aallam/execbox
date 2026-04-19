@@ -15,7 +15,7 @@ export default defineConfig({
   dts: {
     banner: DTS_BANNER,
   },
-  entry: ["src/index.ts", "src/mcp/index.ts"],
+  entry: ["src/index.ts", "src/mcp/index.ts", "src/protocol/index.ts"],
   fixedExtension: false,
   format: ["esm", "cjs"],
   platform: "node",

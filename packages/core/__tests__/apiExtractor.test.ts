@@ -26,8 +26,8 @@ describe("run-api-extractor", () => {
         workspace: "@execbox/core",
       },
       {
-        configFilePath: "packages/protocol/api-extractor.json",
-        workspace: "@execbox/protocol",
+        configFilePath: "packages/core/api-extractor.protocol.json",
+        workspace: "@execbox/core",
       },
       {
         configFilePath: "packages/quickjs/api-extractor.json",
@@ -91,6 +91,7 @@ describe("run-api-extractor", () => {
     ) as {
       devDependencies: Record<string, string>;
       scripts: Record<string, string>;
+      workspaces: string[];
     };
 
     expect(packageJson.scripts.build).toBe(
@@ -105,6 +106,7 @@ describe("run-api-extractor", () => {
     expect(packageJson.scripts["package:check"]).toBe(
       "npm_config_cache=$PWD/.npm-cache CI=1 npm run build",
     );
+    expect(packageJson.workspaces).not.toContain("packages/protocol");
     expect(packageJson.devDependencies).toMatchObject({
       "@arethetypeswrong/core": expect.any(String),
       publint: expect.any(String),
@@ -112,7 +114,6 @@ describe("run-api-extractor", () => {
 
     const tsdownConfigPaths = [
       "packages/core/tsdown.config.ts",
-      "packages/protocol/tsdown.config.ts",
       "packages/quickjs/tsdown.config.ts",
       "packages/remote/tsdown.config.ts",
       "packages/isolated-vm/tsdown.config.ts",
@@ -182,16 +183,16 @@ describe("run-api-extractor", () => {
     expect(
       JSON.parse(
         readFileSync(
-          path.join(repoRoot, "packages/protocol/api-extractor.json"),
+          path.join(repoRoot, "packages/core/api-extractor.protocol.json"),
           "utf8",
         ),
       ),
     ).toMatchObject({
       apiReport: {
         enabled: true,
-        reportFileName: "execbox-protocol.api.md",
+        reportFileName: "execbox-core-protocol.api.md",
       },
-      mainEntryPointFilePath: "<projectFolder>/dist/index.d.ts",
+      mainEntryPointFilePath: "<projectFolder>/dist/protocol/index.d.ts",
     });
 
     expect(
@@ -302,7 +303,7 @@ describe("run-api-extractor", () => {
     ).toContain("## API Report File");
     expect(
       readFileSync(
-        path.join(repoRoot, "packages/protocol/etc/execbox-protocol.api.md"),
+        path.join(repoRoot, "packages/core/etc/execbox-core-protocol.api.md"),
         "utf8",
       ),
     ).toContain("## API Report File");
@@ -360,7 +361,7 @@ describe("run-api-extractor", () => {
     const reportPaths = [
       "packages/core/etc/execbox-core.api.md",
       "packages/core/etc/execbox-core-mcp.api.md",
-      "packages/protocol/etc/execbox-protocol.api.md",
+      "packages/core/etc/execbox-core-protocol.api.md",
       "packages/quickjs/etc/execbox-quickjs.api.md",
       "packages/quickjs/etc/execbox-quickjs-runner.api.md",
       "packages/quickjs/etc/execbox-quickjs-runner-protocol-endpoint.api.md",

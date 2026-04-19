@@ -4,8 +4,8 @@
 
 ```ts
 
-import { DispatcherMessage } from '@execbox/protocol';
-import { RunnerMessage } from '@execbox/protocol';
+import { DispatcherMessage } from '@execbox/core/protocol';
+import { RunnerMessage } from '@execbox/core/protocol';
 
 // @public
 export function attachQuickJsProtocolEndpoint(port: QuickJsProtocolPort): () => void;

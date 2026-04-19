@@ -4,7 +4,7 @@ import type {
   ExecuteMessage,
   RunnerMessage,
   TransportCloseReason,
-} from "@execbox/protocol";
+} from "@execbox/core/protocol";
 
 import { attachQuickJsRemoteEndpoint } from "../src/index";
 

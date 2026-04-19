@@ -30,7 +30,7 @@ vi.mock("node:child_process", () => ({
   }),
 }));
 
-vi.mock("@execbox/protocol", async (importOriginal) => {
+vi.mock("@execbox/core/protocol", async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
 
   return {
