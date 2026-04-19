@@ -1,1 +1,1 @@
-export { createToolCallDispatcher } from "../../core/src/runner.ts";
+export { createToolCallDispatcher } from "@execbox/core";

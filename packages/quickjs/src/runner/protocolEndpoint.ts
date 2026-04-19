@@ -1,3 +1,7 @@
+/**
+ * @packageDocumentation
+ * Public API for the `@execbox/quickjs/runner/protocol-endpoint` entrypoint.
+ */
 import { randomUUID } from "node:crypto";
 
 import type {
@@ -6,6 +10,8 @@ import type {
   RunnerMessage,
   ToolCallResult,
 } from "@execbox/protocol";
+// This entrypoint is executed directly from source in worker/process tests before
+// workspace packages are built, so its runtime validator must stay source-local.
 import { isDispatcherMessage } from "../../../protocol/src/messages.ts";
 
 import { runQuickJsSession } from "./index.ts";

@@ -1,3 +1,7 @@
+/**
+ * @packageDocumentation
+ * Public API for the `@execbox/core` package.
+ */
 export type { Executor, ExecutorPoolOptions } from "./executor/executor";
 export {
   createTimeoutExecuteResult,

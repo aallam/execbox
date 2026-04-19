@@ -1,1 +1,1 @@
-export { extractProviderManifests } from "../../core/src/runner.ts";
+export { extractProviderManifests } from "@execbox/core";

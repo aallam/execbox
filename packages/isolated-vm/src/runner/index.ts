@@ -1,3 +1,7 @@
+/**
+ * @packageDocumentation
+ * Public API for the `@execbox/isolated-vm/runner` entrypoint.
+ */
 import { randomUUID } from "node:crypto";
 
 import {
@@ -15,9 +19,11 @@ import {
   type ProviderManifest,
   type ToolCall,
   type ToolCallResult,
-} from "../../../core/src/runtime.ts";
+} from "@execbox/core";
 
 import type { IsolatedVmExecutorOptions } from "../types";
+
+export type { IsolatedVmExecutorOptions } from "../types";
 
 type IsolatedVmExternalCopyInstance = {
   copyInto: (options?: { release?: boolean; transferIn?: boolean }) => unknown;

@@ -4,3 +4,4 @@ docs/.vitepress/dist
 node_modules
 package-lock.json
 packages/**/dist
+packages/**/etc/*.api.md

@@ -20,17 +20,21 @@ This guide is for both humans and coding agents. Agent-specific operating instru
 ## Verification
 
 - General code changes: `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`
+- Package export, manifest, or published type-resolution changes: `npm run package:check`
 - Docs site changes: `npm run docs:build`
 - Security or execution-boundary changes: `npm run test:security`
 - `@execbox/isolated-vm` changes: `npm run test:isolated-vm` or `npm run verify:isolated-vm`
 
 Choose the smallest verification set that covers your change, and include the commands you ran in your PR or handoff notes when the context would help reviewers.
 
+- Public API changes to `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/process`, `@execbox/worker`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`: run `npm run api:check`
+
 ## Changesets
 
 - Add a `.changeset/*.md` file for user-facing changes to published `@execbox/*` packages.
 - Skip changesets for docs-only, examples-only, CI-only, or internal refactors that do not change published package behavior.
 - Keep the changeset summary focused on the externally visible change.
+- If you intentionally change a checked-in API report, update the report baseline with `npm run api:update` and add the corresponding changeset in the same change.
 
 ## Commits
 
