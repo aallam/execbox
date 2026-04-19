@@ -1,5 +1,13 @@
 # @execbox/remote
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [148303a]
+  - @execbox/quickjs@0.3.0
+  - @execbox/protocol@0.3.0
+
 ## 0.1.4
 
 ### Patch Changes
