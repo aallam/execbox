@@ -1,6 +1,6 @@
 {
   "name": "@execbox/remote",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Transport-backed remote executor for the execbox core package.",
   "license": "MIT",
   "type": "module",
@@ -45,7 +45,7 @@
   "bugs": "https://github.com/aallam/execbox/issues",
   "dependencies": {
     "@execbox/core": "^0.3.1",
-    "@execbox/protocol": "^0.2.1",
-    "@execbox/quickjs": "^0.2.1"
+    "@execbox/protocol": "^0.3.0",
+    "@execbox/quickjs": "^0.3.0"
   }
 }

@@ -1,5 +1,18 @@
 # @execbox/quickjs
 
+## 0.3.0
+
+### Minor Changes
+
+- 148303a: `@execbox/quickjs` now covers inline, worker-hosted, and process-hosted QuickJS execution through `new QuickJsExecutor({ host })`. Migrate `@execbox/process` usage to `new QuickJsExecutor({ host: "process" })` and `@execbox/worker` usage to `new QuickJsExecutor({ host: "worker" })`.
+
+  `@execbox/protocol` no longer re-exports `createToolCallDispatcher` or `extractProviderManifests`. Import those helpers from `@execbox/core` instead.
+
+### Patch Changes
+
+- Updated dependencies [148303a]
+  - @execbox/protocol@0.3.0
+
 ## 0.2.1
 
 ### Patch Changes

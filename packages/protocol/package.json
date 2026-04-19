@@ -1,6 +1,6 @@
 {
   "name": "@execbox/protocol",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Transport-safe protocol and host-session helpers for execbox runtimes.",
   "license": "MIT",
   "type": "module",
