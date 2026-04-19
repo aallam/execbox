@@ -2,13 +2,15 @@ import {
   createTimeoutExecuteResult,
   createToolCallDispatcher,
   extractProviderManifests,
-  type ExecutionOptions,
-  type ExecuteResult,
-  type Executor,
-  type ResolvedToolProvider,
+} from "../../core/src/runtime.ts";
+import type {
+  ExecutionOptions,
+  ExecuteResult,
+  Executor,
+  ResolvedToolProvider,
 } from "@execbox/core";
 
-import { runQuickJsSession } from "./runner/index";
+import { runQuickJsSession } from "./runner/index.ts";
 import type { QuickJsExecutorOptions } from "./types";
 
 /**
