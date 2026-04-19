@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 
-import { runHostTransportSession, type HostTransport } from "@execbox/protocol";
+import {
+  runHostTransportSession,
+  type HostTransport,
+} from "@execbox/core/protocol";
 import type { ExecutorPoolOptions } from "@execbox/core";
 import {
   resolveExecutorRuntimeOptions,

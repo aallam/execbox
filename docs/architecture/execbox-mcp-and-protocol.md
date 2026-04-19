@@ -3,7 +3,7 @@
 This page covers two related but separate parts of the execbox architecture:
 
 - MCP adapters in `@execbox/core`
-- transport-safe execution plumbing in `@execbox/protocol`
+- transport-safe execution plumbing in `@execbox/core/protocol`
 
 Use this page as the overview. For the remote execution control flow, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the message-level protocol contract, read [execbox-protocol-reference.md](./execbox-protocol-reference.md). For the normative runner specification, read [execbox-runner-specification.md](./execbox-runner-specification.md).
 
@@ -39,7 +39,7 @@ flowchart LR
 
 ## Protocol Responsibilities
 
-`@execbox/protocol` is not a sandbox runtime. It provides the transport-safe layer that lets a trusted host and a runtime exchange execution messages without sharing host closures.
+`@execbox/core/protocol` is not a sandbox runtime. It provides the transport-safe layer that lets a trusted host and a runtime exchange execution messages without sharing host closures.
 
 It owns:
 
@@ -51,13 +51,13 @@ It owns:
 The architecture split is:
 
 - `@execbox/core` owns provider resolution, manifest extraction, and host-side tool dispatch semantics
-- `@execbox/protocol` owns wire messages, host-session lifecycle, and host-side shell pooling utilities around those semantics
+- `@execbox/core/protocol` owns wire messages, host-session lifecycle, and host-side shell pooling utilities around those semantics
 
 ## How The Packages Fit Together
 
 - `QuickJsExecutor` uses the shared runner semantics from `@execbox/core` directly.
 - `IsolatedVmExecutor` uses the same core runner semantics, but keeps a direct `isolated-vm` bridge instead of transport messages.
-- `QuickJsExecutor` in `host: "process"` and `host: "worker"` modes uses the shared host session from `@execbox/protocol` plus the shared QuickJS protocol endpoint inside the child or worker shell.
+- `QuickJsExecutor` in `host: "process"` and `host: "worker"` modes uses the shared host session from `@execbox/core/protocol` plus the shared QuickJS protocol endpoint inside the child or worker shell.
 - `RemoteExecutor` uses that same host session across an app-owned transport boundary.
 - Pooled process and worker execution reuse only the outer host shell. Each `execute()` call still starts a fresh QuickJS runtime through the shared protocol endpoint.
 
@@ -73,7 +73,7 @@ flowchart TB
     end
 
     subgraph TransportBacked["Transport-backed executors"]
-        PROTO["@execbox/protocol<br/>messages + host session + resource pool"]
+        PROTO["@execbox/core/protocol<br/>messages + host session + resource pool"]
         HOSTED["QuickJsExecutor host modes"]
         REM["RemoteExecutor"]
         ENDPOINT["QuickJS protocol endpoint"]

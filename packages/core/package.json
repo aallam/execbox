@@ -12,6 +12,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": {
         "import": "./dist/index.d.ts",
         "require": "./dist/index.d.cts"
@@ -20,12 +21,22 @@
       "require": "./dist/index.cjs"
     },
     "./mcp": {
+      "source": "./src/mcp/index.ts",
       "types": {
         "import": "./dist/mcp/index.d.ts",
         "require": "./dist/mcp/index.d.cts"
       },
       "import": "./dist/mcp/index.js",
       "require": "./dist/mcp/index.cjs"
+    },
+    "./protocol": {
+      "source": "./src/protocol/index.ts",
+      "types": {
+        "import": "./dist/protocol/index.d.ts",
+        "require": "./dist/protocol/index.d.cts"
+      },
+      "import": "./dist/protocol/index.js",
+      "require": "./dist/protocol/index.cjs"
     }
   },
   "sideEffects": false,

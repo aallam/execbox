@@ -5,7 +5,7 @@
     "paths": {
       "@execbox/core": ["./packages/core/src/index.ts"],
       "@execbox/core/mcp": ["./packages/core/src/mcp/index.ts"],
-      "@execbox/protocol": ["./packages/protocol/src/index.ts"],
+      "@execbox/core/protocol": ["./packages/core/src/protocol/index.ts"],
       "@execbox/quickjs": ["./packages/quickjs/src/index.ts"],
       "@execbox/quickjs/runner": ["./packages/quickjs/src/runner/index.ts"],
       "@execbox/quickjs/runner/protocol-endpoint": [
@@ -23,7 +23,6 @@
     "examples/**/*.ts",
     "examples/execbox-isolated-vm-basic.ts",
     "packages/core/**/*.ts",
-    "packages/protocol/**/*.ts",
     "packages/quickjs/**/*.ts",
     "packages/remote/**/*.ts",
     "packages/isolated-vm/**/*.ts",

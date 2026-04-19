@@ -1,5 +1,8 @@
-import type { HostTransport, TransportCloseReason } from "@execbox/protocol";
 import type { ExecutorRuntimeOptions } from "@execbox/core";
+import type {
+  HostTransport,
+  TransportCloseReason,
+} from "@execbox/core/protocol";
 
 /**
  * Factory that creates a fresh transport connection for one remote execution.

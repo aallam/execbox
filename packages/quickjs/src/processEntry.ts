@@ -1,4 +1,4 @@
-import type { DispatcherMessage, RunnerMessage } from "@execbox/protocol";
+import type { DispatcherMessage, RunnerMessage } from "@execbox/core/protocol";
 
 import { attachQuickJsProtocolEndpoint } from "./runner/protocolEndpoint.ts";
 

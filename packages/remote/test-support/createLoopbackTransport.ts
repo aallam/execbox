@@ -4,7 +4,7 @@ import type {
   HostTransport,
   RunnerMessage,
   TransportCloseReason,
-} from "@execbox/protocol";
+} from "@execbox/core/protocol";
 
 type CloseHandler = (reason?: TransportCloseReason) => void;
 type ErrorHandler = (error: Error) => void;

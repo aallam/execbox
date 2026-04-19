@@ -3,13 +3,13 @@ import { EventEmitter } from "node:events";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { resolveProvider } from "@execbox/core";
-
-import type { DispatcherMessage, RunnerMessage } from "../src/messages";
 import {
   runHostTransportSession,
+  type DispatcherMessage,
   type HostTransport,
+  type RunnerMessage,
   type TransportCloseReason,
-} from "../src/index";
+} from "@execbox/core/protocol";
 
 const runtimeOptions = {
   maxLogChars: 64_000,
@@ -258,77 +258,70 @@ describe("runHostTransportSession", () => {
     });
   });
 
-  it("fails with internal_error when the transport emits an error before done", async () => {
+  it("returns the transport close reason when it shuts down before timing out", async () => {
+    vi.useFakeTimers();
     const transport = new FakeTransport();
 
-    transport.send.mockImplementation(async (message: DispatcherMessage) => {
-      transport.sent.push(message);
-
-      if (message.type === "execute") {
-        queueMicrotask(() => {
-          transport.emitMessage({
-            id: message.id,
-            type: "started",
-          });
-          transport.emit("error", new Error("Runner channel broke"));
-        });
-      }
+    const resultPromise = runHostTransportSession({
+      cancelGraceMs: 0,
+      code: "1 + 1",
+      executionId: "exec-close",
+      providers: [],
+      runtimeOptions: {
+        ...runtimeOptions,
+        timeoutMs: 1_000,
+      },
+      transport,
     });
 
-    await expect(
-      runHostTransportSession({
-        cancelGraceMs: 0,
-        code: "1 + 1",
-        executionId: "exec-error",
-        providers: [],
-        runtimeOptions,
-        transport,
-      }),
-    ).resolves.toMatchObject({
+    transport.emitClose({
+      code: 25,
+      message: "Transport closed unexpectedly",
+    });
+
+    await expect(resultPromise).resolves.toMatchObject({
       error: {
         code: "internal_error",
-        message: "Runner channel broke",
+        message: "Transport closed unexpectedly",
       },
       ok: false,
     });
   });
 
-  it("fails with internal_error when the transport closes before done", async () => {
+  it("returns transport send failures as internal errors", async () => {
     const transport = new FakeTransport();
+    transport.send.mockRejectedValueOnce(new Error("send failed"));
 
-    transport.send.mockImplementation(async (message: DispatcherMessage) => {
-      transport.sent.push(message);
-
-      if (message.type === "execute") {
-        queueMicrotask(() => {
-          transport.emitClose({
-            code: 13,
-            message: "Runner transport closed early",
-          });
-        });
-      }
+    const result = await runHostTransportSession({
+      cancelGraceMs: 0,
+      code: "1 + 1",
+      executionId: "exec-send-fail",
+      providers: [],
+      runtimeOptions,
+      transport,
     });
 
-    await expect(
-      runHostTransportSession({
-        cancelGraceMs: 0,
-        code: "1 + 1",
-        executionId: "exec-close",
-        providers: [],
-        runtimeOptions,
-        transport,
-      }),
-    ).resolves.toMatchObject({
+    expect(result).toMatchObject({
       error: {
         code: "internal_error",
-        message: "Runner transport closed early",
+        message: "send failed",
       },
       ok: false,
     });
   });
 
-  it("ignores malformed runner messages until a valid done arrives", async () => {
+  it("normalizes tool dispatcher failures into tool_result errors", async () => {
     const transport = new FakeTransport();
+    const provider = resolveProvider({
+      name: "mcp",
+      tools: {
+        add: {
+          execute: async () => {
+            throw new Error("tool crashed");
+          },
+        },
+      },
+    });
 
     transport.send.mockImplementation(async (message: DispatcherMessage) => {
       transport.sent.push(message);
@@ -340,11 +333,62 @@ describe("runHostTransportSession", () => {
             type: "started",
           });
           transport.emitMessage({
-            id: message.id,
-            type: "bogus",
-          } as unknown as RunnerMessage);
+            callId: "call-error",
+            input: {},
+            providerName: "mcp",
+            safeToolName: "add",
+            type: "tool_call",
+          });
+        });
+      }
+
+      if (message.type === "tool_result") {
+        queueMicrotask(() => {
           transport.emitMessage({
             durationMs: 5,
+            error: message.ok
+              ? {
+                  code: "internal_error",
+                  message: "missing tool_result failure",
+                }
+              : message.error,
+            id: "exec-tool-error",
+            logs: [],
+            ok: false,
+            type: "done",
+          });
+        });
+      }
+    });
+
+    const result = await runHostTransportSession({
+      cancelGraceMs: 0,
+      code: "await mcp.add({})",
+      executionId: "exec-tool-error",
+      providers: [provider],
+      runtimeOptions,
+      transport,
+    });
+
+    expect(result).toMatchObject({
+      error: {
+        code: "tool_error",
+        message: "tool crashed",
+      },
+      ok: false,
+    });
+  });
+
+  it("always disposes the transport after the session settles", async () => {
+    const transport = new FakeTransport();
+
+    transport.send.mockImplementation(async (message: DispatcherMessage) => {
+      transport.sent.push(message);
+
+      if (message.type === "execute") {
+        queueMicrotask(() => {
+          transport.emitMessage({
+            durationMs: 1,
             id: message.id,
             logs: [],
             ok: true,
@@ -355,54 +399,15 @@ describe("runHostTransportSession", () => {
       }
     });
 
-    await expect(
-      runHostTransportSession({
-        cancelGraceMs: 0,
-        code: "1 + 1",
-        executionId: "exec-malformed",
-        providers: [],
-        runtimeOptions,
-        transport,
-      }),
-    ).resolves.toMatchObject({
-      ok: true,
-      result: 2,
-    });
-  });
-
-  it("normalizes successful done messages that omit an undefined result", async () => {
-    const transport = new FakeTransport();
-
-    transport.send.mockImplementation(async (message: DispatcherMessage) => {
-      transport.sent.push(message);
-
-      if (message.type === "execute") {
-        queueMicrotask(() => {
-          transport.emitMessage({
-            durationMs: 5,
-            id: message.id,
-            logs: ["12345", "67890"],
-            ok: true,
-            type: "done",
-          } as unknown as RunnerMessage);
-        });
-      }
+    await runHostTransportSession({
+      cancelGraceMs: 0,
+      code: "1 + 1",
+      executionId: "exec-dispose",
+      providers: [],
+      runtimeOptions,
+      transport,
     });
 
-    await expect(
-      runHostTransportSession({
-        cancelGraceMs: 0,
-        code: 'console.log("12345"); console.log("67890");',
-        executionId: "exec-undefined-result",
-        providers: [],
-        runtimeOptions,
-        transport,
-      }),
-    ).resolves.toEqual({
-      durationMs: 5,
-      logs: ["12345", "67890"],
-      ok: true,
-      result: undefined,
-    });
+    expect(transport.dispose).toHaveBeenCalledTimes(1);
   });
 });

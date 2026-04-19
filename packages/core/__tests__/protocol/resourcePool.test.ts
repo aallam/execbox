@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createResourcePool } from "../src/index";
+import { createResourcePool } from "@execbox/core/protocol";
 
 describe("createResourcePool", () => {
   it("reuses released resources when capacity is available", async () => {

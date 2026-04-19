@@ -26,7 +26,7 @@ flowchart LR
     IVMRT["isolated-vm context"]
     THREAD["Worker thread"]
     RUNNER["core runner semantics"]
-    PROTO["execbox-protocol<br/>messages + host session"]
+    PROTO["@execbox/core/protocol<br/>messages + host session"]
     WQJSRT["QuickJS runtime in worker"]
     PQJSRT["QuickJS runtime in child process"]
 
@@ -143,7 +143,7 @@ Every `execute()` call still creates a fresh QuickJS runtime/context, reinjects 
 
 Pooling is implemented at the host-shell layer, not at the QuickJS runtime layer.
 
-- `@execbox/protocol` exposes a small bounded async `createResourcePool()` helper that owns reusable shells, idle eviction, and `prewarm()` / `dispose()` support.
+- `@execbox/core/protocol` exposes a small bounded async `createResourcePool()` helper that owns reusable shells, idle eviction, and `prewarm()` / `dispose()` support.
 - Hosted `QuickJsExecutor` pools either `ChildProcess` or `Worker` shells. Each shell owns one long-lived transport wrapper plus one attached QuickJS protocol endpoint.
 - The child/worker entrypoint only attaches `attachQuickJsProtocolEndpoint(...)` once. That endpoint accepts one active `execute` message at a time and starts a fresh `runQuickJsSession()` for each message.
 - Concurrency therefore comes from pool size, not from multiplexing several executions through one shell.

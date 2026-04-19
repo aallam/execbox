@@ -14,6 +14,10 @@ export default defineConfig({
         replacement: path.join(repoRoot, "packages/core/src/mcp/index.ts"),
       },
       {
+        find: "@execbox/core/protocol",
+        replacement: path.join(repoRoot, "packages/core/src/protocol/index.ts"),
+      },
+      {
         find: "@execbox/quickjs/runner/protocol-endpoint",
         replacement: path.join(
           repoRoot,
@@ -34,10 +38,6 @@ export default defineConfig({
       {
         find: "@execbox/remote",
         replacement: path.join(repoRoot, "packages/remote/src/index.ts"),
-      },
-      {
-        find: "@execbox/protocol",
-        replacement: path.join(repoRoot, "packages/protocol/src/index.ts"),
       },
       {
         find: "@execbox/isolated-vm/runner",

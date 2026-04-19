@@ -8,9 +8,9 @@ import { ExecuteResult } from '@execbox/core';
 import { ExecutionOptions } from '@execbox/core';
 import { Executor } from '@execbox/core';
 import { ExecutorRuntimeOptions } from '@execbox/core';
-import { HostTransport } from '@execbox/protocol';
+import { HostTransport } from '@execbox/core/protocol';
 import { ResolvedToolProvider } from '@execbox/core';
-import { TransportCloseReason } from '@execbox/protocol';
+import { TransportCloseReason } from '@execbox/core/protocol';
 
 // @public
 export function attachQuickJsRemoteEndpoint(port: RemoteRunnerPort): () => void;

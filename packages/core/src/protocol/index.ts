@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Public API for the `@execbox/protocol` package.
+ * Public API for the `@execbox/core/protocol` entrypoint.
  */
 export { runHostTransportSession } from "./hostSession";
 export { getNodeTransportExecArgv } from "./nodeBootstrap";
@@ -28,3 +28,19 @@ export type {
   ResourcePoolLease,
   ResourcePoolOptions,
 } from "./resourcePool";
+export type {
+  ExecutorRuntimeOptions,
+  ProviderManifest,
+  ProviderToolManifest,
+  ToolCall,
+  ToolCallResult,
+} from "../runner";
+export type {
+  ExecuteError,
+  ExecuteErrorCode,
+  ExecuteResult,
+  JsonSchema,
+  ResolvedToolDescriptor,
+  ResolvedToolProvider,
+  ToolExecutionContext,
+} from "../types";

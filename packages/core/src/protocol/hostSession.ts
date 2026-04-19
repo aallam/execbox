@@ -1,19 +1,18 @@
 import {
   createToolCallDispatcher,
   extractProviderManifests,
-  getExecutionTimeoutMessage,
-  type ExecuteResult,
   type ExecutorRuntimeOptions,
-  type ResolvedToolProvider,
-} from "@execbox/core";
+} from "../runner.ts";
+import { getExecutionTimeoutMessage } from "../executor/shared.ts";
+import type { ExecuteResult, ResolvedToolProvider } from "../types.ts";
 
 import type {
   DispatcherMessage,
   DoneMessage,
   RunnerMessage,
   ToolCallMessage,
-} from "./messages";
-import { isRunnerMessage } from "./messages";
+} from "./messages.ts";
+import { isRunnerMessage } from "./messages.ts";
 
 const DEFAULT_CANCEL_GRACE_MS = 25;
 const HOST_TIMEOUT_BACKSTOP_MS = 100;

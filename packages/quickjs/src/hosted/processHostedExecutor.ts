@@ -8,7 +8,7 @@ import {
   type ResourcePool,
   type RunnerMessage,
   type TransportCloseReason,
-} from "@execbox/protocol";
+} from "@execbox/core/protocol";
 import {
   createTimeoutExecuteResult,
   type ExecutionOptions,

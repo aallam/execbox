@@ -16,8 +16,8 @@ export const apiExtractorTargets: ApiExtractorTarget[] = [
     workspace: "@execbox/core",
   },
   {
-    configFilePath: "packages/protocol/api-extractor.json",
-    workspace: "@execbox/protocol",
+    configFilePath: "packages/core/api-extractor.protocol.json",
+    workspace: "@execbox/core",
   },
   {
     configFilePath: "packages/quickjs/api-extractor.json",

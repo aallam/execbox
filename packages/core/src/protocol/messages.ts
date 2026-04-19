@@ -1,10 +1,10 @@
 import type {
-  ExecuteResult,
   ExecutorRuntimeOptions,
   ProviderManifest,
   ToolCall,
   ToolCallResult,
-} from "@execbox/core";
+} from "../runner.ts";
+import type { ExecuteResult } from "../types.ts";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

@@ -4,7 +4,7 @@
 
 - `execbox` is a Node.js 22+ npm workspace that publishes the `@execbox/*` package family.
 - Core source lives under `packages/*/src`, tests live under `packages/*/__tests__`, runnable examples live under `examples/`, and the public docs site lives under `docs/`.
-- The workspace currently contains `@execbox/core`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/remote`, and `@execbox/isolated-vm`.
+- The workspace currently contains `@execbox/core`, `@execbox/quickjs`, `@execbox/remote`, and `@execbox/isolated-vm`.
 - Keep changes aligned with existing package boundaries. Prefer changing the owning package instead of introducing cross-package shortcuts.
 
 ## Setup Commands
@@ -32,7 +32,7 @@
 
 - For most code changes, run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
 - If you change package exports, manifest fields, or published type-resolution behavior, also run `npm run package:check`.
-- If you change the public API of `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`, also run `npm run api:check`.
+- If you change the public API of `@execbox/core`, `@execbox/core/mcp`, `@execbox/core/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`, also run `npm run api:check`.
 - If you change docs site content, navigation, or VitePress config, also run `npm run docs:build`.
 - If you touch execution boundaries, timeout handling, abort propagation, schema validation, or log/memory controls, also run `npm run test:security`.
 - If you touch `@execbox/isolated-vm` or codepaths guarded by `VITEST_INCLUDE_ISOLATED_VM`, run `npm run test:isolated-vm` or `npm run verify:isolated-vm`.
@@ -48,7 +48,7 @@
 - Use Conventional Commits for git commit messages, for example `docs: add agent and contributor guides` or `fix(worker): handle timeout classification`.
 - Published package releases are managed with Changesets and GitHub Actions.
 - Add a `.changeset/*.md` entry when a change affects published package behavior, public APIs, or release notes for one or more `@execbox/*` packages.
-- If you intentionally change a checked-in API report for `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`, update it with `npm run api:update` in the same change as the code and changeset.
+- If you intentionally change a checked-in API report for `@execbox/core`, `@execbox/core/mcp`, `@execbox/core/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`, update it with `npm run api:update` in the same change as the code and changeset.
 - Skip a changeset for docs-only, examples-only, CI-only, or internal maintenance changes that do not affect published package behavior.
 
 ## Useful References
