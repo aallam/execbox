@@ -1,6 +1,6 @@
 {
   "name": "@execbox/process",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Child-process executor for the execbox core package.",
   "license": "MIT",
   "type": "module",
@@ -44,8 +44,8 @@
   "homepage": "https://github.com/aallam/execbox/tree/main/packages/process#readme",
   "bugs": "https://github.com/aallam/execbox/issues",
   "dependencies": {
-    "@execbox/core": "^0.3.0",
-    "@execbox/protocol": "^0.2.0",
-    "@execbox/quickjs": "^0.2.0"
+    "@execbox/core": "^0.3.1",
+    "@execbox/protocol": "^0.2.1",
+    "@execbox/quickjs": "^0.2.1"
   }
 }
