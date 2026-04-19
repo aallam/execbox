@@ -4,12 +4,9 @@
 
 ```ts
 
-import { createToolCallDispatcher } from '@execbox/core';
 import { ExecuteResult } from '@execbox/core';
 import { ExecutorRuntimeOptions } from '@execbox/core';
-import { extractProviderManifests } from '@execbox/core';
 import { ProviderManifest } from '@execbox/core';
-import { ProviderToolManifest } from '@execbox/core';
 import { ResolvedToolProvider } from '@execbox/core';
 import { ToolCall } from '@execbox/core';
 import { ToolCallResult } from '@execbox/core';
@@ -24,8 +21,6 @@ export interface CancelMessage {
 
 // @public
 export function createResourcePool<T>(options: ResourcePoolOptions<T>): ResourcePool<T>;
-
-export { createToolCallDispatcher }
 
 // @public
 export type DispatcherMessage = CancelMessage | ExecuteMessage | ToolResultMessage;
@@ -64,10 +59,6 @@ export interface ExecuteMessage {
     // (undocumented)
     type: "execute";
 }
-
-export { ExecutorRuntimeOptions }
-
-export { extractProviderManifests }
 
 // @public
 export function getNodeTransportExecArgv(moduleUrl: string): string[] | undefined;
@@ -113,10 +104,6 @@ export function isDispatcherMessage(value: unknown): value is DispatcherMessage;
 
 // @public
 export function isRunnerMessage(value: unknown): value is RunnerMessage;
-
-export { ProviderManifest }
-
-export { ProviderToolManifest }
 
 // @public
 export interface ResourcePool<T> {
@@ -164,8 +151,6 @@ export interface StartedMessage {
     type: "started";
 }
 
-export { ToolCall }
-
 // @public
 export interface ToolCallMessage extends ToolCall {
     // (undocumented)
@@ -173,8 +158,6 @@ export interface ToolCallMessage extends ToolCall {
     // (undocumented)
     type: "tool_call";
 }
-
-export { ToolCallResult }
 
 // @public
 export type ToolResultMessage = {

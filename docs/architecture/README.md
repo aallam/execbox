@@ -11,7 +11,7 @@ This doc set is for two audiences:
 
 - Start here for the package map, trust model, and overall flow.
 - Read [execbox-core.md](./execbox-core.md) for provider resolution, execution contracts, and error handling.
-- Read [execbox-executors.md](./execbox-executors.md) for QuickJS, process, worker-thread, and `isolated-vm` trade-offs.
+- Read [execbox-executors.md](./execbox-executors.md) for QuickJS host modes, remote execution, and `isolated-vm` trade-offs.
 - Read [execbox-mcp-and-protocol.md](./execbox-mcp-and-protocol.md) for MCP wrapping and where `execbox-protocol` fits.
 - Read [execbox-remote-workflow.md](./execbox-remote-workflow.md) for the end-to-end remote execution control flow.
 - Read [execbox-protocol-reference.md](./execbox-protocol-reference.md) for the protocol message catalog and session rules.
@@ -23,39 +23,30 @@ This doc set is for two audiences:
 flowchart LR
     APP["Host application"]
     CORE["@execbox/core<br/>provider resolution + runner semantics + MCP adapters"]
-    QJS["@execbox/quickjs<br/>in-process QuickJS executor + reusable runner"]
+    QJS["@execbox/quickjs<br/>QuickJS executor + reusable runner"]
     REM["@execbox/remote<br/>transport-backed remote executor"]
-    PROC["@execbox/process<br/>child-process QuickJS executor"]
     IVM["@execbox/isolated-vm<br/>in-process isolated-vm executor + reusable runner"]
     PROTO["@execbox/protocol<br/>transport messages + shared host session"]
-    WORKER["@execbox/worker<br/>worker-thread QuickJS executor"]
     MCP["MCP sources and wrapped servers"]
 
     APP --> CORE
     APP --> QJS
     APP --> REM
-    APP --> PROC
     APP --> IVM
-    APP --> WORKER
     CORE --> MCP
+    QJS --> PROTO
     REM --> PROTO
-    PROC --> PROTO
-    WORKER --> PROTO
-    PROC --> QJS
-    WORKER --> QJS
 ```
 
 ### Package Roles
 
-| Package                | Role                                                                                                         |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `@execbox/core`        | Core types, provider resolution, shared runner semantics, and MCP adapters                                   |
-| `@execbox/quickjs`     | Default executor backend using a fresh QuickJS runtime per execution and a reusable QuickJS runner           |
-| `@execbox/remote`      | Transport-backed executor that reuses the QuickJS protocol endpoint across an app-defined boundary           |
-| `@execbox/process`     | Child-process executor that runs the QuickJS session behind Node IPC with pooled shells by default           |
-| `@execbox/isolated-vm` | Alternate executor backend using a fresh `isolated-vm` context and a reusable isolated-vm runner             |
-| `@execbox/protocol`    | Transport-safe execution messages, shared host sessions, and reusable resource pools                         |
-| `@execbox/worker`      | Worker-thread executor that runs the QuickJS session behind a message boundary with pooled shells by default |
+| Package                | Role                                                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `@execbox/core`        | Core types, provider resolution, shared runner semantics, and MCP adapters                                                   |
+| `@execbox/quickjs`     | Default QuickJS executor package with inline, worker-hosted, and process-hosted modes plus a reusable runner                 |
+| `@execbox/remote`      | Transport-backed executor that reuses the QuickJS protocol endpoint across an app-defined boundary                           |
+| `@execbox/isolated-vm` | Alternate executor backend using a fresh `isolated-vm` context and a reusable isolated-vm runner                             |
+| `@execbox/protocol`    | Transport-safe execution messages, shared host sessions, and reusable resource pools for hosted QuickJS and remote execution |
 
 ## End-to-End Execution Model
 
@@ -110,4 +101,4 @@ Key implications:
 
 ## Architecture In One Paragraph
 
-`@execbox/core` owns the stable execution contract, provider resolution, shared runner semantics, and MCP adapters. `@execbox/quickjs` and `@execbox/isolated-vm` each expose a runtime-specific reusable runner. `@execbox/process`, `@execbox/worker`, and `@execbox/remote` are transport adapters around the shared QuickJS protocol endpoint, while `@execbox/protocol` owns the transport boundary: message shapes, shared host sessions, and reusable resource pools for transport-backed execution.
+`@execbox/core` owns the stable execution contract, provider resolution, shared runner semantics, and MCP adapters. `@execbox/quickjs` and `@execbox/isolated-vm` each expose a runtime-specific reusable runner. Hosted `@execbox/quickjs` modes and `@execbox/remote` sit on top of `@execbox/protocol`, which owns the transport boundary: message shapes, shared host sessions, and reusable resource pools for transport-backed execution.

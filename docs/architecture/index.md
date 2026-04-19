@@ -11,7 +11,7 @@ This doc set is for two audiences:
 
 - Start here for the package map, trust model, and overall flow.
 - Read [Core](/architecture/execbox-core) for provider resolution, execution contracts, and error handling.
-- Read [Executors](/architecture/execbox-executors) for QuickJS, process, worker-thread, and `isolated-vm` trade-offs.
+- Read [Executors](/architecture/execbox-executors) for QuickJS host modes, remote execution, and `isolated-vm` trade-offs.
 - Read [MCP And Protocol](/architecture/execbox-mcp-and-protocol) for MCP wrapping and where `execbox-protocol` fits.
 - Read [Remote Workflow](/architecture/execbox-remote-workflow) for the end-to-end remote execution control flow.
 - Read [Protocol Reference](/architecture/execbox-protocol-reference) for the protocol message catalog and session rules.
@@ -23,26 +23,19 @@ This doc set is for two audiences:
 flowchart LR
     APP["Host application"]
     CORE["@execbox/core<br/>provider resolution + runner semantics + MCP adapters"]
-    QJS["@execbox/quickjs<br/>in-process QuickJS executor + reusable runner"]
+    QJS["@execbox/quickjs<br/>QuickJS executor + reusable runner"]
     REM["@execbox/remote<br/>transport-backed remote executor"]
-    PROC["@execbox/process<br/>child-process QuickJS executor"]
     IVM["@execbox/isolated-vm<br/>in-process isolated-vm executor + reusable runner"]
     PROTO["@execbox/protocol<br/>transport messages + shared host session"]
-    WORKER["@execbox/worker<br/>worker-thread QuickJS executor"]
     MCP["MCP sources and wrapped servers"]
 
     APP --> CORE
     APP --> QJS
     APP --> REM
-    APP --> PROC
     APP --> IVM
-    APP --> WORKER
     CORE --> MCP
+    QJS --> PROTO
     REM --> PROTO
-    PROC --> PROTO
-    WORKER --> PROTO
-    PROC --> QJS
-    WORKER --> QJS
 ```
 
 ## End-to-end execution model

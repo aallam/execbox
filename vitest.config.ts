@@ -36,14 +36,6 @@ export default defineConfig({
         replacement: path.join(repoRoot, "packages/remote/src/index.ts"),
       },
       {
-        find: "@execbox/worker",
-        replacement: path.join(repoRoot, "packages/worker/src/index.ts"),
-      },
-      {
-        find: "@execbox/process",
-        replacement: path.join(repoRoot, "packages/process/src/index.ts"),
-      },
-      {
         find: "@execbox/protocol",
         replacement: path.join(repoRoot, "packages/protocol/src/index.ts"),
       },

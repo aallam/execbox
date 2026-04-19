@@ -123,7 +123,7 @@ The pooled benchmark factories in this suite use a fixed `pool.maxSize: 2`.
 
 ## 7. Host-Process Memory Delta
 
-This suite only measures the parent Node process. It does not attempt to attribute child-process RSS back to `ProcessExecutor`.
+This suite only measures the parent Node process. It does not attempt to attribute child-process RSS back to `QuickJsExecutor({ host: "process" })`.
 
 | Executor             | Heap Delta | RSS Delta | External Delta |
 | -------------------- | ---------- | --------- | -------------- |
@@ -151,4 +151,4 @@ This suite only measures the parent Node process. It does not attempt to attribu
 ### What this snapshot does not prove
 
 - It does not prove exact throughput rankings for every workload or host. The concurrency and tool-call suites are still sensitive to local scheduler noise.
-- It does not prove memory behavior for `ProcessExecutor`, because the memory suite intentionally avoids reporting child-process RSS as if it were host-process memory.
+- It does not prove memory behavior for `QuickJsExecutor({ host: "process" })`, because the memory suite intentionally avoids reporting child-process RSS as if it were host-process memory.

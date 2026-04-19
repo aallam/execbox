@@ -44,10 +44,9 @@ flowchart LR
 It owns:
 
 - the `execute`, `cancel`, `started`, `tool_call`, `tool_result`, and `done` message types
-- the shared host transport session used by `@execbox/process`, `@execbox/worker`, and `@execbox/remote`
+- the shared host transport session used by hosted `@execbox/quickjs` modes and `@execbox/remote`
 - Node transport bootstrap helpers for worker and child-process execution
-- the reusable async resource pool used by pooled process and worker shells
-- transport-facing access to the shared manifest and dispatcher model defined in `@execbox/core`
+- the reusable async resource pool used by pooled worker and process shells
 
 The architecture split is:
 
@@ -58,7 +57,7 @@ The architecture split is:
 
 - `QuickJsExecutor` uses the shared runner semantics from `@execbox/core` directly.
 - `IsolatedVmExecutor` uses the same core runner semantics, but keeps a direct `isolated-vm` bridge instead of transport messages.
-- `ProcessExecutor` and `WorkerExecutor` use the shared host session from `@execbox/protocol` plus the shared QuickJS protocol endpoint inside the child or worker.
+- `QuickJsExecutor` in `host: "process"` and `host: "worker"` modes uses the shared host session from `@execbox/protocol` plus the shared QuickJS protocol endpoint inside the child or worker shell.
 - `RemoteExecutor` uses that same host session across an app-owned transport boundary.
 - Pooled process and worker execution reuse only the outer host shell. Each `execute()` call still starts a fresh QuickJS runtime through the shared protocol endpoint.
 
@@ -75,8 +74,7 @@ flowchart TB
 
     subgraph TransportBacked["Transport-backed executors"]
         PROTO["@execbox/protocol<br/>messages + host session + resource pool"]
-        PROC["ProcessExecutor"]
-        WORKER["WorkerExecutor"]
+        HOSTED["QuickJsExecutor host modes"]
         REM["RemoteExecutor"]
         ENDPOINT["QuickJS protocol endpoint"]
     end
@@ -84,17 +82,15 @@ flowchart TB
     CORE --> QJS
     CORE --> IVM
     CORE --> PROTO
-    PROC --> PROTO
-    WORKER --> PROTO
+    HOSTED --> PROTO
     REM --> PROTO
-    PROC --> ENDPOINT
-    WORKER --> ENDPOINT
+    HOSTED --> ENDPOINT
     REM --> ENDPOINT
 ```
 
 ## Transport-Backed Execution Flow
 
-The same host-session model is used for process, worker, and remote execution:
+The same host-session model is used for hosted QuickJS and remote execution:
 
 ```mermaid
 sequenceDiagram

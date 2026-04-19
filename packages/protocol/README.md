@@ -14,19 +14,17 @@ This is a low-level package for building transport-backed execbox runtimes. It d
 It provides:
 
 - runner/dispatcher message types
-- a shared host transport session for process, worker, and remote executors
+- a shared host transport session for hosted QuickJS and remote executors
 - a reusable async resource pool for host-side shell reuse
-- transport-facing access to the shared manifest and dispatcher model from `@execbox/core`
 
 Most application code should use `@execbox/core` plus an executor package directly instead of importing this package. Reach for `@execbox/protocol` when you are building a transport-backed executor, a runner endpoint, or another host-side transport integration on top of the execbox execution model.
 
 ## Used By
 
-- `@execbox/worker`
-- `@execbox/process`
+- `@execbox/quickjs` in worker/process host modes
 - `@execbox/remote`
 
-`@execbox/quickjs` and `@execbox/isolated-vm` use the shared runner semantics from `@execbox/core` directly and do not depend on this package because they do not cross a transport boundary.
+`@execbox/isolated-vm` and inline `@execbox/quickjs` use the shared runner semantics from `@execbox/core` directly and do not depend on this package because they do not cross a transport boundary.
 
 ## Install
 
@@ -39,7 +37,7 @@ npm install @execbox/core @execbox/protocol
 - This package is protocol glue, not a sandbox.
 - It does not provide isolation by itself.
 - The host tool surface remains the capability boundary.
-- Worker/process lifecycle isolation comes from the surrounding executor package, not from this package alone.
+- Worker/process lifecycle isolation comes from the surrounding executor mode, not from this package alone.
 
 ## Architecture Docs
 

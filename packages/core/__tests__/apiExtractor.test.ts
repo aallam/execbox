@@ -15,7 +15,7 @@ const repoRoot = path.resolve(
 );
 
 describe("run-api-extractor", () => {
-  it("covers the phase 1 public entrypoints", () => {
+  it("covers the current public entrypoints", () => {
     expect(apiExtractorTargets).toEqual([
       {
         configFilePath: "packages/core/api-extractor.json",
@@ -44,14 +44,6 @@ describe("run-api-extractor", () => {
       {
         configFilePath: "packages/remote/api-extractor.json",
         workspace: "@execbox/remote",
-      },
-      {
-        configFilePath: "packages/process/api-extractor.json",
-        workspace: "@execbox/process",
-      },
-      {
-        configFilePath: "packages/worker/api-extractor.json",
-        workspace: "@execbox/worker",
       },
       {
         configFilePath: "packages/isolated-vm/api-extractor.json",
@@ -93,7 +85,7 @@ describe("run-api-extractor", () => {
     ]);
   });
 
-  it("defines root scripts and committed phase 1 API report configs", () => {
+  it("defines root scripts and committed API report configs", () => {
     const packageJson = JSON.parse(
       readFileSync(path.join(repoRoot, "package.json"), "utf8"),
     ) as {
@@ -123,8 +115,6 @@ describe("run-api-extractor", () => {
       "packages/protocol/tsdown.config.ts",
       "packages/quickjs/tsdown.config.ts",
       "packages/remote/tsdown.config.ts",
-      "packages/process/tsdown.config.ts",
-      "packages/worker/tsdown.config.ts",
       "packages/isolated-vm/tsdown.config.ts",
     ];
 
@@ -271,36 +261,6 @@ describe("run-api-extractor", () => {
     expect(
       JSON.parse(
         readFileSync(
-          path.join(repoRoot, "packages/process/api-extractor.json"),
-          "utf8",
-        ),
-      ),
-    ).toMatchObject({
-      apiReport: {
-        enabled: true,
-        reportFileName: "execbox-process.api.md",
-      },
-      mainEntryPointFilePath: "<projectFolder>/dist/index.d.ts",
-    });
-
-    expect(
-      JSON.parse(
-        readFileSync(
-          path.join(repoRoot, "packages/worker/api-extractor.json"),
-          "utf8",
-        ),
-      ),
-    ).toMatchObject({
-      apiReport: {
-        enabled: true,
-        reportFileName: "execbox-worker.api.md",
-      },
-      mainEntryPointFilePath: "<projectFolder>/dist/index.d.ts",
-    });
-
-    expect(
-      JSON.parse(
-        readFileSync(
           path.join(repoRoot, "packages/isolated-vm/api-extractor.json"),
           "utf8",
         ),
@@ -378,18 +338,6 @@ describe("run-api-extractor", () => {
     ).toContain("## API Report File");
     expect(
       readFileSync(
-        path.join(repoRoot, "packages/process/etc/execbox-process.api.md"),
-        "utf8",
-      ),
-    ).toContain("## API Report File");
-    expect(
-      readFileSync(
-        path.join(repoRoot, "packages/worker/etc/execbox-worker.api.md"),
-        "utf8",
-      ),
-    ).toContain("## API Report File");
-    expect(
-      readFileSync(
         path.join(
           repoRoot,
           "packages/isolated-vm/etc/execbox-isolated-vm.api.md",
@@ -417,8 +365,6 @@ describe("run-api-extractor", () => {
       "packages/quickjs/etc/execbox-quickjs-runner.api.md",
       "packages/quickjs/etc/execbox-quickjs-runner-protocol-endpoint.api.md",
       "packages/remote/etc/execbox-remote.api.md",
-      "packages/process/etc/execbox-process.api.md",
-      "packages/worker/etc/execbox-worker.api.md",
       "packages/isolated-vm/etc/execbox-isolated-vm.api.md",
       "packages/isolated-vm/etc/execbox-isolated-vm-runner.api.md",
     ];

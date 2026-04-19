@@ -23,21 +23,15 @@ export class RemoteExecutor implements Executor {
 
 // @public
 export interface RemoteExecutorOptions extends ExecutorRuntimeOptions {
-    // (undocumented)
     cancelGraceMs?: number;
-    // (undocumented)
     connectTransport: RemoteTransportFactory;
 }
 
 // @public
 export interface RemoteRunnerPort {
-    // (undocumented)
     onClose?(handler: (reason?: TransportCloseReason) => void): void | (() => void);
-    // (undocumented)
     onError?(handler: (error: Error) => void): void | (() => void);
-    // (undocumented)
     onMessage(handler: (message: unknown) => void): void | (() => void);
-    // (undocumented)
     send(message: unknown): void | Promise<void>;
 }
 

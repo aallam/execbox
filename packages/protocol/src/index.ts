@@ -2,9 +2,7 @@
  * @packageDocumentation
  * Public API for the `@execbox/protocol` package.
  */
-export { createToolCallDispatcher } from "./dispatcher";
 export { runHostTransportSession } from "./hostSession";
-export { extractProviderManifests } from "./manifest";
 export { getNodeTransportExecArgv } from "./nodeBootstrap";
 export { createResourcePool } from "./resourcePool";
 export type {
@@ -30,10 +28,3 @@ export type {
   ResourcePoolLease,
   ResourcePoolOptions,
 } from "./resourcePool";
-export type {
-  ExecutorRuntimeOptions,
-  ProviderManifest,
-  ProviderToolManifest,
-  ToolCall,
-  ToolCallResult,
-} from "@execbox/core";

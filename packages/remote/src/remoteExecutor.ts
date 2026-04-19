@@ -1,43 +1,20 @@
 import { randomUUID } from "node:crypto";
 
-import {
-  runHostTransportSession,
-  type HostTransport,
-  type ExecutorRuntimeOptions,
-} from "@execbox/protocol";
+import { runHostTransportSession, type HostTransport } from "@execbox/protocol";
 import {
   createTimeoutExecuteResult,
-  type ExecutionOptions,
-  type ExecuteResult,
-  type Executor,
-  type ResolvedToolProvider,
+  resolveExecutorRuntimeOptions,
+} from "../../core/src/runtime.ts";
+import type {
+  ExecutionOptions,
+  ExecuteResult,
+  Executor,
+  ResolvedToolProvider,
 } from "@execbox/core";
 
 import type { RemoteExecutorOptions } from "./types";
 
 const DEFAULT_CANCEL_GRACE_MS = 25;
-const DEFAULT_MAX_LOG_CHARS = 64_000;
-const DEFAULT_MAX_LOG_LINES = 100;
-const DEFAULT_MEMORY_LIMIT_BYTES = 64 * 1024 * 1024;
-const DEFAULT_TIMEOUT_MS = 5000;
-
-function createRuntimeOptions(
-  options: RemoteExecutorOptions,
-  overrides: ExecutionOptions = {},
-): Required<ExecutorRuntimeOptions> {
-  return {
-    maxLogChars:
-      overrides.maxLogChars ?? options.maxLogChars ?? DEFAULT_MAX_LOG_CHARS,
-    maxLogLines:
-      overrides.maxLogLines ?? options.maxLogLines ?? DEFAULT_MAX_LOG_LINES,
-    memoryLimitBytes:
-      overrides.memoryLimitBytes ??
-      options.memoryLimitBytes ??
-      DEFAULT_MEMORY_LIMIT_BYTES,
-    timeoutMs: overrides.timeoutMs ?? options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
-  };
-}
-
 /**
  * Transport-backed executor that runs guest code outside the host process.
  */
@@ -86,7 +63,7 @@ export class RemoteExecutor implements Executor {
       code,
       executionId: randomUUID(),
       providers,
-      runtimeOptions: createRuntimeOptions(this.options, options),
+      runtimeOptions: resolveExecutorRuntimeOptions(this.options, options),
       signal: options.signal,
       transport,
     });

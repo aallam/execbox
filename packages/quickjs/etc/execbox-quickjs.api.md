@@ -7,18 +7,55 @@
 import { ExecuteResult } from '@execbox/core';
 import { ExecutionOptions } from '@execbox/core';
 import { Executor } from '@execbox/core';
+import { ExecutorPoolOptions } from '@execbox/core';
 import { ExecutorRuntimeOptions } from '@execbox/core';
 import { ResolvedToolProvider } from '@execbox/core';
 
 // @public
 export class QuickJsExecutor implements Executor {
     constructor(options?: QuickJsExecutorOptions);
+    dispose(): Promise<void>;
     execute(code: string, providers: ResolvedToolProvider[], options?: ExecutionOptions): Promise<ExecuteResult>;
+    prewarm(count?: number): Promise<void>;
 }
 
 // @public
-export interface QuickJsExecutorOptions extends ExecutorRuntimeOptions {
+export type QuickJsExecutorHost = "inline" | "worker" | "process";
+
+// @public
+export type QuickJsExecutorOptions = QuickJsInlineExecutorOptions | QuickJsWorkerExecutorOptions | QuickJsProcessExecutorOptions;
+
+// @public
+export type QuickJsHostedMode = "pooled" | "ephemeral";
+
+// @public
+export interface QuickJsInlineExecutorOptions extends ExecutorRuntimeOptions {
+    host?: "inline";
     loadModule?: () => Promise<unknown> | unknown;
+}
+
+// @public
+export interface QuickJsProcessExecutorOptions extends ExecutorRuntimeOptions {
+    cancelGraceMs?: number;
+    host: "process";
+    mode?: QuickJsHostedMode;
+    pool?: ExecutorPoolOptions;
+}
+
+// @public
+export interface QuickJsWorkerExecutorOptions extends ExecutorRuntimeOptions {
+    cancelGraceMs?: number;
+    host: "worker";
+    mode?: QuickJsHostedMode;
+    pool?: ExecutorPoolOptions;
+    workerResourceLimits?: WorkerResourceLimits;
+}
+
+// @public
+export interface WorkerResourceLimits {
+    maxOldGenerationSizeMb?: number;
+    maxYoungGenerationSizeMb?: number;
+    stackSizeMb?: number;
 }
 
 ```

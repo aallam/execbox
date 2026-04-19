@@ -18,6 +18,10 @@ export {
   createToolCallDispatcher,
   extractProviderManifests,
 } from "./runner.ts";
+export {
+  DEFAULT_EXECUTOR_RUNTIME_OPTIONS,
+  resolveExecutorRuntimeOptions,
+} from "./runtimeOptions.ts";
 export type { Executor } from "./executor/executor.ts";
 export type {
   ExecuteError,

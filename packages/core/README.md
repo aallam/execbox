@@ -18,13 +18,11 @@ Docs: https://execbox.aallam.com
 
 `@execbox/core` does not execute code on its own. Pair it with one of the executor packages:
 
-| Package                                                                      | Best for                                                             |
-| ---------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs)         | Easiest setup, no native addon, good default backend                 |
-| [`@execbox/remote`](https://www.npmjs.com/package/@execbox/remote)           | Same executor API, but with a caller-supplied remote boundary        |
-| [`@execbox/process`](https://www.npmjs.com/package/@execbox/process)         | QuickJS execution in a child process with a stronger lifecycle split |
-| [`@execbox/worker`](https://www.npmjs.com/package/@execbox/worker)           | QuickJS execution on a worker thread with a message boundary         |
-| [`@execbox/isolated-vm`](https://www.npmjs.com/package/@execbox/isolated-vm) | Native `isolated-vm` backend when you specifically want that runtime |
+| Package                                                                      | Best for                                                                    |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs)         | Easiest setup, no native addon, with inline, worker, and process host modes |
+| [`@execbox/remote`](https://www.npmjs.com/package/@execbox/remote)           | Same executor API, but with a caller-supplied remote boundary               |
+| [`@execbox/isolated-vm`](https://www.npmjs.com/package/@execbox/isolated-vm) | Native `isolated-vm` backend when you specifically want that runtime        |
 
 ## Examples
 
@@ -44,7 +42,8 @@ npm install @execbox/core @execbox/quickjs
 ```
 
 Swap in `@execbox/isolated-vm` when you want the native executor instead.
-Swap in `@execbox/process` when you want the QuickJS runtime to live in a fresh child process.
+Set `host: "process"` on `QuickJsExecutor` when you want the QuickJS runtime to live in a fresh child process.
+Set `host: "worker"` on `QuickJsExecutor` when you want QuickJS off the main thread with pooled worker shells.
 Swap in `@execbox/remote` when you want the same API but a caller-managed remote transport boundary.
 
 ## Security Posture
@@ -54,7 +53,7 @@ Swap in `@execbox/remote` when you want the same API but a caller-managed remote
 - Providers are explicit capability grants. Every tool you expose is authority you are handing to guest code.
 - In the default deployment model, provider and MCP tool definitions are controlled by the application, not by the end user.
 - Third-party MCP integrations should be reviewed as dependency-trust decisions, not folded into the primary end-user attacker model.
-- If the code source is hostile, prefer stronger isolation such as `@execbox/process`, `@execbox/remote`, a container, or a VM.
+- If the code source is hostile, prefer stronger isolation such as `QuickJsExecutor` with `host: "process"`, `@execbox/remote`, a container, or a VM.
 
 ## Architecture Docs
 

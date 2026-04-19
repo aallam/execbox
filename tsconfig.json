@@ -12,8 +12,6 @@
         "./packages/quickjs/src/runner/protocolEndpoint.ts"
       ],
       "@execbox/remote": ["./packages/remote/src/index.ts"],
-      "@execbox/process": ["./packages/process/src/index.ts"],
-      "@execbox/worker": ["./packages/worker/src/index.ts"],
       "@execbox/isolated-vm": ["./packages/isolated-vm/src/index.ts"],
       "@execbox/isolated-vm/runner": [
         "./packages/isolated-vm/src/runner/index.ts"
@@ -28,8 +26,6 @@
     "packages/protocol/**/*.ts",
     "packages/quickjs/**/*.ts",
     "packages/remote/**/*.ts",
-    "packages/process/**/*.ts",
-    "packages/worker/**/*.ts",
     "packages/isolated-vm/**/*.ts",
     "scripts/**/*.ts",
     "vitest.config.ts"

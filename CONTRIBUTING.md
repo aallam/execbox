@@ -13,7 +13,7 @@ This guide is for both humans and coding agents. Agent-specific operating instru
 ## Working In This Repo
 
 - Make changes in the package that owns the behavior you are updating.
-- Keep exported API documentation current when you change exported symbols in `packages/*/src`; the ESLint config requires JSDoc for exported package APIs.
+- Keep exported API documentation current when you change exported symbols in `packages/*/src`; public functions, constants, types, and classes should ship with JSDoc, and the ESLint config enforces that for package APIs.
 - Update tests with behavior changes.
 - Update examples and docs when public behavior, recommended setup, or runtime tradeoffs change.
 
@@ -27,7 +27,7 @@ This guide is for both humans and coding agents. Agent-specific operating instru
 
 Choose the smallest verification set that covers your change, and include the commands you ran in your PR or handoff notes when the context would help reviewers.
 
-- Public API changes to `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/process`, `@execbox/worker`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`: run `npm run api:check`
+- Public API changes to `@execbox/core`, `@execbox/core/mcp`, `@execbox/protocol`, `@execbox/quickjs`, `@execbox/quickjs/runner`, `@execbox/quickjs/runner/protocol-endpoint`, `@execbox/remote`, `@execbox/isolated-vm`, or `@execbox/isolated-vm/runner`: run `npm run api:check`
 
 ## Changesets
 
