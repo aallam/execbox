@@ -1,5 +1,17 @@
 # @execbox/process
 
+## 0.2.2
+
+### Patch Changes
+
+- 4d8aeeb: Fix published export metadata so CommonJS entrypoints resolve their `.d.cts`
+  declaration files correctly, and add package validation with `publint` and
+  Are the Types Wrong in CI.
+- Updated dependencies [4d8aeeb]
+  - @execbox/core@0.3.1
+  - @execbox/protocol@0.2.1
+  - @execbox/quickjs@0.2.1
+
 ## 0.2.1
 
 ### Patch Changes
