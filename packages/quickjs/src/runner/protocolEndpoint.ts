@@ -10,7 +10,9 @@ import type {
   RunnerMessage,
   ToolCallResult,
 } from "@execbox/protocol";
-import { isDispatcherMessage } from "@execbox/protocol";
+// This entrypoint is executed directly from source in worker/process tests before
+// workspace packages are built, so its runtime validator must stay source-local.
+import { isDispatcherMessage } from "../../../protocol/src/messages.ts";
 
 import { runQuickJsSession } from "./index.ts";
 
