@@ -1,10 +1,11 @@
 import { parentPort } from "node:worker_threads";
 
-import { attachQuickJsProtocolEndpoint } from "@execbox/quickjs/runner/protocol-endpoint";
 import type { DispatcherMessage, RunnerMessage } from "@execbox/protocol";
 
+import { attachQuickJsProtocolEndpoint } from "./runner/protocolEndpoint.ts";
+
 if (!parentPort) {
-  throw new Error("WorkerExecutor requires a worker parent port");
+  throw new Error("QuickJsExecutor worker host requires a worker parent port");
 }
 
 const workerPort = parentPort;

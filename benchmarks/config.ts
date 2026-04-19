@@ -1,7 +1,5 @@
 import type { Executor } from "@execbox/core";
 import { QuickJsExecutor } from "@execbox/quickjs";
-import { ProcessExecutor } from "@execbox/process";
-import { WorkerExecutor } from "@execbox/worker";
 
 export type DisposableExecutor = Executor & {
   dispose?(): Promise<void>;
@@ -57,29 +55,37 @@ export function createBenchmarkFactories(): ExecutorFactory[] {
     {
       name: "worker (ephemeral)",
       create: () =>
-        new WorkerExecutor({ mode: "ephemeral" }) as DisposableExecutor,
+        new QuickJsExecutor({
+          host: "worker",
+          mode: "ephemeral",
+        }) as DisposableExecutor,
       supportsExplicitPrewarm: false,
     },
     {
       name: "worker (pooled)",
       create: () =>
-        new WorkerExecutor(
-          createPooledBenchmarkOptions(),
-        ) as DisposableExecutor,
+        new QuickJsExecutor({
+          host: "worker",
+          ...createPooledBenchmarkOptions(),
+        }) as DisposableExecutor,
       supportsExplicitPrewarm: true,
     },
     {
       name: "process (ephemeral)",
       create: () =>
-        new ProcessExecutor({ mode: "ephemeral" }) as DisposableExecutor,
+        new QuickJsExecutor({
+          host: "process",
+          mode: "ephemeral",
+        }) as DisposableExecutor,
       supportsExplicitPrewarm: false,
     },
     {
       name: "process (pooled)",
       create: () =>
-        new ProcessExecutor(
-          createPooledBenchmarkOptions(),
-        ) as DisposableExecutor,
+        new QuickJsExecutor({
+          host: "process",
+          ...createPooledBenchmarkOptions(),
+        }) as DisposableExecutor,
       supportsExplicitPrewarm: true,
     },
   ];
@@ -98,6 +104,6 @@ export function createContentionExecutor(
 ): DisposableExecutor {
   const pool = createContentionPoolOptions(poolSize);
   return executorType === "worker"
-    ? (new WorkerExecutor({ pool }) as DisposableExecutor)
-    : (new ProcessExecutor({ pool }) as DisposableExecutor);
+    ? (new QuickJsExecutor({ host: "worker", pool }) as DisposableExecutor)
+    : (new QuickJsExecutor({ host: "process", pool }) as DisposableExecutor);
 }

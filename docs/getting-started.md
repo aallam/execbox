@@ -46,8 +46,8 @@ console.log(result);
 ## Which package should I use?
 
 - Use `@execbox/quickjs` first unless you already know you need a separate runtime boundary.
-- Use `@execbox/process` when you want QuickJS semantics in a separate child process.
-- Use `@execbox/worker` when you want QuickJS off the main thread with pooled workers.
+- Use `new QuickJsExecutor({ host: "worker" })` when you want QuickJS off the main thread with pooled workers.
+- Use `new QuickJsExecutor({ host: "process" })` when you want QuickJS semantics in a separate child process.
 - Use `@execbox/remote` when your runtime already lives behind an application-owned transport.
 - Use `@execbox/isolated-vm` only when you explicitly want that runtime and can support `--no-node-snapshot`.
 

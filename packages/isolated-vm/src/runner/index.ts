@@ -20,6 +20,7 @@ import {
   type ToolCall,
   type ToolCallResult,
 } from "@execbox/core";
+import { resolveExecutorRuntimeOptions } from "../../../core/src/runtime.ts";
 
 import type { IsolatedVmExecutorOptions } from "../types";
 
@@ -80,10 +81,6 @@ type GuestExecutionEnvelope =
       ok: false;
     };
 
-const DEFAULT_MEMORY_LIMIT_BYTES = 64 * 1024 * 1024;
-const DEFAULT_TIMEOUT_MS = 5000;
-const DEFAULT_MAX_LOG_LINES = 100;
-const DEFAULT_MAX_LOG_CHARS = 64_000;
 let cachedModulePromise: Promise<IsolatedVmModule> | undefined;
 
 /**
@@ -496,17 +493,15 @@ export async function runIsolatedVmSession(
   request: IsolatedVmSessionRequest,
   options: IsolatedVmSessionOptions = {},
 ): Promise<ExecuteResult> {
+  const runtimeOptions = resolveExecutorRuntimeOptions(options);
   const loadModule = async () => {
     const loaded = options.loadModule
       ? await options.loadModule()
       : await loadDefaultModule();
     return loaded as IsolatedVmModule;
   };
-  const maxLogChars = options.maxLogChars ?? DEFAULT_MAX_LOG_CHARS;
-  const maxLogLines = options.maxLogLines ?? DEFAULT_MAX_LOG_LINES;
-  const memoryLimitBytes =
-    options.memoryLimitBytes ?? DEFAULT_MEMORY_LIMIT_BYTES;
-  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const { maxLogChars, maxLogLines, memoryLimitBytes, timeoutMs } =
+    runtimeOptions;
   const startedAt = Date.now();
   const deadline = startedAt + timeoutMs;
   const logs: string[] = [];

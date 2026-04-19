@@ -19,7 +19,7 @@ If you want the simpler default backend, use [`@execbox/quickjs`](https://www.np
 
 - [Basic provider execution on `isolated-vm`](https://github.com/aallam/execbox/blob/main/examples/execbox-isolated-vm-basic.ts)
 - [QuickJS-based execbox examples for the shared API surface](https://github.com/aallam/execbox/blob/main/examples/execbox-basic.ts)
-- [Worker-backed QuickJS example for the alternate transport-backed path](https://github.com/aallam/execbox/blob/main/examples/execbox-worker.ts)
+- [Worker-hosted QuickJS example for the alternate host mode](https://github.com/aallam/execbox/blob/main/examples/execbox-worker.ts)
 - [Full examples index](https://github.com/aallam/execbox/tree/main/examples)
 
 ## Install
@@ -78,4 +78,4 @@ npm run verify:isolated-vm
 
 The required CI lane runs the isolated-vm suite on Node 24 with `--no-node-snapshot`, which is the best local environment to match when validating native-runtime changes.
 
-If process stability and trust separation matter more than in-process performance, prefer process or remote isolation around the executor.
+If process stability and trust separation matter more than in-process performance, prefer `@execbox/quickjs` with `host: "process"` or a remote transport boundary.

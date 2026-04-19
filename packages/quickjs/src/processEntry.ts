@@ -1,8 +1,11 @@
-import { attachQuickJsProtocolEndpoint } from "@execbox/quickjs/runner/protocol-endpoint";
 import type { DispatcherMessage, RunnerMessage } from "@execbox/protocol";
 
+import { attachQuickJsProtocolEndpoint } from "./runner/protocolEndpoint.ts";
+
 if (typeof process.send !== "function") {
-  throw new Error("ProcessExecutor requires a child process IPC channel");
+  throw new Error(
+    "QuickJsExecutor process host requires a child process IPC channel",
+  );
 }
 
 attachQuickJsProtocolEndpoint({

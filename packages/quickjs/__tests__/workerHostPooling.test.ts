@@ -88,7 +88,7 @@ vi.mock("@execbox/protocol", async (importOriginal) => {
   };
 });
 
-describe("WorkerExecutor pooling", () => {
+describe("QuickJsExecutor worker host pooling", () => {
   beforeEach(() => {
     state.blockExecutions = false;
     state.blockedResolvers = [];
@@ -99,8 +99,8 @@ describe("WorkerExecutor pooling", () => {
   });
 
   it("reuses one worker for sequential executions by default", async () => {
-    const { WorkerExecutor } = await import("../src/index");
-    const executor = new WorkerExecutor();
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({ host: "worker" });
 
     await executor.execute("1 + 1", []);
     await executor.execute("1 + 1", []);
@@ -109,10 +109,10 @@ describe("WorkerExecutor pooling", () => {
   });
 
   it("uses a CPU-aware default pooled size under concurrent load", async () => {
-    const { WorkerExecutor } = await import("../src/index");
+    const { QuickJsExecutor } = await import("../src/index");
     state.blockExecutions = true;
     state.parallelism = 8;
-    const executor = new WorkerExecutor();
+    const executor = new QuickJsExecutor({ host: "worker" });
 
     const executions = Array.from({ length: 5 }, () =>
       executor.execute("1 + 1", []),
@@ -125,11 +125,12 @@ describe("WorkerExecutor pooling", () => {
   });
 
   it("uses a fresh worker per execution in ephemeral mode", async () => {
-    const { WorkerExecutor } = await import("../src/index");
-    const executor = new WorkerExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "worker",
       mode: "ephemeral",
       pool: { maxSize: 1 },
-    } as never);
+    });
 
     await executor.execute("1 + 1", []);
     await executor.execute("1 + 1", []);
@@ -138,10 +139,11 @@ describe("WorkerExecutor pooling", () => {
   });
 
   it("runs real warmup sessions before the first pooled execution", async () => {
-    const { WorkerExecutor } = await import("../src/index");
-    const executor = new WorkerExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "worker",
       pool: { maxSize: 2, prewarm: 2 },
-    } as never);
+    });
 
     await executor.execute("1 + 1", []);
 
@@ -162,10 +164,11 @@ describe("WorkerExecutor pooling", () => {
   });
 
   it("rejects failed explicit prewarm and evicts the broken worker", async () => {
-    const { WorkerExecutor } = await import("../src/index");
-    const executor = new WorkerExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "worker",
       pool: { maxSize: 1 },
-    } as never);
+    });
     state.results = [
       {
         durationMs: 0,
@@ -194,10 +197,11 @@ describe("WorkerExecutor pooling", () => {
   });
 
   it("evicts a pooled worker after a timeout result", async () => {
-    const { WorkerExecutor } = await import("../src/index");
-    const executor = new WorkerExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "worker",
       pool: { maxSize: 1 },
-    } as never);
+    });
     state.results = [
       {
         durationMs: 0,

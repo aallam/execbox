@@ -1,6 +1,6 @@
 # @execbox/quickjs
 
-QuickJS executor backend for `@execbox/core`.
+QuickJS executor backend for `@execbox/core`, supporting inline, worker-hosted, and process-hosted execution.
 
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fquickjs?style=flat-square)](https://www.npmjs.com/package/@execbox/quickjs)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
@@ -12,6 +12,7 @@ Docs: https://execbox.aallam.com
 - you want the easiest execbox backend to install
 - you do not want a native addon in CI or local development
 - you want fresh runtimes, captured `console.*` output, and JSON-only tool boundaries
+- you want to move from inline execution to worker or child-process hosts without changing packages
 
 ## Security Notes
 
@@ -19,7 +20,7 @@ Docs: https://execbox.aallam.com
 - Tool calls cross a JSON-only bridge, and executor timeouts propagate abort signals to in-flight provider work.
 - In the default deployment model, provider definitions are controlled by the host application, while hostile users control guest code and tool inputs.
 - This package is designed for host-controlled deployments and does not by itself create a hard isolation boundary for hostile code.
-- If you need a stronger boundary, move execution into a separate process, container, or remote runtime.
+- If you need a stronger boundary, use `host: "process"`, move execution behind `@execbox/remote`, or place the runtime behind a container or VM.
 
 ## Architecture Docs
 
@@ -30,6 +31,7 @@ Docs: https://execbox.aallam.com
 ## Examples
 
 - [Basic provider execution](https://github.com/aallam/execbox/blob/main/examples/execbox-basic.ts)
+- [Process-hosted QuickJS execution](https://github.com/aallam/execbox/blob/main/examples/execbox-process.ts)
 - [Worker-backed QuickJS execution](https://github.com/aallam/execbox/blob/main/examples/execbox-worker.ts)
 - [MCP provider wrapping](https://github.com/aallam/execbox/blob/main/examples/execbox-mcp-provider.ts)
 - [MCP server wrapper](https://github.com/aallam/execbox/blob/main/examples/execbox-mcp-server.ts)
@@ -42,7 +44,7 @@ npm install @execbox/core @execbox/quickjs
 ```
 
 Advanced consumers can also import the reusable QuickJS runner from `@execbox/quickjs/runner`.
-Transport-backed executors such as `@execbox/worker` and `@execbox/process` also reuse the shared QuickJS protocol endpoint from `@execbox/quickjs/runner/protocol-endpoint`.
+Hosted worker/process execution and `@execbox/remote` also reuse the shared QuickJS protocol endpoint from `@execbox/quickjs/runner/protocol-endpoint`.
 
 ## Usage
 
@@ -66,4 +68,16 @@ const result = await executor.execute("await codemode.echo({ ok: true })", [
 
 Each execution runs in a fresh QuickJS runtime with timeout handling, captured logs, and JSON-only result and tool boundaries.
 
-`QuickJsExecutor` intentionally stays ephemeral. Every `execute()` call creates a fresh QuickJS runtime/context, and the package does not expose a pooling API.
+`QuickJsExecutor` defaults to inline execution. Set `host: "worker"` when you want pooled worker-shell reuse, or `host: "process"` when you want pooled child-process reuse with a stronger lifecycle split.
+
+```ts
+const executor = new QuickJsExecutor({
+  host: "worker",
+  pool: {
+    maxSize: 4,
+    prewarm: true,
+  },
+});
+
+await executor.prewarm();
+```

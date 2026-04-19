@@ -23,6 +23,7 @@ assert.equal(typeof coreMcp.createMcpToolProvider, "function");
 assert.equal(typeof coreMcp.openMcpToolProvider, "function");
 assert.equal(typeof coreMcp.codeMcpServer, "function");
 assert.equal(typeof protocol.runHostTransportSession, "function");
-assert.equal(typeof protocol.createToolCallDispatcher, "function");
+assert.equal(typeof protocol.createResourcePool, "function");
+assert.equal(typeof protocol.getNodeTransportExecArgv, "function");
 
 console.log("Built dist smoke test passed");

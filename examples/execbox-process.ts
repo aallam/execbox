@@ -1,5 +1,5 @@
 import { resolveProvider } from "@execbox/core";
-import { ProcessExecutor } from "@execbox/process";
+import { QuickJsExecutor } from "@execbox/quickjs";
 
 async function main(): Promise<void> {
   const provider = resolveProvider({
@@ -37,7 +37,9 @@ async function main(): Promise<void> {
     },
   });
 
-  const executor = new ProcessExecutor();
+  const executor = new QuickJsExecutor({
+    host: "process",
+  });
   const result = await executor.execute(
     `
       const sum = await tools.add({ x: 2, y: 5 });

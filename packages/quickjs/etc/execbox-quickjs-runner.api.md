@@ -5,6 +5,7 @@
 ```ts
 
 import { ExecuteResult } from '@execbox/core';
+import { ExecutorPoolOptions } from '@execbox/core';
 import { ExecutorRuntimeOptions } from '@execbox/core';
 import { ProviderManifest } from '@execbox/core';
 import { QuickJSWASMModule } from 'quickjs-emscripten';
@@ -12,28 +13,40 @@ import { ToolCall } from '@execbox/core';
 import { ToolCallResult } from '@execbox/core';
 
 // @public
-export interface QuickJsExecutorOptions extends ExecutorRuntimeOptions {
+export type QuickJsExecutorHost = "inline" | "worker" | "process";
+
+// @public
+export type QuickJsExecutorOptions = QuickJsInlineExecutorOptions | QuickJsWorkerExecutorOptions | QuickJsProcessExecutorOptions;
+
+// @public
+export type QuickJsHostedMode = "pooled" | "ephemeral";
+
+// @public
+export interface QuickJsInlineExecutorOptions extends ExecutorRuntimeOptions {
+    host?: "inline";
     loadModule?: () => Promise<unknown> | unknown;
 }
 
 // @public
-export type QuickJsSessionOptions = QuickJsExecutorOptions & ExecutorRuntimeOptions & {
+export interface QuickJsProcessExecutorOptions extends ExecutorRuntimeOptions {
+    cancelGraceMs?: number;
+    host: "process";
+    mode?: QuickJsHostedMode;
+    pool?: ExecutorPoolOptions;
+}
+
+// @public
+export type QuickJsSessionOptions = ExecutorRuntimeOptions & Pick<QuickJsInlineExecutorOptions, "loadModule"> & {
     module?: QuickJSWASMModule;
 };
 
 // @public
 export interface QuickJsSessionRequest {
-    // (undocumented)
     abortController?: AbortController;
-    // (undocumented)
     code: string;
-    // (undocumented)
     onStarted?: () => void;
-    // (undocumented)
     onToolCall: (call: ToolCall) => Promise<ToolCallResult> | ToolCallResult;
-    // (undocumented)
     providers: ProviderManifest[];
-    // (undocumented)
     signal?: AbortSignal;
 }
 
@@ -41,6 +54,22 @@ export interface QuickJsSessionRequest {
 export type QuickJsSessionToolCall = ToolCall;
 
 // @public
+export interface QuickJsWorkerExecutorOptions extends ExecutorRuntimeOptions {
+    cancelGraceMs?: number;
+    host: "worker";
+    mode?: QuickJsHostedMode;
+    pool?: ExecutorPoolOptions;
+    workerResourceLimits?: WorkerResourceLimits;
+}
+
+// @public
 export function runQuickJsSession(request: QuickJsSessionRequest, options?: QuickJsSessionOptions): Promise<ExecuteResult>;
+
+// @public
+export interface WorkerResourceLimits {
+    maxOldGenerationSizeMb?: number;
+    maxYoungGenerationSizeMb?: number;
+    stackSizeMb?: number;
+}
 
 ```

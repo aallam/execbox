@@ -2,65 +2,56 @@ import { EventEmitter } from "node:events";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-class FakeChildProcess extends EventEmitter {
-  connected = true;
-
-  kill = vi.fn(() => true);
-  send = vi.fn();
-
-  disconnect(): void {
-    this.connected = false;
-    this.emit("disconnect");
-  }
+class FakeWorker extends EventEmitter {
+  readonly postMessage = vi.fn();
+  readonly terminate = vi.fn(async () => 0);
 }
 
 const state = vi.hoisted(() => ({
   autoExitOnStart: true,
-  child: undefined as FakeChildProcess | undefined,
   options: undefined as Record<string, unknown> | undefined,
+  worker: undefined as FakeWorker | undefined,
 }));
 
-vi.mock("node:child_process", () => ({
-  fork: vi.fn(
-    (_path: string, _args: string[], options?: Record<string, unknown>) => {
-      const child = new FakeChildProcess();
-      state.options = options;
-      state.child = child;
-      if (state.autoExitOnStart) {
-        queueMicrotask(() => {
-          child.emit("exit", 17, null);
-        });
-      }
-      return child;
-    },
-  ),
+vi.mock("node:worker_threads", () => ({
+  Worker: vi.fn((_filename: unknown, options?: Record<string, unknown>) => {
+    const worker = new FakeWorker();
+    state.options = options;
+    state.worker = worker;
+    if (state.autoExitOnStart) {
+      queueMicrotask(() => {
+        worker.emit("exit", 17);
+      });
+    }
+    return worker;
+  }),
 }));
 
-describe("ProcessExecutor", () => {
+describe("QuickJsExecutor worker host lifecycle", () => {
   beforeEach(() => {
     state.autoExitOnStart = true;
-    state.child = undefined;
     state.options = undefined;
+    state.worker = undefined;
   });
 
-  it("returns internal_error when the child exits before sending a result", async () => {
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor();
+  it("returns internal_error when the worker exits before sending a result", async () => {
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({ host: "worker" });
 
     const result = await executor.execute("1 + 1", []);
 
     expect(result).toMatchObject({
       error: {
         code: "internal_error",
-        message: "Child process exited unexpectedly with code 17",
+        message: "Worker exited unexpectedly with code 17",
       },
       ok: false,
     });
   });
 
   it("uses explicit source bootstrap conditions in repo source mode", async () => {
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor();
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({ host: "worker" });
 
     await executor.execute("1 + 1", []);
 
@@ -73,11 +64,12 @@ describe("ProcessExecutor", () => {
     });
   });
 
-  it("force-kills a silent child process only once when execution times out", async () => {
+  it("terminates a silent worker only once when execution times out", async () => {
     vi.useFakeTimers();
     state.autoExitOnStart = false;
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "worker",
       cancelGraceMs: 0,
       timeoutMs: 10,
     });
@@ -92,13 +84,12 @@ describe("ProcessExecutor", () => {
       },
       ok: false,
     });
-    expect(state.child?.kill).toHaveBeenCalledTimes(1);
-    expect(state.child?.kill).toHaveBeenCalledWith("SIGKILL");
+    expect(state.worker?.terminate).toHaveBeenCalledTimes(1);
   });
 
-  it("does not create a child process when the caller signal is already aborted", async () => {
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor();
+  it("does not create a worker when the caller signal is already aborted", async () => {
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({ host: "worker" });
     const controller = new AbortController();
     controller.abort();
 
@@ -112,14 +103,15 @@ describe("ProcessExecutor", () => {
       },
       ok: false,
     });
-    expect(state.child).toBeUndefined();
+    expect(state.worker).toBeUndefined();
   });
 
-  it("force-kills a silent child process only once when the caller aborts", async () => {
+  it("terminates a silent worker only once when the caller aborts", async () => {
     vi.useFakeTimers();
     state.autoExitOnStart = false;
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "worker",
       cancelGraceMs: 0,
       timeoutMs: 1_000,
     });
@@ -138,7 +130,6 @@ describe("ProcessExecutor", () => {
       },
       ok: false,
     });
-    expect(state.child?.kill).toHaveBeenCalledTimes(1);
-    expect(state.child?.kill).toHaveBeenCalledWith("SIGKILL");
+    expect(state.worker?.terminate).toHaveBeenCalledTimes(1);
   });
 });

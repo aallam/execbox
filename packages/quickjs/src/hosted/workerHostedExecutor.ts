@@ -1,11 +1,8 @@
-import { randomUUID } from "node:crypto";
 import { availableParallelism } from "node:os";
 import { Worker } from "node:worker_threads";
 
 import {
   createResourcePool,
-  type ExecutorRuntimeOptions,
-  runHostTransportSession,
   getNodeTransportExecArgv,
   type HostTransport,
   type ResourcePool,
@@ -15,27 +12,25 @@ import {
 import {
   createTimeoutExecuteResult,
   type ExecutionOptions,
-  type ExecutorPoolOptions,
-  type ExecuteResult,
   type Executor,
+  type ExecuteResult,
   type ResolvedToolProvider,
-} from "@execbox/core";
+} from "../../../core/src/runtime.ts";
+import type { ExecutorPoolOptions } from "@execbox/core";
 
-import type { WorkerExecutorOptions } from "./types";
+import type { QuickJsWorkerExecutorOptions } from "../types.ts";
+import {
+  DEFAULT_CANCEL_GRACE_MS,
+  DEFAULT_POOL_OPTIONS,
+  createBorrowedTransport,
+  getPrewarmCount,
+  getWarmupTarget,
+  isReusableResult,
+  runHostedTransportSession,
+  warmHostedPool,
+} from "./shared.ts";
 
-const DEFAULT_CANCEL_GRACE_MS = 25;
-const DEFAULT_MAX_LOG_CHARS = 64_000;
-const DEFAULT_MAX_LOG_LINES = 100;
-const DEFAULT_MEMORY_LIMIT_BYTES = 64 * 1024 * 1024;
 const DEFAULT_POOLED_WORKER_MAX_SIZE = 4;
-const DEFAULT_POOL_OPTIONS: Required<ExecutorPoolOptions> = {
-  idleTimeoutMs: 30_000,
-  maxSize: 1,
-  minSize: 0,
-  prewarm: false,
-};
-const DEFAULT_PREWARM_CODE = "undefined";
-const DEFAULT_TIMEOUT_MS = 5000;
 
 interface WorkerShell {
   transport: HostTransport;
@@ -44,35 +39,7 @@ interface WorkerShell {
 
 function resolveWorkerEntryUrl(): URL {
   const extension = import.meta.url.endsWith(".ts") ? ".ts" : ".js";
-  return new URL(`./workerEntry${extension}`, import.meta.url);
-}
-
-function createRuntimeOptions(
-  options: WorkerExecutorOptions,
-  overrides: ExecutionOptions = {},
-): Required<ExecutorRuntimeOptions> {
-  return {
-    maxLogChars:
-      overrides.maxLogChars ?? options.maxLogChars ?? DEFAULT_MAX_LOG_CHARS,
-    maxLogLines:
-      overrides.maxLogLines ?? options.maxLogLines ?? DEFAULT_MAX_LOG_LINES,
-    memoryLimitBytes:
-      overrides.memoryLimitBytes ??
-      options.memoryLimitBytes ??
-      DEFAULT_MEMORY_LIMIT_BYTES,
-    timeoutMs: overrides.timeoutMs ?? options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
-  };
-}
-
-function createBorrowedTransport(transport: HostTransport): HostTransport {
-  return {
-    dispose() {},
-    onClose: transport.onClose,
-    onError: transport.onError,
-    onMessage: transport.onMessage,
-    send: transport.send,
-    terminate: transport.terminate,
-  };
+  return new URL(`../workerEntry${extension}`, import.meta.url);
 }
 
 function createWorkerTransport(worker: Worker): HostTransport {
@@ -158,7 +125,7 @@ function createWorkerTransport(worker: Worker): HostTransport {
   };
 }
 
-function createWorkerShell(options: WorkerExecutorOptions): WorkerShell {
+function createWorkerShell(options: QuickJsWorkerExecutorOptions): WorkerShell {
   const worker = new Worker(resolveWorkerEntryUrl(), {
     execArgv: getNodeTransportExecArgv(import.meta.url),
     resourceLimits: options.workerResourceLimits,
@@ -181,20 +148,8 @@ function getDefaultPoolMaxSize(): number {
   }
 }
 
-function getPrewarmCount(pool: ExecutorPoolOptions | undefined): number {
-  if (!pool?.prewarm) {
-    return 0;
-  }
-
-  if (typeof pool.prewarm === "number") {
-    return Math.max(0, Math.min(pool.prewarm, pool.maxSize));
-  }
-
-  return Math.max(1, Math.min(pool.minSize ?? 1, pool.maxSize));
-}
-
 function resolvePoolOptions(
-  options: WorkerExecutorOptions,
+  options: QuickJsWorkerExecutorOptions,
 ): ExecutorPoolOptions | undefined {
   if (options.mode === "ephemeral") {
     return undefined;
@@ -207,46 +162,20 @@ function resolvePoolOptions(
   };
 }
 
-function isReusableResult(result: ExecuteResult): boolean {
-  return (
-    result.ok || !["internal_error", "timeout"].includes(result.error.code)
-  );
-}
-
-function getWarmupTarget(
-  count: number | undefined,
-  poolOptions: ExecutorPoolOptions,
-): number {
-  return Math.max(
-    0,
-    Math.min(count ?? poolOptions.minSize ?? 0, poolOptions.maxSize),
-  );
-}
-
-function toWarmupError(result: ExecuteResult): Error {
-  if (result.ok) {
-    return new Error("Failed to prewarm pooled worker shell");
-  }
-
-  return new Error(
-    `Failed to prewarm pooled worker shell: ${result.error.message}`,
-  );
-}
-
 /**
  * Worker-thread executor that runs guest code inside a dedicated QuickJS runtime per call.
  */
-export class WorkerExecutor implements Executor {
+export class WorkerHostedQuickJsExecutor implements Executor {
   private readonly cancelGraceMs: number;
-  private readonly options: WorkerExecutorOptions;
+  private readonly options: QuickJsWorkerExecutorOptions;
   private readonly pool: ResourcePool<WorkerShell> | undefined;
   private readonly poolOptions: ExecutorPoolOptions | undefined;
   private readonly warmup: Promise<void> | undefined;
 
   /**
-   * Creates a worker-backed executor with hard-stop timeout behavior.
+   * Creates a hosted QuickJS executor that launches worker-thread shells on demand.
    */
-  constructor(options: WorkerExecutorOptions = {}) {
+  constructor(options: QuickJsWorkerExecutorOptions) {
     this.cancelGraceMs = options.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS;
     this.options = options;
     const poolOptions = resolvePoolOptions(options);
@@ -270,14 +199,14 @@ export class WorkerExecutor implements Executor {
   }
 
   /**
-   * Disposes any pooled worker shells owned by this executor.
+   * Disposes any pooled worker-thread shells owned by this executor.
    */
   async dispose(): Promise<void> {
     await this.pool?.dispose();
   }
 
   /**
-   * Preloads pooled worker shells when pooling is enabled.
+   * Prewarms pooled worker-thread shells up to the requested count.
    */
   async prewarm(count?: number): Promise<void> {
     if (!this.pool || !this.poolOptions) {
@@ -299,14 +228,13 @@ export class WorkerExecutor implements Executor {
     options: ExecutionOptions = {},
     onSettled?: (result: ExecuteResult) => Promise<void> | void,
   ): Promise<ExecuteResult> {
-    return await runHostTransportSession({
+    return await runHostedTransportSession({
       cancelGraceMs: this.cancelGraceMs,
       code,
-      executionId: randomUUID(),
+      executorOptions: this.options,
       onSettled,
       providers,
-      runtimeOptions: createRuntimeOptions(this.options, options),
-      signal: options.signal,
+      requestOptions: options,
       transport,
     });
   }
@@ -318,7 +246,10 @@ export class WorkerExecutor implements Executor {
 
     await this.pool.prewarm(count);
 
-    const leases = [];
+    const leases: Array<{
+      release: (reusable: boolean) => Promise<void>;
+      value: WorkerShell;
+    }> = [];
     try {
       for (let index = 0; index < count; index += 1) {
         leases.push(await this.pool.acquire());
@@ -330,35 +261,19 @@ export class WorkerExecutor implements Executor {
       throw error;
     }
 
-    const results = await Promise.allSettled(
-      leases.map(async (lease) => {
-        let reusable = false;
-
-        try {
-          const result = await this.runTransportSession(
-            createBorrowedTransport(lease.value.transport),
-            DEFAULT_PREWARM_CODE,
-            [],
-          );
-          reusable = result.ok;
-          if (!result.ok) {
-            throw toWarmupError(result);
-          }
-        } finally {
-          await lease.release(reusable);
-        }
-      }),
-    );
-
-    const rejected = results.find((result) => result.status === "rejected");
-    if (rejected?.status === "rejected") {
-      throw rejected.reason;
-    }
+    await warmHostedPool({
+      count,
+      getTransport: (lease) => lease.value.transport,
+      label: "worker shell",
+      onRelease: async (lease, reusable) => await lease.release(reusable),
+      runSession: async (transport, code, providers) =>
+        await this.runTransportSession(transport, code, providers),
+      shells: leases,
+    });
   }
 
   /**
-   * Executes JavaScript inside a fresh QuickJS runtime running in either a
-   * pooled or ephemeral worker shell.
+   * Executes guest code in a worker-thread-hosted QuickJS shell.
    */
   async execute(
     code: string,

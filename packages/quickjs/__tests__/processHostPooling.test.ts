@@ -60,7 +60,7 @@ vi.mock("@execbox/protocol", async (importOriginal) => {
   };
 });
 
-describe("ProcessExecutor pooling", () => {
+describe("QuickJsExecutor process host pooling", () => {
   beforeEach(() => {
     state.blockExecutions = false;
     state.blockedResolvers = [];
@@ -70,8 +70,8 @@ describe("ProcessExecutor pooling", () => {
   });
 
   it("reuses one child process for sequential executions by default", async () => {
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor();
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({ host: "process" });
 
     await executor.execute("1 + 1", []);
     await executor.execute("1 + 1", []);
@@ -80,11 +80,12 @@ describe("ProcessExecutor pooling", () => {
   });
 
   it("uses a fresh child process per execution in ephemeral mode", async () => {
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "process",
       mode: "ephemeral",
       pool: { maxSize: 1 },
-    } as never);
+    });
 
     await executor.execute("1 + 1", []);
     await executor.execute("1 + 1", []);
@@ -93,10 +94,11 @@ describe("ProcessExecutor pooling", () => {
   });
 
   it("runs real warmup sessions before the first pooled execution", async () => {
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "process",
       pool: { maxSize: 2, prewarm: 2 },
-    } as never);
+    });
 
     await executor.execute("1 + 1", []);
 
@@ -117,10 +119,11 @@ describe("ProcessExecutor pooling", () => {
   });
 
   it("rejects failed explicit prewarm and evicts the broken child", async () => {
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "process",
       pool: { maxSize: 1 },
-    } as never);
+    });
     state.results = [
       {
         durationMs: 0,
@@ -149,10 +152,11 @@ describe("ProcessExecutor pooling", () => {
   });
 
   it("evicts a pooled child after a timeout result", async () => {
-    const { ProcessExecutor } = await import("../src/index");
-    const executor = new ProcessExecutor({
+    const { QuickJsExecutor } = await import("../src/index");
+    const executor = new QuickJsExecutor({
+      host: "process",
       pool: { maxSize: 1 },
-    } as never);
+    });
     state.results = [
       {
         durationMs: 0,

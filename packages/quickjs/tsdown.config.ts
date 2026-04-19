@@ -17,8 +17,10 @@ export default defineConfig({
   },
   entry: [
     "src/index.ts",
+    "src/processEntry.ts",
     "src/runner/index.ts",
     "src/runner/protocolEndpoint.ts",
+    "src/workerEntry.ts",
   ],
   fixedExtension: false,
   format: ["esm", "cjs"],

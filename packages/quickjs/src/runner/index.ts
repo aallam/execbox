@@ -24,6 +24,7 @@ import {
   isKnownExecuteErrorCode,
   normalizeCode,
   normalizeThrownMessage,
+  resolveExecutorRuntimeOptions,
   truncateLogs,
 } from "../../../core/src/runtime.ts";
 import type {
@@ -40,14 +41,17 @@ import {
   fromGuestHandle,
   toGuestHandle,
 } from "../quickjsBridge.ts";
-import type { QuickJsExecutorOptions } from "../types.ts";
+import type { QuickJsInlineExecutorOptions } from "../types.ts";
 
-export type { QuickJsExecutorOptions } from "../types.ts";
-
-const DEFAULT_MEMORY_LIMIT_BYTES = 64 * 1024 * 1024;
-const DEFAULT_TIMEOUT_MS = 5000;
-const DEFAULT_MAX_LOG_LINES = 100;
-const DEFAULT_MAX_LOG_CHARS = 64_000;
+export type {
+  QuickJsExecutorHost,
+  QuickJsExecutorOptions,
+  QuickJsHostedMode,
+  QuickJsInlineExecutorOptions,
+  QuickJsProcessExecutorOptions,
+  QuickJsWorkerExecutorOptions,
+  WorkerResourceLimits,
+} from "../types.ts";
 
 const loadDefaultModule = memoizePromiseFactory(() =>
   newQuickJSWASMModule(RELEASE_SYNC),
@@ -62,19 +66,31 @@ export type QuickJsSessionToolCall = ToolCall;
  * Input required to run one transport-backed QuickJS execution session.
  */
 export interface QuickJsSessionRequest {
+  /** Optional abort controller that should be triggered when execution stops. */
   abortController?: AbortController;
+
+  /** Guest JavaScript source to evaluate inside QuickJS. */
   code: string;
+
+  /** Host callback used to fulfill guest tool calls. */
   onToolCall: (call: ToolCall) => Promise<ToolCallResult> | ToolCallResult;
+
+  /** Optional hook invoked once the guest runtime has started. */
   onStarted?: () => void;
+
+  /** Transport-safe provider manifests exposed to the guest runtime. */
   providers: ProviderManifest[];
+
+  /** Optional caller-owned abort signal for the session. */
   signal?: AbortSignal;
 }
 
 /**
  * Options controlling one transport-backed QuickJS session.
  */
-export type QuickJsSessionOptions = QuickJsExecutorOptions &
-  ExecutorRuntimeOptions & {
+export type QuickJsSessionOptions = ExecutorRuntimeOptions &
+  Pick<QuickJsInlineExecutorOptions, "loadModule"> & {
+    /** Optional preloaded QuickJS WASM module instance. */
     module?: QuickJSWASMModule;
   };
 
@@ -395,6 +411,7 @@ export async function runQuickJsSession(
   request: QuickJsSessionRequest,
   options: QuickJsSessionOptions = {},
 ): Promise<ExecuteResult> {
+  const runtimeOptions = resolveExecutorRuntimeOptions(options);
   const loadModule = async () => {
     if (options.module) {
       return options.module;
@@ -405,11 +422,8 @@ export async function runQuickJsSession(
       : await loadDefaultModule();
     return loaded as QuickJSWASMModule;
   };
-  const maxLogChars = options.maxLogChars ?? DEFAULT_MAX_LOG_CHARS;
-  const maxLogLines = options.maxLogLines ?? DEFAULT_MAX_LOG_LINES;
-  const memoryLimitBytes =
-    options.memoryLimitBytes ?? DEFAULT_MEMORY_LIMIT_BYTES;
-  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const { maxLogChars, maxLogLines, memoryLimitBytes, timeoutMs } =
+    runtimeOptions;
   const startedAt = Date.now();
   const logs: string[] = [];
   const abortController = new AbortController();

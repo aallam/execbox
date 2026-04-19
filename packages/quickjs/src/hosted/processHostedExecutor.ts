@@ -1,13 +1,10 @@
-import { randomUUID } from "node:crypto";
 import { fork, type ChildProcess } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import {
   createResourcePool,
   getNodeTransportExecArgv,
-  runHostTransportSession,
   type HostTransport,
-  type ExecutorRuntimeOptions,
   type ResourcePool,
   type RunnerMessage,
   type TransportCloseReason,
@@ -15,26 +12,23 @@ import {
 import {
   createTimeoutExecuteResult,
   type ExecutionOptions,
-  type ExecutorPoolOptions,
-  type ExecuteResult,
   type Executor,
+  type ExecuteResult,
   type ResolvedToolProvider,
-} from "@execbox/core";
+} from "../../../core/src/runtime.ts";
+import type { ExecutorPoolOptions } from "@execbox/core";
 
-import type { ProcessExecutorOptions } from "./types";
-
-const DEFAULT_CANCEL_GRACE_MS = 25;
-const DEFAULT_MAX_LOG_CHARS = 64_000;
-const DEFAULT_MAX_LOG_LINES = 100;
-const DEFAULT_MEMORY_LIMIT_BYTES = 64 * 1024 * 1024;
-const DEFAULT_POOL_OPTIONS: Required<ExecutorPoolOptions> = {
-  idleTimeoutMs: 30_000,
-  maxSize: 1,
-  minSize: 0,
-  prewarm: false,
-};
-const DEFAULT_PREWARM_CODE = "undefined";
-const DEFAULT_TIMEOUT_MS = 5000;
+import type { QuickJsProcessExecutorOptions } from "../types.ts";
+import {
+  DEFAULT_CANCEL_GRACE_MS,
+  DEFAULT_POOL_OPTIONS,
+  createBorrowedTransport,
+  getPrewarmCount,
+  getWarmupTarget,
+  isReusableResult,
+  runHostedTransportSession,
+  warmHostedPool,
+} from "./shared.ts";
 
 interface ProcessShell {
   child: ChildProcess;
@@ -43,24 +37,7 @@ interface ProcessShell {
 
 function resolveProcessEntryPath(): string {
   const extension = import.meta.url.endsWith(".ts") ? ".ts" : ".js";
-  return fileURLToPath(new URL(`./processEntry${extension}`, import.meta.url));
-}
-
-function createRuntimeOptions(
-  options: ProcessExecutorOptions,
-  overrides: ExecutionOptions = {},
-): Required<ExecutorRuntimeOptions> {
-  return {
-    maxLogChars:
-      overrides.maxLogChars ?? options.maxLogChars ?? DEFAULT_MAX_LOG_CHARS,
-    maxLogLines:
-      overrides.maxLogLines ?? options.maxLogLines ?? DEFAULT_MAX_LOG_LINES,
-    memoryLimitBytes:
-      overrides.memoryLimitBytes ??
-      options.memoryLimitBytes ??
-      DEFAULT_MEMORY_LIMIT_BYTES,
-    timeoutMs: overrides.timeoutMs ?? options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
-  };
+  return fileURLToPath(new URL(`../processEntry${extension}`, import.meta.url));
 }
 
 function createUnexpectedExitMessage(
@@ -83,25 +60,6 @@ function createChildProcess(): ChildProcess {
     execArgv: getNodeTransportExecArgv(import.meta.url),
     stdio: ["ignore", "ignore", "ignore", "ipc"],
   });
-}
-
-function createBorrowedTransport(transport: HostTransport): HostTransport {
-  return {
-    dispose() {},
-    onClose: transport.onClose,
-    onError: transport.onError,
-    onMessage: transport.onMessage,
-    send: transport.send,
-    terminate: transport.terminate,
-  };
-}
-
-function createProcessShell(): ProcessShell {
-  const child = createChildProcess();
-  return {
-    child,
-    transport: createProcessTransport(child),
-  };
 }
 
 function createProcessTransport(child: ChildProcess): HostTransport {
@@ -210,20 +168,16 @@ function createProcessTransport(child: ChildProcess): HostTransport {
   };
 }
 
-function getPrewarmCount(pool: ExecutorPoolOptions | undefined): number {
-  if (!pool?.prewarm) {
-    return 0;
-  }
-
-  if (typeof pool.prewarm === "number") {
-    return Math.max(0, Math.min(pool.prewarm, pool.maxSize));
-  }
-
-  return Math.max(1, Math.min(pool.minSize ?? 1, pool.maxSize));
+function createProcessShell(): ProcessShell {
+  const child = createChildProcess();
+  return {
+    child,
+    transport: createProcessTransport(child),
+  };
 }
 
 function resolvePoolOptions(
-  options: ProcessExecutorOptions,
+  options: QuickJsProcessExecutorOptions,
 ): ExecutorPoolOptions | undefined {
   if (options.mode === "ephemeral") {
     return undefined;
@@ -235,46 +189,20 @@ function resolvePoolOptions(
   };
 }
 
-function isReusableResult(result: ExecuteResult): boolean {
-  return (
-    result.ok || !["internal_error", "timeout"].includes(result.error.code)
-  );
-}
-
-function getWarmupTarget(
-  count: number | undefined,
-  poolOptions: ExecutorPoolOptions,
-): number {
-  return Math.max(
-    0,
-    Math.min(count ?? poolOptions.minSize ?? 0, poolOptions.maxSize),
-  );
-}
-
-function toWarmupError(result: ExecuteResult): Error {
-  if (result.ok) {
-    return new Error("Failed to prewarm pooled child process");
-  }
-
-  return new Error(
-    `Failed to prewarm pooled child process: ${result.error.message}`,
-  );
-}
-
 /**
  * Child-process executor that runs guest code inside a dedicated QuickJS runtime per call.
  */
-export class ProcessExecutor implements Executor {
+export class ProcessHostedQuickJsExecutor implements Executor {
   private readonly cancelGraceMs: number;
-  private readonly options: ProcessExecutorOptions;
+  private readonly options: QuickJsProcessExecutorOptions;
   private readonly pool: ResourcePool<ProcessShell> | undefined;
   private readonly poolOptions: ExecutorPoolOptions | undefined;
   private readonly warmup: Promise<void> | undefined;
 
   /**
-   * Creates a process-backed executor with hard-stop timeout behavior.
+   * Creates a hosted QuickJS executor that launches child-process shells on demand.
    */
-  constructor(options: ProcessExecutorOptions = {}) {
+  constructor(options: QuickJsProcessExecutorOptions) {
     this.cancelGraceMs = options.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS;
     this.options = options;
     const poolOptions = resolvePoolOptions(options);
@@ -284,7 +212,7 @@ export class ProcessExecutor implements Executor {
       this.pool = createResourcePool({
         create: async () => createProcessShell(),
         destroy: async (shell) => {
-          shell.transport.dispose();
+          await shell.transport.dispose();
         },
         idleTimeoutMs: poolOptions.idleTimeoutMs,
         maxSize: poolOptions.maxSize,
@@ -305,7 +233,7 @@ export class ProcessExecutor implements Executor {
   }
 
   /**
-   * Preloads pooled child-process shells when pooling is enabled.
+   * Prewarms pooled child-process shells up to the requested count.
    */
   async prewarm(count?: number): Promise<void> {
     if (!this.pool || !this.poolOptions) {
@@ -327,14 +255,13 @@ export class ProcessExecutor implements Executor {
     options: ExecutionOptions = {},
     onSettled?: (result: ExecuteResult) => Promise<void> | void,
   ): Promise<ExecuteResult> {
-    return await runHostTransportSession({
+    return await runHostedTransportSession({
       cancelGraceMs: this.cancelGraceMs,
       code,
-      executionId: randomUUID(),
+      executorOptions: this.options,
       onSettled,
       providers,
-      runtimeOptions: createRuntimeOptions(this.options, options),
-      signal: options.signal,
+      requestOptions: options,
       transport,
     });
   }
@@ -346,7 +273,10 @@ export class ProcessExecutor implements Executor {
 
     await this.pool.prewarm(count);
 
-    const leases = [];
+    const leases: Array<{
+      release: (reusable: boolean) => Promise<void>;
+      value: ProcessShell;
+    }> = [];
     try {
       for (let index = 0; index < count; index += 1) {
         leases.push(await this.pool.acquire());
@@ -358,35 +288,19 @@ export class ProcessExecutor implements Executor {
       throw error;
     }
 
-    const results = await Promise.allSettled(
-      leases.map(async (lease) => {
-        let reusable = false;
-
-        try {
-          const result = await this.runTransportSession(
-            createBorrowedTransport(lease.value.transport),
-            DEFAULT_PREWARM_CODE,
-            [],
-          );
-          reusable = result.ok;
-          if (!result.ok) {
-            throw toWarmupError(result);
-          }
-        } finally {
-          await lease.release(reusable);
-        }
-      }),
-    );
-
-    const rejected = results.find((result) => result.status === "rejected");
-    if (rejected?.status === "rejected") {
-      throw rejected.reason;
-    }
+    await warmHostedPool({
+      count,
+      getTransport: (lease) => lease.value.transport,
+      label: "child process",
+      onRelease: async (lease, reusable) => await lease.release(reusable),
+      runSession: async (transport, code, providers) =>
+        await this.runTransportSession(transport, code, providers),
+      shells: leases,
+    });
   }
 
   /**
-   * Executes JavaScript inside a fresh QuickJS runtime running in either a
-   * pooled or ephemeral child-process shell.
+   * Executes guest code in a child-process-hosted QuickJS shell.
    */
   async execute(
     code: string,
