@@ -9,14 +9,14 @@ import {
   type RunnerMessage,
   type TransportCloseReason,
 } from "@execbox/core/protocol";
-import {
-  createTimeoutExecuteResult,
-  type ExecutionOptions,
-  type Executor,
-  type ExecuteResult,
-  type ResolvedToolProvider,
-} from "../../../core/src/runtime.ts";
-import type { ExecutorPoolOptions } from "@execbox/core";
+import { createTimeoutExecuteResult } from "@execbox/core/_internal";
+import type {
+  ExecutionOptions,
+  Executor,
+  ExecutorPoolOptions,
+  ExecuteResult,
+  ResolvedToolProvider,
+} from "@execbox/core";
 
 import type { QuickJsWorkerExecutorOptions } from "../types.ts";
 import {

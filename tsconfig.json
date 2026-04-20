@@ -4,6 +4,7 @@
     "noEmit": true,
     "paths": {
       "@execbox/core": ["./packages/core/src/index.ts"],
+      "@execbox/core/_internal": ["./packages/core/src/_internal/index.ts"],
       "@execbox/core/mcp": ["./packages/core/src/mcp/index.ts"],
       "@execbox/core/protocol": ["./packages/core/src/protocol/index.ts"],
       "@execbox/quickjs": ["./packages/quickjs/src/index.ts"],

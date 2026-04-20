@@ -2,9 +2,9 @@
  * @packageDocumentation
  * Public API for the `@execbox/core/protocol` entrypoint.
  */
-export { runHostTransportSession } from "./hostSession";
-export { getNodeTransportExecArgv } from "./nodeBootstrap";
-export { createResourcePool } from "./resourcePool";
+export { runHostTransportSession } from "./hostSession.ts";
+export { getNodeTransportExecArgv } from "./nodeBootstrap.ts";
+export { createResourcePool } from "./resourcePool.ts";
 export type {
   CancelMessage,
   DispatcherMessage,
@@ -16,25 +16,25 @@ export type {
   StartedMessage,
   ToolCallMessage,
   ToolResultMessage,
-} from "./messages";
-export { isDispatcherMessage, isRunnerMessage } from "./messages";
+} from "./messages.ts";
+export { isDispatcherMessage, isRunnerMessage } from "./messages.ts";
 export type {
   HostTransport,
   HostTransportSessionOptions,
   TransportCloseReason,
-} from "./hostSession";
+} from "./hostSession.ts";
 export type {
   ResourcePool,
   ResourcePoolLease,
   ResourcePoolOptions,
-} from "./resourcePool";
+} from "./resourcePool.ts";
 export type {
   ExecutorRuntimeOptions,
   ProviderManifest,
   ProviderToolManifest,
   ToolCall,
   ToolCallResult,
-} from "../runner";
+} from "../runner.ts";
 export type {
   ExecuteError,
   ExecuteErrorCode,
@@ -43,4 +43,4 @@ export type {
   ResolvedToolDescriptor,
   ResolvedToolProvider,
   ToolExecutionContext,
-} from "../types";
+} from "../types.ts";

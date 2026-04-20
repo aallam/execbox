@@ -37,6 +37,15 @@
       },
       "import": "./dist/protocol/index.js",
       "require": "./dist/protocol/index.cjs"
+    },
+    "./_internal": {
+      "source": "./src/_internal/index.ts",
+      "types": {
+        "import": "./dist/_internal/index.d.ts",
+        "require": "./dist/_internal/index.d.cts"
+      },
+      "import": "./dist/_internal/index.js",
+      "require": "./dist/_internal/index.cjs"
     }
   },
   "sideEffects": false,

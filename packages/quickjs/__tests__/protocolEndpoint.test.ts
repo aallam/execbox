@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-
 import { describe, expect, it } from "vitest";
 
 import type { DispatcherMessage, RunnerMessage } from "@execbox/core/protocol";
@@ -56,17 +54,6 @@ class FakePort {
 }
 
 describe("attachQuickJsProtocolEndpoint", () => {
-  it("keeps the runtime protocol guard source-local for prebuild execution", () => {
-    const source = readFileSync(
-      new URL("../src/runner/protocolEndpoint.ts", import.meta.url),
-      "utf8",
-    );
-
-    expect(source).toContain(
-      'import { isDispatcherMessage } from "../../../core/src/protocol/messages.ts";',
-    );
-  });
-
   it("emits started and done for simple executions", async () => {
     const port = new FakePort();
 

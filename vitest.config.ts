@@ -10,6 +10,13 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: "@execbox/core/_internal",
+        replacement: path.join(
+          repoRoot,
+          "packages/core/src/_internal/index.ts",
+        ),
+      },
+      {
         find: "@execbox/core/mcp",
         replacement: path.join(repoRoot, "packages/core/src/mcp/index.ts"),
       },

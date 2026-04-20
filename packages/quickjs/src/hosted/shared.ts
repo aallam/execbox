@@ -5,13 +5,13 @@ import {
   type HostTransport,
 } from "@execbox/core/protocol";
 import type { ExecutorPoolOptions } from "@execbox/core";
-import {
-  resolveExecutorRuntimeOptions,
-  type ExecutionOptions,
-  type ExecuteResult,
-  type ExecutorRuntimeOptions,
-  type ResolvedToolProvider,
-} from "../../../core/src/runtime.ts";
+import { resolveExecutorRuntimeOptions } from "@execbox/core/_internal";
+import type {
+  ExecutionOptions,
+  ExecuteResult,
+  ExecutorRuntimeOptions,
+  ResolvedToolProvider,
+} from "@execbox/core";
 
 /**
  * Default grace period before a hosted shell is forcefully terminated.

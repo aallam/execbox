@@ -4,15 +4,13 @@
  */
 import { randomUUID } from "node:crypto";
 
+import { isDispatcherMessage } from "@execbox/core/protocol";
 import type {
   DispatcherMessage,
   ExecuteMessage,
   RunnerMessage,
 } from "@execbox/core/protocol";
 import type { ToolCallResult } from "@execbox/core";
-// This entrypoint is executed directly from source in worker/process tests before
-// workspace packages are built, so its runtime validator must stay source-local.
-import { isDispatcherMessage } from "../../../core/src/protocol/messages.ts";
 
 import { runQuickJsSession } from "./index.ts";
 
