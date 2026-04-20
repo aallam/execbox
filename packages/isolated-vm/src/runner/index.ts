@@ -20,7 +20,7 @@ import {
   type ToolCall,
   type ToolCallResult,
 } from "@execbox/core";
-import { resolveExecutorRuntimeOptions } from "../../../core/src/runtime.ts";
+import { resolveExecutorRuntimeOptions } from "@execbox/core/_internal";
 
 import type { IsolatedVmExecutorOptions } from "../types";
 

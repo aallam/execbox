@@ -7,7 +7,7 @@ import {
 import {
   createTimeoutExecuteResult,
   resolveExecutorRuntimeOptions,
-} from "../../core/src/runtime.ts";
+} from "@execbox/core/_internal";
 import type {
   ExecutionOptions,
   ExecuteResult,

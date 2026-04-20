@@ -26,7 +26,7 @@ import {
   normalizeThrownMessage,
   resolveExecutorRuntimeOptions,
   truncateLogs,
-} from "../../../core/src/runtime.ts";
+} from "@execbox/core/_internal";
 import type {
   ExecuteError,
   ExecuteResult,

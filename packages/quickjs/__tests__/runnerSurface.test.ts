@@ -9,7 +9,7 @@ describe("@execbox/quickjs runner surface", () => {
       "utf8",
     );
 
-    expect(source).toContain('} from "../../../core/src/runtime.ts";');
+    expect(source).toContain('} from "@execbox/core/_internal";');
   });
 
   it("exports runQuickJsSession for transport-backed runtimes", async () => {

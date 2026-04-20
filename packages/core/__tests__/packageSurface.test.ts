@@ -32,12 +32,39 @@ describe("@execbox/core package surface", () => {
     expect(packageJson.exports).toHaveProperty("./protocol");
   });
 
+  it("declares an internal helper subpath for execbox-owned packages", () => {
+    const packageJson = JSON.parse(
+      readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+    ) as {
+      exports: Record<string, unknown>;
+    };
+
+    expect(packageJson.exports).toHaveProperty("./_internal");
+  });
+
   it("exports the protocol transport helpers without re-exporting core dispatch", async () => {
     const protocol = await import("@execbox/core/protocol");
 
     expect(protocol).toHaveProperty("runHostTransportSession");
     expect(protocol).toHaveProperty("createResourcePool");
+    expect(protocol).toHaveProperty("isDispatcherMessage");
+    expect(protocol).toHaveProperty("isRunnerMessage");
     expect(protocol).not.toHaveProperty("createToolCallDispatcher");
     expect(protocol).not.toHaveProperty("extractProviderManifests");
+  });
+
+  it("exports the internal helper seam without promoting it onto public entrypoints", async () => {
+    const core = await import("@execbox/core");
+    const protocol = await import("@execbox/core/protocol");
+    const internal = await import("@execbox/core/_internal");
+
+    expect(internal).toHaveProperty("createTimeoutExecuteResult");
+    expect(internal).toHaveProperty("resolveExecutorRuntimeOptions");
+    expect(internal).toHaveProperty("createToolCallDispatcher");
+    expect(internal).toHaveProperty("extractProviderManifests");
+    expect(internal).toHaveProperty("ExecuteFailure");
+
+    expect(core).not.toHaveProperty("isDispatcherMessage");
+    expect(protocol).not.toHaveProperty("createTimeoutExecuteResult");
   });
 });

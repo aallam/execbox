@@ -62,9 +62,8 @@ describe("attachQuickJsProtocolEndpoint", () => {
       "utf8",
     );
 
-    expect(source).toContain(
-      'import { isDispatcherMessage } from "../../../core/src/protocol/messages.ts";',
-    );
+    expect(source).toContain('from "@execbox/core/protocol";');
+    expect(source).toContain("isDispatcherMessage");
   });
 
   it("emits started and done for simple executions", async () => {

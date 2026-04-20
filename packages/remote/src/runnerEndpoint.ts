@@ -1,9 +1,9 @@
 import { attachQuickJsProtocolEndpoint } from "@execbox/quickjs/runner/protocol-endpoint";
 import {
+  isDispatcherMessage,
   type DispatcherMessage,
   type RunnerMessage,
 } from "@execbox/core/protocol";
-import { isDispatcherMessage } from "../../core/src/protocol/messages.ts";
 
 import type { RemoteRunnerPort } from "./types";
 

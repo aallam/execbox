@@ -16,9 +16,9 @@ describe("@execbox/quickjs package source safety", () => {
       "utf8",
     );
 
-    expect(executorSource).toContain('} from "../../core/src/runtime.ts";');
+    expect(executorSource).toContain('} from "@execbox/core/_internal";');
     expect(bridgeSource).toContain(
-      'import { ExecuteFailure } from "../../core/src/runtime.ts";',
+      'import { ExecuteFailure } from "@execbox/core/_internal";',
     );
   });
 });

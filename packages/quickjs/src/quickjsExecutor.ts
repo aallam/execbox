@@ -2,7 +2,7 @@ import {
   createTimeoutExecuteResult,
   createToolCallDispatcher,
   extractProviderManifests,
-} from "../../core/src/runtime.ts";
+} from "@execbox/core/_internal";
 import type {
   ExecutionOptions,
   ExecuteResult,
