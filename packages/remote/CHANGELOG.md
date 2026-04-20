@@ -1,5 +1,17 @@
 # @execbox/remote
 
+## 0.2.0
+
+### Minor Changes
+
+- bb3b2a0: Move the standalone protocol helpers into the new `@execbox/core/protocol` entrypoint and remove the separate `@execbox/protocol` package. Transport-backed integrations should now import protocol messages, host-session helpers, and resource-pool utilities from `@execbox/core/protocol`.
+
+### Patch Changes
+
+- Updated dependencies [bb3b2a0]
+  - @execbox/core@0.4.0
+  - @execbox/quickjs@0.4.0
+
 ## 0.1.5
 
 ### Patch Changes
