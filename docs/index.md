@@ -14,9 +14,6 @@ hero:
     - theme: alt
       text: Explore Examples
       link: /examples
-    - theme: alt
-      text: Read the Architecture
-      link: /architecture/
 
 features:
   - title: Code-first tool use

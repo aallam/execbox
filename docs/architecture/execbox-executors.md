@@ -1,6 +1,6 @@
 # Execbox Executors
 
-This page explains how the current executors and QuickJS host modes differ and what trade-offs they make.
+This page explains how the available executors and QuickJS host modes differ and what trade-offs they make.
 
 ## Executor Comparison
 
@@ -60,7 +60,7 @@ That design gives QuickJS two useful properties:
 
 That means:
 
-- it does not depend on `execbox-protocol`
+- it does not use `@execbox/core/protocol`
 - it avoids the extra message loop used by worker-backed execution
 - its runtime-specific bridge logic still lives in the executor package itself
 - it aligns to the same runner-level shape used by QuickJS and transport-backed execution
@@ -69,7 +69,7 @@ The package keeps its native bridge where it belongs while still sharing the sam
 
 ## Worker-Hosted QuickJS
 
-`QuickJsExecutor` with `host: "worker"` uses a worker thread for lifecycle isolation, but it does not invent a second scripting model. It loads the same QuickJS session runner used by the inline QuickJS executor, reuses the shared QuickJS protocol endpoint inside the worker, and uses the shared `execbox-protocol` host session on the parent side. By default it keeps a worker shell warm between executions; `mode: "ephemeral"` switches to a fresh worker per execution.
+`QuickJsExecutor` with `host: "worker"` uses a worker thread for lifecycle isolation, but it does not invent a second scripting model. It loads the same QuickJS session runner used by the inline QuickJS executor, reuses the shared QuickJS protocol endpoint inside the worker, and uses the shared `@execbox/core/protocol` host session on the parent side. By default it keeps a worker shell warm between executions; `mode: "ephemeral"` switches to a fresh worker per execution.
 
 ```mermaid
 sequenceDiagram
@@ -90,7 +90,7 @@ sequenceDiagram
 
 ## Process-Hosted QuickJS
 
-`QuickJsExecutor` with `host: "process"` uses the same message-driven model as the worker host, but runs it behind a child-process boundary. It loads the same QuickJS session runner used by the inline QuickJS executor, reuses the same QuickJS protocol endpoint inside the child, and uses the shared `execbox-protocol` host session on the parent side. By default it keeps a child-process shell warm between executions; `mode: "ephemeral"` switches to a fresh child process per execution.
+`QuickJsExecutor` with `host: "process"` uses the same message-driven model as the worker host, but runs it behind a child-process boundary. It loads the same QuickJS session runner used by the inline QuickJS executor, reuses the same QuickJS protocol endpoint inside the child, and uses the shared `@execbox/core/protocol` host session on the parent side. By default it keeps a child-process shell warm between executions; `mode: "ephemeral"` switches to a fresh child process per execution.
 
 ```mermaid
 sequenceDiagram

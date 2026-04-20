@@ -16,7 +16,7 @@ Docs: https://execbox.aallam.com
 
 ## Pair It With an Executor
 
-`@execbox/core` does not execute code on its own. Pair it with one of the executor packages:
+`@execbox/core` does not execute code on its own. Pair it with an executor backend:
 
 | Package                                                                      | Best for                                                                    |
 | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |

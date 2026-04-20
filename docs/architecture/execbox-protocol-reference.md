@@ -274,7 +274,7 @@ Example execution with one tool call:
 
 ## Scope Of This Reference
 
-This reference describes the current message contract and host-session semantics used inside the execbox package family. It does not specify:
+This reference describes the message contract and host-session semantics used inside the execbox package family. It does not specify:
 
 - a built-in network transport such as HTTP or WebSocket
 - multi-execution multiplexing over one shared long-lived channel

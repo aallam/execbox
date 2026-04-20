@@ -22,7 +22,7 @@ Use it when you want to implement a non-TypeScript runner, such as a Go remote r
 
 ## Status And Scope
 
-This is the normative runner specification for the current execbox runner contract.
+This is the normative runner specification for the execbox runner contract.
 
 It defines:
 

@@ -1,6 +1,6 @@
 # Execbox Architecture Overview
 
-Execbox is the code-execution part of the `execbox` workspace. It turns host tool catalogs into callable guest namespaces, lets those namespaces wrap MCP tools, and pairs with executor packages that decide where and how guest JavaScript runs.
+Execbox is the code-execution part of the `execbox` workspace. It turns host tool catalogs into callable guest namespaces, lets those namespaces wrap MCP tools, and uses executor backends that decide where and how guest JavaScript runs.
 
 This doc set is for two audiences:
 

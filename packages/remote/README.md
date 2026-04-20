@@ -7,7 +7,7 @@ Transport-backed remote executor for `@execbox/core`.
 
 Docs: https://execbox.aallam.com
 
-## Choose `execbox-remote` When
+## Choose `@execbox/remote` When
 
 - you want execbox execution to live outside the application process
 - you already own the transport and runtime deployment shape
