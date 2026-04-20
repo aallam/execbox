@@ -1,17 +1,16 @@
 # @execbox/remote
 
-Transport-backed remote executor for `@execbox/core`.
+Transport-backed executor for execbox. Use it when you want the execbox API on the host side, but the actual runtime to live behind a transport and deployment boundary that your application already owns.
 
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fremote?style=flat-square)](https://www.npmjs.com/package/@execbox/remote)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
+[![Docs](https://img.shields.io/badge/docs-site-0ea5e9?style=flat-square)](https://execbox.aallam.com)
 
-Docs: https://execbox.aallam.com
-
-## Choose `@execbox/remote` When
+## Use `@execbox/remote` When
 
 - you want execbox execution to live outside the application process
-- you already own the transport and runtime deployment shape
-- you want to keep the same `Executor` API while placing execution behind an application-defined boundary
+- you already own the network stack, process topology, or runtime placement
+- you want to keep the same provider/executor model while moving the runtime behind your own boundary
 
 ## Install
 
@@ -19,7 +18,16 @@ Docs: https://execbox.aallam.com
 npm install @execbox/core @execbox/remote
 ```
 
-## Usage
+## How It Fits
+
+`@execbox/remote` has two sides:
+
+- the host uses `RemoteExecutor` and supplies `HostTransport` instances
+- the runner attaches a protocol endpoint to an app-owned transport port
+
+The package stays intentionally small. It does not create servers, own authentication, or prescribe an HTTP or WebSocket framework.
+
+## Smallest Working Usage
 
 Host side:
 
@@ -41,11 +49,11 @@ const executor = new RemoteExecutor({
   timeoutMs: 1000,
 });
 
-const result = await executor.execute(
-  "await tools.echo({ ok: true })",
-  [provider],
-  { timeoutMs: 250 },
-);
+const result = await executor.execute(`await tools.echo({ ok: true })`, [
+  provider,
+]);
+
+console.log(result);
 ```
 
 Runner side:
@@ -56,22 +64,18 @@ import { attachQuickJsRemoteEndpoint } from "@execbox/remote";
 attachQuickJsRemoteEndpoint(myRunnerPort);
 ```
 
-`RemoteExecutor` stays transport-agnostic. Your application owns the network stack and provides the `HostTransport` instances that execution runs on. `attachQuickJsRemoteEndpoint()` binds the shared QuickJS runner protocol to an app-provided remote port on the runner side.
+## Operational Notes
 
-`RemoteExecutor` intentionally stays ephemeral. It asks `connectTransport()` for a fresh transport per `execute()` call and leaves any connection reuse policy to the caller-owned transport layer.
+- `RemoteExecutor` is intentionally ephemeral and asks `connectTransport()` for a fresh transport per `execute()` call.
+- Connection reuse, authentication, and transport lifecycle stay under caller control.
+- Providers are still the capability boundary. Moving execution behind a transport does not change what guest code is allowed to call.
+- The real trust boundary depends on the runtime and operational controls you deploy behind that transport.
 
-## Security Notes
+## Read Next
 
-- This package moves execution behind a caller-supplied transport.
-- The actual trust boundary depends on the remote runtime and operational controls you deploy behind that transport.
-- Providers remain the capability boundary.
-- The package is intentionally small: it does not create servers, own authentication, or prescribe an HTTP/WebSocket framework.
-
-## Examples
-
-- [Remote execbox execution](https://github.com/aallam/execbox/blob/main/examples/execbox-remote.ts)
-- [Execbox architecture overview](https://github.com/aallam/execbox/blob/main/docs/architecture/README.md)
-- [Execbox remote execution workflow](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-remote-workflow.md)
-- [Execbox protocol reference](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-protocol-reference.md)
-- [Execbox runner specification](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-runner-specification.md)
-- [Execbox MCP adapters and protocol overview](https://github.com/aallam/execbox/blob/main/docs/architecture/execbox-mcp-and-protocol.md)
+- [Getting Started](https://execbox.aallam.com/getting-started)
+- [Examples](https://execbox.aallam.com/examples)
+- [Security & Boundaries](https://execbox.aallam.com/security)
+- [Remote Workflow](https://execbox.aallam.com/architecture/execbox-remote-workflow)
+- [Protocol Reference](https://execbox.aallam.com/architecture/execbox-protocol-reference)
+- [Runner Specification](https://execbox.aallam.com/architecture/execbox-runner-specification)
