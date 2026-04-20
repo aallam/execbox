@@ -1,5 +1,11 @@
 # @execbox/core
 
+## 0.4.1
+
+### Patch Changes
+
+- 241b575: Ship an internal `@execbox/core/_internal` subpath for execbox-owned packages so hosted and remote runtimes no longer import private `packages/core/src/*` files directly.
+
 ## 0.4.0
 
 ### Minor Changes
