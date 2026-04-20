@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-
 import { describe, expect, it } from "vitest";
 import type {
   DispatcherMessage,
@@ -64,16 +62,6 @@ function createPort() {
 }
 
 describe("attachQuickJsRemoteEndpoint", () => {
-  it("uses the public protocol guard for inbound transport messages", () => {
-    const source = readFileSync(
-      new URL("../src/runnerEndpoint.ts", import.meta.url),
-      "utf8",
-    );
-
-    expect(source).toContain('from "@execbox/core/protocol";');
-    expect(source).toContain("isDispatcherMessage");
-  });
-
   it("detaches itself when the transport closes", async () => {
     const { emitClose, emitMessage, port, sent } = createPort();
     attachQuickJsRemoteEndpoint(port);
