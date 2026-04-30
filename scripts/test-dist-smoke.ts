@@ -19,25 +19,32 @@ const coreProtocol = await import(
   pathToFileURL(path.join(repoRoot, "packages/core/dist/protocol/index.js"))
     .href
 );
-const coreInternal = await import(
-  pathToFileURL(path.join(repoRoot, "packages/core/dist/_internal/index.js"))
+const coreRuntime = await import(
+  pathToFileURL(path.join(repoRoot, "packages/core/dist/runtime.js")).href
+);
+const coreRuntimeCjs = require(
+  path.join(repoRoot, "packages/core/dist/runtime.cjs"),
+) as Record<string, unknown>;
+const quickjsRemoteEndpoint = await import(
+  pathToFileURL(path.join(repoRoot, "packages/quickjs/dist/remoteEndpoint.js"))
     .href
 );
-const coreInternalCjs = require(
-  path.join(repoRoot, "packages/core/dist/_internal/index.cjs"),
-) as Record<string, unknown>;
 
 assert.equal(typeof core.resolveProvider, "function");
-assert.equal(typeof core.createToolCallDispatcher, "function");
+assert.equal(core.createToolCallDispatcher, undefined);
 assert.equal(typeof coreMcp.createMcpToolProvider, "function");
 assert.equal(typeof coreMcp.openMcpToolProvider, "function");
 assert.equal(typeof coreMcp.codeMcpServer, "function");
 assert.equal(typeof coreProtocol.runHostTransportSession, "function");
 assert.equal(typeof coreProtocol.createResourcePool, "function");
 assert.equal(typeof coreProtocol.getNodeTransportExecArgv, "function");
-assert.equal(typeof coreInternal.resolveExecutorRuntimeOptions, "function");
-assert.equal(typeof coreInternal.createTimeoutExecuteResult, "function");
-assert.equal(typeof coreInternalCjs.resolveExecutorRuntimeOptions, "function");
-assert.equal(typeof coreInternalCjs.createTimeoutExecuteResult, "function");
+assert.equal(typeof coreRuntime.resolveExecutorRuntimeOptions, "function");
+assert.equal(typeof coreRuntime.createTimeoutExecuteResult, "function");
+assert.equal(typeof coreRuntimeCjs.resolveExecutorRuntimeOptions, "function");
+assert.equal(typeof coreRuntimeCjs.createTimeoutExecuteResult, "function");
+assert.equal(
+  typeof quickjsRemoteEndpoint.attachQuickJsRemoteEndpoint,
+  "function",
+);
 
 console.log("Built dist smoke test passed");

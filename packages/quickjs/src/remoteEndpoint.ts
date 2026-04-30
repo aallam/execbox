@@ -1,18 +1,41 @@
-import { attachQuickJsProtocolEndpoint } from "@execbox/quickjs/runner/protocol-endpoint";
+/**
+ * @packageDocumentation
+ * QuickJS remote runner endpoint for `@execbox/remote` transports.
+ */
 import {
   isDispatcherMessage,
   type DispatcherMessage,
   type RunnerMessage,
+  type TransportCloseReason,
 } from "@execbox/core/protocol";
 
-import type { RemoteRunnerPort } from "./types";
+import { attachQuickJsProtocolEndpoint } from "./runner/protocolEndpoint.ts";
+
+/**
+ * Minimal runner-side port for transport-backed QuickJS execution.
+ */
+export interface QuickJsRemoteEndpointPort {
+  /** Registers a close callback for transport shutdown notifications. */
+  onClose?(
+    handler: (reason?: TransportCloseReason) => void,
+  ): void | (() => void);
+
+  /** Registers an error callback for transport-level failures. */
+  onError?(handler: (error: Error) => void): void | (() => void);
+
+  /** Registers a handler for inbound runner messages. */
+  onMessage(handler: (message: unknown) => void): void | (() => void);
+
+  /** Sends a transport message to the attached host session. */
+  send(message: unknown): void | Promise<void>;
+}
 
 /**
  * Attaches the shared QuickJS protocol endpoint to a remote runner transport
  * and tears it down automatically when the transport closes or errors.
  */
 export function attachQuickJsRemoteEndpoint(
-  port: RemoteRunnerPort,
+  port: QuickJsRemoteEndpointPort,
 ): () => void {
   const detachProtocol = attachQuickJsProtocolEndpoint({
     onMessage(handler: (message: DispatcherMessage) => void): () => void {

@@ -1,34 +1,12 @@
-import { defineConfig } from "tsdown";
+import { definePackageBuildConfig } from "../../scripts/tsdown-config.ts";
 
-const DTS_BANNER = `/**
- * @packageDocumentation
- * Public TypeScript declarations for this package entrypoint.
- */`;
-
-export default defineConfig({
-  attw: {
-    enabled: "ci-only",
-    level: "error",
-    profile: "node16",
-  },
-  clean: true,
-  dts: {
-    banner: DTS_BANNER,
-  },
+export default definePackageBuildConfig({
   entry: [
     "src/index.ts",
     "src/processEntry.ts",
+    "src/remoteEndpoint.ts",
     "src/runner/index.ts",
     "src/runner/protocolEndpoint.ts",
     "src/workerEntry.ts",
   ],
-  fixedExtension: false,
-  format: ["esm", "cjs"],
-  platform: "node",
-  publint: {
-    enabled: "ci-only",
-    level: "error",
-  },
-  sourcemap: true,
-  target: "node20",
 });

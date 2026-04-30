@@ -38,14 +38,14 @@
       "import": "./dist/protocol/index.js",
       "require": "./dist/protocol/index.cjs"
     },
-    "./_internal": {
-      "source": "./src/_internal/index.ts",
+    "./runtime": {
+      "source": "./src/runtime.ts",
       "types": {
-        "import": "./dist/_internal/index.d.ts",
-        "require": "./dist/_internal/index.d.cts"
+        "import": "./dist/runtime.d.ts",
+        "require": "./dist/runtime.d.cts"
       },
-      "import": "./dist/_internal/index.js",
-      "require": "./dist/_internal/index.cjs"
+      "import": "./dist/runtime.js",
+      "require": "./dist/runtime.cjs"
     }
   },
   "sideEffects": false,

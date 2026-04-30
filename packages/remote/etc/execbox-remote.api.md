@@ -13,9 +13,6 @@ import { ResolvedToolProvider } from '@execbox/core';
 import { TransportCloseReason } from '@execbox/core/protocol';
 
 // @public
-export function attachQuickJsRemoteEndpoint(port: RemoteRunnerPort): () => void;
-
-// @public
 export class RemoteExecutor implements Executor {
     constructor(options: RemoteExecutorOptions);
     execute(code: string, providers: ResolvedToolProvider[], options?: ExecutionOptions): Promise<ExecuteResult>;

@@ -40,12 +40,12 @@ flowchart LR
 
 ### Package Roles
 
-| Package                | Role                                                                                                                       |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `@execbox/core`        | Core types, provider resolution, shared runner semantics, MCP adapters, and the `@execbox/core/protocol` transport subpath |
-| `@execbox/quickjs`     | Default QuickJS executor package with inline, worker-hosted, and process-hosted modes plus a reusable runner               |
-| `@execbox/remote`      | Transport-backed executor that reuses the QuickJS protocol endpoint across an app-defined boundary                         |
-| `@execbox/isolated-vm` | Alternate executor backend using a fresh `isolated-vm` context and a reusable isolated-vm runner                           |
+| Package                | Role                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `@execbox/core`        | App-facing core types, provider resolution, MCP adapters, plus runtime and protocol subpaths                 |
+| `@execbox/quickjs`     | Default QuickJS executor package with inline, worker-hosted, and process-hosted modes plus a reusable runner |
+| `@execbox/remote`      | Transport-backed executor that runs against an app-defined runner boundary                                   |
+| `@execbox/isolated-vm` | Alternate executor backend using a fresh `isolated-vm` context and a reusable isolated-vm runner             |
 
 ## End-to-End Execution Model
 
@@ -100,4 +100,4 @@ Key implications:
 
 ## Architecture In One Paragraph
 
-`@execbox/core` owns the stable execution contract, provider resolution, shared runner semantics, MCP adapters, and the `@execbox/core/protocol` transport surface. `@execbox/quickjs` and `@execbox/isolated-vm` each expose a runtime-specific reusable runner. Hosted `@execbox/quickjs` modes and `@execbox/remote` sit on top of `@execbox/core/protocol`, which owns the transport boundary: message shapes, shared host sessions, and reusable resource pools for transport-backed execution.
+`@execbox/core` owns the app-facing execution contract, provider resolution, MCP adapters, and the `@execbox/core/protocol` transport surface. Runtime implementers use `@execbox/core/runtime` for shared dispatch, manifest, timeout, log, and normalization helpers. `@execbox/quickjs` and `@execbox/isolated-vm` each expose a runtime-specific reusable runner. Hosted `@execbox/quickjs` modes and `@execbox/remote` sit on top of `@execbox/core/protocol`, which owns the transport boundary: message shapes, shared host sessions, and reusable resource pools for transport-backed execution.

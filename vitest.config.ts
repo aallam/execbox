@@ -10,11 +10,8 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: "@execbox/core/_internal",
-        replacement: path.join(
-          repoRoot,
-          "packages/core/src/_internal/index.ts",
-        ),
+        find: "@execbox/core/runtime",
+        replacement: path.join(repoRoot, "packages/core/src/runtime.ts"),
       },
       {
         find: "@execbox/core/mcp",
@@ -29,6 +26,13 @@ export default defineConfig({
         replacement: path.join(
           repoRoot,
           "packages/quickjs/src/runner/protocolEndpoint.ts",
+        ),
+      },
+      {
+        find: "@execbox/quickjs/remote-endpoint",
+        replacement: path.join(
+          repoRoot,
+          "packages/quickjs/src/remoteEndpoint.ts",
         ),
       },
       {

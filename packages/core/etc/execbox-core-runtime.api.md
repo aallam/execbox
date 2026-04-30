@@ -8,7 +8,16 @@ import { ZodRawShape } from 'zod';
 import { ZodTypeAny } from 'zod';
 
 // @public
-export function assertValidIdentifier(value: string, label?: string): void;
+export function createExecutionContext(signal: AbortSignal, providerName: string, safeToolName: string, originalToolName: string): ToolExecutionContext;
+
+// @public
+export function createTimeoutExecuteResult(durationMs?: number): ExecuteResult;
+
+// @public
+export function createToolCallDispatcher(providers: ResolvedToolProvider[], signal: AbortSignal): (call: ToolCall) => Promise<ToolCallResult>;
+
+// @public
+export const DEFAULT_EXECUTOR_RUNTIME_OPTIONS: ResolvedExecutorRuntimeOptions;
 
 // @public
 export interface ExecuteError {
@@ -56,18 +65,6 @@ export interface Executor {
 }
 
 // @public
-export interface ExecutorPoolOptions {
-    // (undocumented)
-    idleTimeoutMs?: number;
-    // (undocumented)
-    maxSize: number;
-    // (undocumented)
-    minSize?: number;
-    // (undocumented)
-    prewarm?: boolean | number;
-}
-
-// @public
 export interface ExecutorRuntimeOptions {
     // (undocumented)
     maxLogChars?: number;
@@ -80,7 +77,13 @@ export interface ExecutorRuntimeOptions {
 }
 
 // @public
-export function generateTypesFromJsonSchema(providerName: string, tools: Record<string, TypegenToolDescriptor>): string;
+export function extractProviderManifests(providers: ResolvedToolProvider[]): ProviderManifest[];
+
+// @public
+export function formatConsoleLine(values: unknown[]): string;
+
+// @public
+export function getExecutionTimeoutMessage(): string;
 
 // @public
 export function isExecuteFailure(value: unknown): value is ExecuteFailure;
@@ -89,13 +92,19 @@ export function isExecuteFailure(value: unknown): value is ExecuteFailure;
 export function isJsonSerializable(value: unknown, active?: Set<object>, memo?: WeakSet<object>): boolean;
 
 // @public
-export function isReservedWord(value: string): boolean;
-
-// @public
-export function isValidIdentifier(value: string): boolean;
+export function isKnownExecuteErrorCode(value: unknown): value is ExecuteErrorCode;
 
 // @public
 export type JsonSchema = Record<string, unknown>;
+
+// @public
+export function normalizeCode(source: string): string;
+
+// @public
+export function normalizeThrownMessage(error: unknown): string;
+
+// @public
+export function normalizeThrownName(error: unknown): string | undefined;
 
 // @public
 export interface ProviderManifest {
@@ -118,6 +127,9 @@ export interface ProviderToolManifest {
 }
 
 // @public
+export type ResolvedExecutorRuntimeOptions = Readonly<Required<ExecutorRuntimeOptions>>;
+
+// @public
 export interface ResolvedToolDescriptor {
     description?: string;
     execute: (input: unknown, context: ToolExecutionContext) => Promise<unknown>;
@@ -137,16 +149,7 @@ export interface ResolvedToolProvider {
 }
 
 // @public
-export function resolveProvider(provider: ToolProvider): ResolvedToolProvider;
-
-// @public
-export function sanitizeIdentifier(value: string): string;
-
-// @public
-export function sanitizeToolName(name: string): string;
-
-// @public
-export function serializePropertyName(name: string): string;
+export function resolveExecutorRuntimeOptions(options?: ExecutorRuntimeOptions, overrides?: ExecutorRuntimeOptions): Required<ExecutorRuntimeOptions>;
 
 // @public
 export interface ToolCall {
@@ -192,6 +195,9 @@ export interface ToolProvider {
 
 // @public
 export type ToolSchema = JsonSchema | ZodTypeAny | ZodRawShape;
+
+// @public
+export function truncateLogs(logs: string[], maxLogLines: number, maxLogChars: number): string[];
 
 // @public
 export type TypegenToolDescriptor = Pick<ResolvedToolDescriptor, "description" | "inputSchema" | "outputSchema"> & Partial<Pick<ResolvedToolDescriptor, "execute">>;

@@ -1,6 +1,6 @@
 import type { QuickJSContext, QuickJSHandle } from "quickjs-emscripten";
 
-import { ExecuteFailure } from "@execbox/core/_internal";
+import { ExecuteFailure } from "@execbox/core/runtime";
 import type { ExecuteErrorCode } from "@execbox/core";
 
 /**

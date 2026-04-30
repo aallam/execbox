@@ -32,6 +32,11 @@ npm install @execbox/core @execbox/quickjs
 
 Swap in `@execbox/remote` or `@execbox/isolated-vm` when you need a different runtime boundary.
 
+## Runtime Implementer Surface
+
+Application code should usually import from `@execbox/core`, `@execbox/core/mcp`, or `@execbox/core/protocol`.
+Executor and runner packages should import shared runtime helpers from `@execbox/core/runtime` instead. That subpath contains the manifest dispatcher, runtime option defaults, timeout helpers, log formatting, code normalization, and error normalization used to keep runtime implementations aligned.
+
 ## Smallest Working Usage
 
 ```ts

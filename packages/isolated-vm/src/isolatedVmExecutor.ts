@@ -2,10 +2,12 @@ import {
   createTimeoutExecuteResult,
   createToolCallDispatcher,
   extractProviderManifests,
-  type ExecutionOptions,
-  type ExecuteResult,
-  type Executor,
-  type ResolvedToolProvider,
+} from "@execbox/core/runtime";
+import type {
+  ExecutionOptions,
+  ExecuteResult,
+  Executor,
+  ResolvedToolProvider,
 } from "@execbox/core";
 
 import { runIsolatedVmSession } from "./runner/index";

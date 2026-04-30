@@ -17,8 +17,8 @@ This page covers the parts of execbox that stay stable regardless of which execu
 The core package exposes three main responsibilities:
 
 - Resolve host-authored tools into a deterministic guest namespace
-- Normalize guest code into an executable async shape
-- Define the stable execution contract and shared runner semantics used by all executors
+- Define the stable app-facing execution contract
+- Provide runtime implementers with shared runner semantics through `@execbox/core/runtime`
 
 The main public concepts are:
 
@@ -66,7 +66,7 @@ The resolved provider also carries two maps:
 
 ## Guest Code Normalization
 
-Executors do not evaluate arbitrary snippets directly. `normalizeCode()` first turns model- or user-produced text into a consistent async function body.
+Executors do not evaluate arbitrary snippets directly. Runtime implementers import `normalizeCode()` from `@execbox/core/runtime` to turn model- or user-produced text into a consistent async function body.
 
 That normalization handles:
 
@@ -79,27 +79,28 @@ The practical effect is that all executors can treat guest code as “an async f
 
 ## Shared Runner Semantics
 
-The core package owns the small runner-level contract that sits between resolved providers and runtime-specific runners.
+The `@execbox/core/runtime` entrypoint owns the small runner-level helper surface that sits between resolved providers and runtime-specific runners.
 
 That contract is intentionally transport-neutral:
 
 - `extractProviderManifests()` converts resolved providers into transport-safe manifests
 - `createToolCallDispatcher()` turns a runner-emitted tool call back into a trusted host invocation
-- `ExecutorRuntimeOptions` carries timeout, memory, and log limits in a runtime-agnostic form
+- `resolveExecutorRuntimeOptions()` applies shared timeout, memory, and log defaults
+- `ExecutorRuntimeOptions` carries the runtime-agnostic limit shape used by public executor options
 
 ```mermaid
 sequenceDiagram
     participant Host as Host app
-    participant Core as execbox core
+    participant Runtime as core runtime
     participant Runner as Runtime-specific runner
     participant Tool as Resolved tool wrapper
 
-    Host->>Core: extractProviderManifests(providers)
+    Host->>Runtime: extractProviderManifests(providers)
     Host->>Runner: runSession(code, manifests, onToolCall)
-    Runner->>Core: onToolCall({ providerName, safeToolName, input })
-    Core->>Tool: descriptor.execute(input, context)
-    Tool-->>Core: JSON-safe result or ExecuteError
-    Core-->>Runner: ToolCallResult
+    Runner->>Runtime: onToolCall({ providerName, safeToolName, input })
+    Runtime->>Tool: descriptor.execute(input, context)
+    Tool-->>Runtime: JSON-safe result or ExecuteError
+    Runtime-->>Runner: ToolCallResult
 ```
 
 This seam is what lets execbox share semantics across:
@@ -198,7 +199,8 @@ The core package does not own QuickJS, `isolated-vm`, worker threads, or transpo
 
 The consequence is deliberate separation between:
 
-- core execution and runner semantics in `@execbox/core`
+- app-facing execution contracts in `@execbox/core`
+- runtime implementer helpers in `@execbox/core/runtime`
 - transport/session mechanics in `@execbox/core/protocol`
 - runtime-specific bridge code in executor packages
 
