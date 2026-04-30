@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Runtime implementer API for executor and runner authors.
+ *
+ * This entrypoint contains the shared helpers used by execbox runtime packages
+ * to normalize execution limits, logs, manifests, thrown values, and tool-call
+ * dispatch. Application code should usually import from `@execbox/core`
+ * instead.
+ */
 export {
   createTimeoutExecuteResult,
   createExecutionContext,
@@ -22,6 +31,7 @@ export {
   DEFAULT_EXECUTOR_RUNTIME_OPTIONS,
   resolveExecutorRuntimeOptions,
 } from "./runtimeOptions.ts";
+export type { ResolvedExecutorRuntimeOptions } from "./runtimeOptions.ts";
 export type { Executor } from "./executor/executor.ts";
 export type {
   ExecuteError,

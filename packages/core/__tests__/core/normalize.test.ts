@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeCode } from "@execbox/core";
+import { normalizeCode } from "@execbox/core/runtime";
 
 describe("normalizeCode", () => {
   it("strips fenced code blocks before wrapping", () => {

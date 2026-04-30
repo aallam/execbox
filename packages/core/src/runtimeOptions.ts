@@ -1,6 +1,9 @@
 import type { ExecutorRuntimeOptions } from "./runner.ts";
 
-type ResolvedExecutorRuntimeOptions = Readonly<
+/**
+ * Fully resolved executor runtime limits after defaults and overrides apply.
+ */
+export type ResolvedExecutorRuntimeOptions = Readonly<
   Required<ExecutorRuntimeOptions>
 >;
 

@@ -1,5 +1,6 @@
 import { resolveProvider } from "@execbox/core";
-import { RemoteExecutor, attachQuickJsRemoteEndpoint } from "@execbox/remote";
+import { attachQuickJsRemoteEndpoint } from "@execbox/quickjs/remote-endpoint";
+import { RemoteExecutor } from "@execbox/remote";
 import type {
   DispatcherMessage,
   HostTransport,

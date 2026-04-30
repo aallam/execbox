@@ -59,7 +59,7 @@ console.log(result);
 Runner side:
 
 ```ts
-import { attachQuickJsRemoteEndpoint } from "@execbox/remote";
+import { attachQuickJsRemoteEndpoint } from "@execbox/quickjs/remote-endpoint";
 
 attachQuickJsRemoteEndpoint(myRunnerPort);
 ```
@@ -68,6 +68,7 @@ attachQuickJsRemoteEndpoint(myRunnerPort);
 
 - `RemoteExecutor` is intentionally ephemeral and asks `connectTransport()` for a fresh transport per `execute()` call.
 - Connection reuse, authentication, and transport lifecycle stay under caller control.
+- Runtime-specific runner endpoints are owned by runtime packages such as `@execbox/quickjs`.
 - Providers are still the capability boundary. Moving execution behind a transport does not change what guest code is allowed to call.
 - The real trust boundary depends on the runtime and operational controls you deploy behind that transport.
 

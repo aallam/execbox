@@ -26,7 +26,7 @@ import {
   normalizeThrownMessage,
   resolveExecutorRuntimeOptions,
   truncateLogs,
-} from "@execbox/core/_internal";
+} from "@execbox/core/runtime";
 import type {
   ExecuteError,
   ExecuteResult,

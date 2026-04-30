@@ -6,7 +6,7 @@ import type {
   TransportCloseReason,
 } from "@execbox/core/protocol";
 
-import { attachQuickJsRemoteEndpoint } from "../src/index";
+import { attachQuickJsRemoteEndpoint } from "../src/remoteEndpoint";
 
 type MessageHandler = (message: DispatcherMessage) => void;
 type CloseHandler = (reason?: TransportCloseReason) => void;

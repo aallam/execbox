@@ -37,6 +37,15 @@
       },
       "import": "./dist/runner/protocolEndpoint.js",
       "require": "./dist/runner/protocolEndpoint.cjs"
+    },
+    "./remote-endpoint": {
+      "source": "./src/remoteEndpoint.ts",
+      "types": {
+        "import": "./dist/remoteEndpoint.d.ts",
+        "require": "./dist/remoteEndpoint.d.cts"
+      },
+      "import": "./dist/remoteEndpoint.js",
+      "require": "./dist/remoteEndpoint.cjs"
     }
   },
   "sideEffects": false,

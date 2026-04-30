@@ -1,8 +1,8 @@
 import {
   createToolCallDispatcher,
   extractProviderManifests,
-  resolveProvider,
-} from "@execbox/core";
+} from "@execbox/core/runtime";
+import { resolveProvider } from "@execbox/core";
 import { describe, expect, it } from "vitest";
 
 import { runIsolatedVmSession } from "../src/runner/index.ts";

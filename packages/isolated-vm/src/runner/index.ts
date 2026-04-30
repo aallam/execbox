@@ -13,14 +13,16 @@ import {
   normalizeCode,
   normalizeThrownMessage,
   truncateLogs,
-  type ExecuteError,
-  type ExecuteResult,
-  type ExecutorRuntimeOptions,
-  type ProviderManifest,
-  type ToolCall,
-  type ToolCallResult,
+  resolveExecutorRuntimeOptions,
+} from "@execbox/core/runtime";
+import type {
+  ExecuteError,
+  ExecuteResult,
+  ExecutorRuntimeOptions,
+  ProviderManifest,
+  ToolCall,
+  ToolCallResult,
 } from "@execbox/core";
-import { resolveExecutorRuntimeOptions } from "@execbox/core/_internal";
 
 import type { IsolatedVmExecutorOptions } from "../types";
 

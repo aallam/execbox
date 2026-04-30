@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   createToolCallDispatcher,
   getExecutionTimeoutMessage,
-  resolveProvider,
-} from "@execbox/core";
+} from "@execbox/core/runtime";
+import { resolveProvider } from "@execbox/core";
 
 describe("createToolCallDispatcher", () => {
   it("does not start new host tool work after the execution has been aborted", async () => {

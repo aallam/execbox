@@ -9,7 +9,7 @@ import {
   type RunnerMessage,
   type TransportCloseReason,
 } from "@execbox/core/protocol";
-import { createTimeoutExecuteResult } from "@execbox/core/_internal";
+import { createTimeoutExecuteResult } from "@execbox/core/runtime";
 import type {
   ExecutionOptions,
   Executor,

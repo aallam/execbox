@@ -5,7 +5,7 @@ import {
   type HostTransport,
 } from "@execbox/core/protocol";
 import type { ExecutorPoolOptions } from "@execbox/core";
-import { resolveExecutorRuntimeOptions } from "@execbox/core/_internal";
+import { resolveExecutorRuntimeOptions } from "@execbox/core/runtime";
 import type {
   ExecutionOptions,
   ExecuteResult,
