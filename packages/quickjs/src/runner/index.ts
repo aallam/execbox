@@ -48,7 +48,6 @@ export type {
   QuickJsExecutorOptions,
   QuickJsHostedMode,
   QuickJsInlineExecutorOptions,
-  QuickJsProcessExecutorOptions,
   QuickJsWorkerExecutorOptions,
   WorkerResourceLimits,
 } from "../types.ts";

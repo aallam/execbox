@@ -40,11 +40,11 @@ flowchart LR
 
 ### Package Roles
 
-| Package            | Role                                                                                                         |
-| ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `@execbox/core`    | App-facing core types, provider resolution, MCP adapters, plus runtime and protocol subpaths                 |
-| `@execbox/quickjs` | Default QuickJS executor package with inline, worker-hosted, and process-hosted modes plus a reusable runner |
-| `@execbox/remote`  | Transport-backed executor that runs against an app-defined runner boundary                                   |
+| Package            | Role                                                                                         |
+| ------------------ | -------------------------------------------------------------------------------------------- |
+| `@execbox/core`    | App-facing core types, provider resolution, MCP adapters, plus runtime and protocol subpaths |
+| `@execbox/quickjs` | Default QuickJS executor package with inline and worker-hosted modes plus a reusable runner  |
+| `@execbox/remote`  | Transport-backed executor that runs against an app-defined runner boundary                   |
 
 ## End-to-End Execution Model
 

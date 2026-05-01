@@ -70,24 +70,6 @@ export function createBenchmarkFactories(): ExecutorFactory[] {
         }) as DisposableExecutor,
       supportsExplicitPrewarm: true,
     },
-    {
-      name: "process (ephemeral)",
-      create: () =>
-        new QuickJsExecutor({
-          host: "process",
-          mode: "ephemeral",
-        }) as DisposableExecutor,
-      supportsExplicitPrewarm: false,
-    },
-    {
-      name: "process (pooled)",
-      create: () =>
-        new QuickJsExecutor({
-          host: "process",
-          ...createPooledBenchmarkOptions(),
-        }) as DisposableExecutor,
-      supportsExplicitPrewarm: true,
-    },
   ];
 }
 
@@ -98,12 +80,7 @@ export function createMemoryBenchmarkFactories(
   return factories.filter((factory) => allowedNames.has(factory.name));
 }
 
-export function createContentionExecutor(
-  executorType: "worker" | "process",
-  poolSize: number,
-): DisposableExecutor {
+export function createContentionExecutor(poolSize: number): DisposableExecutor {
   const pool = createContentionPoolOptions(poolSize);
-  return executorType === "worker"
-    ? (new QuickJsExecutor({ host: "worker", pool }) as DisposableExecutor)
-    : (new QuickJsExecutor({ host: "process", pool }) as DisposableExecutor);
+  return new QuickJsExecutor({ host: "worker", pool }) as DisposableExecutor;
 }

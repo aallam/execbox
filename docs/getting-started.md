@@ -47,7 +47,6 @@ console.log(result);
 
 - Use `@execbox/quickjs` first unless you already know you need a separate runtime boundary.
 - Use `new QuickJsExecutor({ host: "worker" })` when you want QuickJS off the main thread with pooled workers.
-- Use `new QuickJsExecutor({ host: "process" })` when you want QuickJS semantics in a separate child process.
 - Use `@execbox/remote` only when your runtime already lives behind an application-owned transport.
 
 ## Run the examples

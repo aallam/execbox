@@ -18,7 +18,7 @@ Core execution contract for execbox. Use it to resolve host tools into callable 
 
 | Package                                                              | Start here when                                                            |
 | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs) | You want the default path with inline, worker, or process-hosted QuickJS.  |
+| [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs) | You want the default path with inline or worker-hosted QuickJS.            |
 | [`@execbox/remote`](https://www.npmjs.com/package/@execbox/remote)   | Your runtime already lives behind an application-owned transport boundary. |
 
 ## Install

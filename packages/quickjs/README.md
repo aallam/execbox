@@ -1,6 +1,6 @@
 # @execbox/quickjs
 
-Default execbox executor for most deployments. It runs guest JavaScript in QuickJS and lets you keep the same API as you move between inline, worker-hosted, and process-hosted execution.
+Default execbox executor for most deployments. It runs guest JavaScript in QuickJS and lets you keep the same API as you move between inline and worker-hosted execution.
 
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fquickjs?style=flat-square)](https://www.npmjs.com/package/@execbox/quickjs)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
@@ -10,7 +10,7 @@ Default execbox executor for most deployments. It runs guest JavaScript in Quick
 
 - you want the default execbox path with the easiest setup
 - you do not want a native addon in local development or CI
-- you want one package that can stay inline, move off-thread, or move into a child process later
+- you want one package that can stay inline or move off-thread later
 
 ## Install
 
@@ -45,11 +45,10 @@ console.log(result);
 
 `QuickJsExecutor` keeps the same execution API while changing where the runtime lives:
 
-| Mode              | Use it when                                                                 |
-| ----------------- | --------------------------------------------------------------------------- |
-| Inline (default)  | You want the lowest-friction development path.                              |
-| `host: "worker"`  | You want QuickJS off the main thread with pooled worker shells.             |
-| `host: "process"` | You want QuickJS hosted in a child process with a stronger lifecycle split. |
+| Mode             | Use it when                                                     |
+| ---------------- | --------------------------------------------------------------- |
+| Inline (default) | You want the lowest-friction development path.                  |
+| `host: "worker"` | You want QuickJS off the main thread with pooled worker shells. |
 
 ```ts
 const executor = new QuickJsExecutor({
@@ -66,14 +65,14 @@ await executor.prewarm();
 ## Advanced Imports
 
 - `@execbox/quickjs/runner` exports the reusable QuickJS runner
-- `@execbox/quickjs/runner/protocol-endpoint` exports the low-level QuickJS protocol loop used by hosted worker/process integrations
+- `@execbox/quickjs/runner/protocol-endpoint` exports the low-level QuickJS protocol loop used by hosted worker integrations
 - `@execbox/quickjs/remote-endpoint` adapts the QuickJS protocol loop to `@execbox/remote` runner ports
 
 ## Operational Notes
 
 - Each execution gets a fresh QuickJS runtime with JSON-only tool and result boundaries.
 - This package is the default deployment path, not a hard security boundary for hostile or multi-tenant code.
-- If you need a stronger boundary, prefer `host: "process"` or move execution behind `@execbox/remote`.
+- If you need a stronger deployment boundary, move execution behind `@execbox/remote`.
 
 ## Read Next
 

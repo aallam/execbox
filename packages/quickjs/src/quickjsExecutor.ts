@@ -10,13 +10,11 @@ import type {
   ResolvedToolProvider,
 } from "@execbox/core";
 
-import { ProcessHostedQuickJsExecutor } from "./hosted/processHostedExecutor.ts";
 import { WorkerHostedQuickJsExecutor } from "./hosted/workerHostedExecutor.ts";
 import { runQuickJsSession } from "./runner/index.ts";
 import type {
   QuickJsExecutorOptions,
   QuickJsInlineExecutorOptions,
-  QuickJsProcessExecutorOptions,
   QuickJsWorkerExecutorOptions,
 } from "./types";
 
@@ -26,14 +24,19 @@ function isWorkerOptions(
   return options.host === "worker";
 }
 
-function isProcessOptions(
+function getUnsupportedHost(
   options: QuickJsExecutorOptions,
-): options is QuickJsProcessExecutorOptions {
-  return options.host === "process";
+): string | undefined {
+  const host = (options as { host?: unknown }).host;
+  if (host === undefined || host === "inline" || host === "worker") {
+    return undefined;
+  }
+
+  return String(host);
 }
 
 /**
- * QuickJS-backed executor for inline, worker-backed, or process-backed JavaScript runs.
+ * QuickJS-backed executor for inline or worker-backed JavaScript runs.
  */
 export class QuickJsExecutor implements Executor {
   private readonly hostedExecutor: Executor | undefined;
@@ -41,16 +44,20 @@ export class QuickJsExecutor implements Executor {
 
   /**
    * Creates a QuickJS executor with inline QuickJS by default, or a hosted
-   * worker/process shell when `host` is explicitly set.
+   * worker shell when `host` is explicitly set.
    */
   constructor(options: QuickJsExecutorOptions = {}) {
-    if (isWorkerOptions(options)) {
-      this.hostedExecutor = new WorkerHostedQuickJsExecutor(options);
-      return;
+    const unsupportedHost = getUnsupportedHost(options);
+    if (unsupportedHost !== undefined) {
+      throw new Error(
+        `QuickJsExecutor host "${unsupportedHost}" is no longer supported. ` +
+          'Use host "worker" for local hosted execution, or @execbox/remote ' +
+          "for process, container, or VM boundaries.",
+      );
     }
 
-    if (isProcessOptions(options)) {
-      this.hostedExecutor = new ProcessHostedQuickJsExecutor(options);
+    if (isWorkerOptions(options)) {
+      this.hostedExecutor = new WorkerHostedQuickJsExecutor(options);
       return;
     }
 
@@ -65,8 +72,8 @@ export class QuickJsExecutor implements Executor {
   }
 
   /**
-   * Prewarms pooled hosted shells when the executor is running in worker or
-   * process mode. Inline mode treats this as a no-op.
+   * Prewarms pooled hosted shells when the executor is running in worker mode.
+   * Inline mode treats this as a no-op.
    */
   async prewarm(count?: number): Promise<void> {
     await this.hostedExecutor?.prewarm?.(count);

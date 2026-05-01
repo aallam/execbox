@@ -2,7 +2,7 @@
  * Comprehensive execbox performance benchmark suite.
  *
  * Covers:
- *   1. Single-execution latency across all in-process & out-of-process executors
+ *   1. Single-execution latency across inline and worker-hosted executors
  *   2. Cold-start vs warm (pooled/prewarmed) first-execution cost
  *   3. Tool-call overhead scaling (0, 1, 5, 10 tool calls)
  *   4. Schema validation overhead (with vs without input/output schemas)
@@ -349,7 +349,7 @@ async function suiteToolCalls(): Promise<void> {
     ).join(";\n");
   }
 
-  // Use quickjs (fastest) and worker-pooled (representative out-of-process)
+  // Use quickjs (fastest) and worker-pooled (representative hosted local mode)
   const testFactories = factories.filter(
     (f) => f.name === "quickjs (in-process)" || f.name === "worker (pooled)",
   );
@@ -507,31 +507,29 @@ async function suiteContention(): Promise<void> {
   const poolSizes = [1, 2, 4];
   const concurrency = 8;
 
-  for (const executor_type of ["worker", "process"] as const) {
-    console.log(`\n  [${executor_type}]`);
+  console.log("\n  [worker]");
 
-    for (const poolSize of poolSizes) {
-      const executor = createContentionExecutor(executor_type, poolSize);
-      try {
-        await executor.prewarm?.(poolSize);
-        const { totalMs, perRequestMs } = await benchConcurrent(
-          executor,
-          code,
-          [simpleProvider],
-          concurrency,
-          totalRuns,
-        );
-        const throughput = (totalRuns / totalMs) * 1000;
-        console.log(
-          `    pool_size=${String(poolSize).padEnd(2)} concurrency=${concurrency} ` +
-            `throughput=${throughput.toFixed(1)} exec/s ` +
-            `median=${fmt(median(perRequestMs))} ` +
-            `p95=${fmt(percentile(perRequestMs, 95))} ` +
-            `max=${fmt(max(perRequestMs))}`,
-        );
-      } finally {
-        await executor.dispose?.();
-      }
+  for (const poolSize of poolSizes) {
+    const executor = createContentionExecutor(poolSize);
+    try {
+      await executor.prewarm?.(poolSize);
+      const { totalMs, perRequestMs } = await benchConcurrent(
+        executor,
+        code,
+        [simpleProvider],
+        concurrency,
+        totalRuns,
+      );
+      const throughput = (totalRuns / totalMs) * 1000;
+      console.log(
+        `    pool_size=${String(poolSize).padEnd(2)} concurrency=${concurrency} ` +
+          `throughput=${throughput.toFixed(1)} exec/s ` +
+          `median=${fmt(median(perRequestMs))} ` +
+          `p95=${fmt(percentile(perRequestMs, 95))} ` +
+          `max=${fmt(max(perRequestMs))}`,
+      );
+    } finally {
+      await executor.dispose?.();
     }
   }
 }

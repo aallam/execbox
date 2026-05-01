@@ -20,10 +20,10 @@ export class QuickJsExecutor implements Executor {
 }
 
 // @public
-export type QuickJsExecutorHost = "inline" | "worker" | "process";
+export type QuickJsExecutorHost = "inline" | "worker";
 
 // @public
-export type QuickJsExecutorOptions = QuickJsInlineExecutorOptions | QuickJsWorkerExecutorOptions | QuickJsProcessExecutorOptions;
+export type QuickJsExecutorOptions = QuickJsInlineExecutorOptions | QuickJsWorkerExecutorOptions;
 
 // @public
 export type QuickJsHostedMode = "pooled" | "ephemeral";
@@ -32,14 +32,6 @@ export type QuickJsHostedMode = "pooled" | "ephemeral";
 export interface QuickJsInlineExecutorOptions extends ExecutorRuntimeOptions {
     host?: "inline";
     loadModule?: () => Promise<unknown> | unknown;
-}
-
-// @public
-export interface QuickJsProcessExecutorOptions extends ExecutorRuntimeOptions {
-    cancelGraceMs?: number;
-    host: "process";
-    mode?: QuickJsHostedMode;
-    pool?: ExecutorPoolOptions;
 }
 
 // @public
