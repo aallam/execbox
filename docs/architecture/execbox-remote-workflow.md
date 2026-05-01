@@ -53,7 +53,7 @@ sequenceDiagram
     participant Client as Downstream MCP client
     participant Wrapper as Wrapped MCP server
     participant Host as Host execbox session
-    participant Runner as Remote QuickJS runner
+    participant Runner as Remote runner
     participant Upstream as Upstream tools or MCP server
 
     Client->>Wrapper: callTool("mcp_execute_code", { code })

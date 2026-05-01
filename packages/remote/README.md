@@ -14,8 +14,16 @@ Transport-backed executor for execbox. Use it when you want the execbox API on t
 
 ## Install
 
+Host side:
+
 ```bash
 npm install @execbox/core @execbox/remote
+```
+
+Runner side, when using the shipped QuickJS endpoint:
+
+```bash
+npm install @execbox/quickjs
 ```
 
 ## How It Fits
@@ -23,7 +31,7 @@ npm install @execbox/core @execbox/remote
 `@execbox/remote` has two sides:
 
 - the host uses `RemoteExecutor` and supplies `HostTransport` instances
-- the runner attaches a protocol endpoint to an app-owned transport port
+- the runner attaches a runtime-owned endpoint adapter to an app-owned transport port
 
 The package stays intentionally small. It does not create servers, own authentication, or prescribe an HTTP or WebSocket framework.
 
@@ -56,7 +64,7 @@ const result = await executor.execute(`await tools.echo({ ok: true })`, [
 console.log(result);
 ```
 
-Runner side:
+Runner side, using the QuickJS endpoint shipped by `@execbox/quickjs`:
 
 ```ts
 import { attachQuickJsRemoteEndpoint } from "@execbox/quickjs/remote-endpoint";

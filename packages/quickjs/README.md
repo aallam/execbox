@@ -66,8 +66,8 @@ await executor.prewarm();
 ## Advanced Imports
 
 - `@execbox/quickjs/runner` exports the reusable QuickJS runner
-- `@execbox/quickjs/runner/protocol-endpoint` exports the shared protocol endpoint used by hosted and remote flows
-- `@execbox/quickjs/remote-endpoint` exports the QuickJS runner endpoint adapter for `@execbox/remote` transports
+- `@execbox/quickjs/runner/protocol-endpoint` exports the low-level QuickJS protocol loop used by hosted worker/process integrations
+- `@execbox/quickjs/remote-endpoint` adapts the QuickJS protocol loop to `@execbox/remote` runner ports
 
 ## Operational Notes
 

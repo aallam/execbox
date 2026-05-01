@@ -22,7 +22,7 @@ This doc set is for two audiences:
 ```mermaid
 flowchart LR
     APP["Host application"]
-    CORE["@execbox/core<br/>provider resolution + runner semantics + MCP adapters"]
+    CORE["@execbox/core<br/>provider resolution + MCP adapters + runtime helpers"]
     QJS["@execbox/quickjs<br/>QuickJS executor + reusable runner"]
     REM["@execbox/remote<br/>transport-backed remote executor"]
     IVM["@execbox/isolated-vm<br/>in-process isolated-vm executor + reusable runner"]
