@@ -11,7 +11,7 @@ Execbox provides defense-in-depth controls for guest code execution. The isolati
 - Timeout and memory controls
 - Abort propagation into in-flight host tool work
 
-## Important boundaries
+## What execbox does not provide
 
 - A hard security boundary for hostile or multi-tenant code by default
 - That in-process runtimes are equivalent to a container, VM, or separate trust domain

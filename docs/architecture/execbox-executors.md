@@ -47,7 +47,7 @@ flowchart LR
 
 ## QuickJS
 
-`QuickJsExecutor` is the default reference implementation for execbox. It uses the shared runner semantics from `@execbox/core`: providers are converted to manifests, host tool calls are dispatched through the shared dispatcher helper, and the reusable QuickJS runner turns them back into guest-visible async functions.
+`QuickJsExecutor` is the default reference implementation for execbox. It uses the shared runner semantics from `@execbox/core/runtime`: providers are converted to manifests, host tool calls are dispatched through the shared dispatcher helper, and the reusable QuickJS runner turns them back into guest-visible async functions.
 
 That design gives QuickJS two useful properties:
 

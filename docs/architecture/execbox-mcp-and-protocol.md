@@ -50,15 +50,17 @@ It owns:
 
 The architecture split is:
 
-- `@execbox/core` owns provider resolution, manifest extraction, and host-side tool dispatch semantics
+- `@execbox/core` owns app-facing provider resolution and MCP adapters
+- `@execbox/core/runtime` owns manifest extraction and host-side tool dispatch helpers for runtime implementers
 - `@execbox/core/protocol` owns wire messages, host-session lifecycle, and host-side shell pooling utilities around those semantics
 
 ## How The Packages Fit Together
 
-- `QuickJsExecutor` uses the shared runner semantics from `@execbox/core` directly.
-- `IsolatedVmExecutor` uses the same core runner semantics, but keeps a direct `isolated-vm` bridge instead of transport messages.
+- `QuickJsExecutor` uses the shared runner semantics from `@execbox/core/runtime` directly.
+- `IsolatedVmExecutor` uses the same runtime helper surface, but keeps a direct `isolated-vm` bridge instead of transport messages.
 - `QuickJsExecutor` in `host: "process"` and `host: "worker"` modes uses the shared host session from `@execbox/core/protocol` plus the shared QuickJS protocol endpoint inside the child or worker shell.
 - `RemoteExecutor` uses that same host session across an app-owned transport boundary.
+- The runner side of a remote deployment attaches a runtime-owned endpoint adapter; `@execbox/quickjs/remote-endpoint` is the shipped QuickJS adapter.
 - Pooled process and worker execution reuse only the outer host shell. Each `execute()` call still starts a fresh QuickJS runtime through the shared protocol endpoint.
 
 ```mermaid
@@ -76,7 +78,8 @@ flowchart TB
         PROTO["@execbox/core/protocol<br/>messages + host session + resource pool"]
         HOSTED["QuickJsExecutor host modes"]
         REM["RemoteExecutor"]
-        ENDPOINT["QuickJS protocol endpoint"]
+        QJS_ENDPOINT["QuickJS protocol endpoint<br/>worker/process side"]
+        REMOTE_ENDPOINT["Runtime-owned remote endpoint<br/>QuickJS adapter is shipped"]
     end
 
     CORE --> QJS
@@ -84,8 +87,9 @@ flowchart TB
     CORE --> PROTO
     HOSTED --> PROTO
     REM --> PROTO
-    HOSTED --> ENDPOINT
-    REM --> ENDPOINT
+    HOSTED --> QJS_ENDPOINT
+    REM -. runner side .-> REMOTE_ENDPOINT
+    REMOTE_ENDPOINT -. QuickJS example .-> QJS_ENDPOINT
 ```
 
 ## Transport-Backed Execution Flow
