@@ -1,4 +1,7 @@
-# Performance
+---
+title: Performance
+description: Practical performance guidance for choosing and configuring execbox executors.
+---
 
 This page summarizes practical performance guidance for choosing and configuring execbox executors.
 
@@ -61,4 +64,4 @@ const executor = new QuickJsExecutor({
 
 For most applications, start with `QuickJsExecutor` and move to `host: "worker"` when you want local execution off the main thread without leaving the package.
 
-Use `QuickJsExecutor` only for trusted code paths. See [Security & Boundaries](/security) before treating an in-process runtime as if it were a hard tenant boundary.
+Use `QuickJsExecutor` only for trusted code paths. See [Security & Boundaries](/security/) before treating an in-process runtime as if it were a hard tenant boundary.

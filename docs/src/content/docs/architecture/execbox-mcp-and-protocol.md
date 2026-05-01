@@ -1,11 +1,14 @@
-# Execbox MCP Adapters And Protocol
+---
+title: Execbox MCP Adapters And Protocol
+description: How execbox wraps upstream MCP tools and exposes code execution back through MCP.
+---
 
 This page covers two related but separate parts of the execbox architecture:
 
 - MCP adapters in `@execbox/core`
 - transport-safe execution plumbing in `@execbox/core/protocol`
 
-Use this page as the overview. For the remote execution control flow, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the message-level protocol contract, read [execbox-protocol-reference.md](./execbox-protocol-reference.md). For the normative runner specification, read [execbox-runner-specification.md](./execbox-runner-specification.md).
+Use this page as the overview. For the remote execution control flow, read [Remote Workflow](/architecture/execbox-remote-workflow/). For the message-level protocol contract, read [Protocol Reference](/architecture/execbox-protocol-reference/). For the normative runner specification, read [Runner Specification](/architecture/execbox-runner-specification/).
 
 ## MCP Adapter Responsibilities
 
@@ -14,22 +17,6 @@ The MCP adapter layer lets execbox sit on either side of an MCP tool catalog:
 - `createMcpToolProvider({ client })` wraps caller-owned MCP client connections as execbox providers
 - `openMcpToolProvider({ client | server })` opens a provider handle and is required when execbox owns a local `{ server }` connection
 - `codeMcpServer()` exposes execbox execution back out as MCP tools such as `mcp_execute_code`, `mcp_search_tools`, and `mcp_code`
-
-```mermaid
-flowchart LR
-    UP["Upstream MCP client or server"]
-    WRAP["openMcpToolProvider / createMcpToolProvider"]
-    PROVIDER["ResolvedToolProvider<br/>namespace + types + tool wrappers"]
-    EXEC["Executor"]
-    SERVER["codeMcpServer"]
-    DOWN["Downstream MCP client"]
-
-    UP --> WRAP --> PROVIDER
-    PROVIDER --> EXEC
-    PROVIDER --> SERVER
-    EXEC --> SERVER
-    SERVER --> DOWN
-```
 
 ### Ownership Model
 

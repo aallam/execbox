@@ -1,4 +1,7 @@
-# Getting Started
+---
+title: Getting Started
+description: Install execbox, run the smallest QuickJS example, and choose what to read next.
+---
 
 Execbox works best when you start with inline QuickJS, get one provider flow working, and then choose a different runtime placement only when your deployment needs it.
 
@@ -49,7 +52,7 @@ console.log(result);
 - Use `new QuickJsExecutor({ host: "worker" })` when you want QuickJS off the main thread with pooled worker shells.
 - Use `@execbox/remote` when your application owns the process, container, VM, or network boundary for the runtime.
 
-Worker-hosted QuickJS improves local lifecycle control, but it still shares the host process. Read [Security](/security) before treating any runtime placement as a production trust boundary.
+Worker-hosted QuickJS improves local lifecycle control, but it still shares the host process. Read [Security](/security/) before treating any runtime placement as a production trust boundary.
 
 ## Run the examples
 
@@ -63,6 +66,7 @@ npm run examples
 
 Next:
 
-- [Examples](/examples) for runnable flows
-- [Concepts](/architecture/) for architecture, security, and performance guidance
-- [Security](/security) before choosing a production boundary
+- [Runtime Choices](/runtime-choices/) for executor selection guidance
+- [Examples](/examples/) for runnable flows
+- [Architecture](/architecture/) for architecture, security, and performance guidance
+- [Security](/security/) before choosing a production boundary

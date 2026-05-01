@@ -1,4 +1,7 @@
-# Security & Boundaries
+---
+title: Security & Boundaries
+description: Understand execbox's defense-in-depth controls, capability boundary, and production trust model.
+---
 
 Execbox provides defense-in-depth controls for guest code execution. The isolation level you get depends on the executor and deployment boundary you choose.
 
@@ -36,6 +39,7 @@ For hostile-code or multi-tenant deployments, prefer `@execbox/remote` behind a 
 ## Deeper reading
 
 - [Architecture Overview](/architecture/)
-- [Executors](/architecture/execbox-executors)
-- [MCP And Protocol](/architecture/execbox-mcp-and-protocol)
+- [Runtime Choices](/runtime-choices/)
+- [Executors](/architecture/execbox-executors/)
+- [MCP And Protocol](/architecture/execbox-mcp-and-protocol/)
 - [Performance](/performance/)

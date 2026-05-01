@@ -2,8 +2,7 @@
 node_modules/
 .npm-cache/
 dist/
-docs/.vitepress/cache/
-docs/.vitepress/dist/
+docs/.astro/
 packages/*/dist/
 packages/*/temp/
 coverage/
