@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 class FakeWorker extends EventEmitter {
   readonly postMessage = vi.fn();
@@ -28,6 +28,10 @@ vi.mock("node:worker_threads", () => ({
 }));
 
 describe("QuickJsExecutor worker host lifecycle", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   beforeEach(() => {
     state.autoExitOnStart = true;
     state.options = undefined;

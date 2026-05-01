@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 class FakeChildProcess extends EventEmitter {
   connected = true;
@@ -37,6 +37,10 @@ vi.mock("node:child_process", () => ({
 }));
 
 describe("QuickJsExecutor process host lifecycle", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   beforeEach(() => {
     state.autoExitOnStart = true;
     state.child = undefined;
