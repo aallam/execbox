@@ -1,7 +1,11 @@
 import path from "node:path";
 
 export interface WorkspaceEntrypoint {
-  specifier: string;
+  apiReportFileName: string;
+  declarationPath: string;
+  exportPath: "." | `./${string}`;
+  packageDir: string;
+  packageName: string;
   sourcePath: string;
 }
 
@@ -12,56 +16,116 @@ export interface VitestAlias {
 
 export const workspaceEntrypoints = [
   {
-    specifier: "@execbox/core",
+    apiReportFileName: "execbox-core.api.md",
+    declarationPath: "dist/index.d.ts",
+    exportPath: ".",
+    packageDir: "packages/core",
+    packageName: "@execbox/core",
     sourcePath: "packages/core/src/index.ts",
   },
   {
-    specifier: "@execbox/core/runtime",
+    apiReportFileName: "execbox-core-runtime.api.md",
+    declarationPath: "dist/runtime.d.ts",
+    exportPath: "./runtime",
+    packageDir: "packages/core",
+    packageName: "@execbox/core",
     sourcePath: "packages/core/src/runtime.ts",
   },
   {
-    specifier: "@execbox/core/mcp",
+    apiReportFileName: "execbox-core-mcp.api.md",
+    declarationPath: "dist/mcp/index.d.ts",
+    exportPath: "./mcp",
+    packageDir: "packages/core",
+    packageName: "@execbox/core",
     sourcePath: "packages/core/src/mcp/index.ts",
   },
   {
-    specifier: "@execbox/core/protocol",
+    apiReportFileName: "execbox-core-protocol.api.md",
+    declarationPath: "dist/protocol/index.d.ts",
+    exportPath: "./protocol",
+    packageDir: "packages/core",
+    packageName: "@execbox/core",
     sourcePath: "packages/core/src/protocol/index.ts",
   },
   {
-    specifier: "@execbox/quickjs",
+    apiReportFileName: "execbox-quickjs.api.md",
+    declarationPath: "dist/index.d.ts",
+    exportPath: ".",
+    packageDir: "packages/quickjs",
+    packageName: "@execbox/quickjs",
     sourcePath: "packages/quickjs/src/index.ts",
   },
   {
-    specifier: "@execbox/quickjs/remote-endpoint",
+    apiReportFileName: "execbox-quickjs-remote-endpoint.api.md",
+    declarationPath: "dist/remoteEndpoint.d.ts",
+    exportPath: "./remote-endpoint",
+    packageDir: "packages/quickjs",
+    packageName: "@execbox/quickjs",
     sourcePath: "packages/quickjs/src/remoteEndpoint.ts",
   },
   {
-    specifier: "@execbox/quickjs/runner",
+    apiReportFileName: "execbox-quickjs-runner.api.md",
+    declarationPath: "dist/runner/index.d.ts",
+    exportPath: "./runner",
+    packageDir: "packages/quickjs",
+    packageName: "@execbox/quickjs",
     sourcePath: "packages/quickjs/src/runner/index.ts",
   },
   {
-    specifier: "@execbox/quickjs/runner/protocol-endpoint",
+    apiReportFileName: "execbox-quickjs-runner-protocol-endpoint.api.md",
+    declarationPath: "dist/runner/protocolEndpoint.d.ts",
+    exportPath: "./runner/protocol-endpoint",
+    packageDir: "packages/quickjs",
+    packageName: "@execbox/quickjs",
     sourcePath: "packages/quickjs/src/runner/protocolEndpoint.ts",
   },
   {
-    specifier: "@execbox/remote",
+    apiReportFileName: "execbox-remote.api.md",
+    declarationPath: "dist/index.d.ts",
+    exportPath: ".",
+    packageDir: "packages/remote",
+    packageName: "@execbox/remote",
     sourcePath: "packages/remote/src/index.ts",
   },
   {
-    specifier: "@execbox/isolated-vm",
+    apiReportFileName: "execbox-isolated-vm.api.md",
+    declarationPath: "dist/index.d.ts",
+    exportPath: ".",
+    packageDir: "packages/isolated-vm",
+    packageName: "@execbox/isolated-vm",
     sourcePath: "packages/isolated-vm/src/index.ts",
   },
   {
-    specifier: "@execbox/isolated-vm/runner",
+    apiReportFileName: "execbox-isolated-vm-runner.api.md",
+    declarationPath: "dist/runner/index.d.ts",
+    exportPath: "./runner",
+    packageDir: "packages/isolated-vm",
+    packageName: "@execbox/isolated-vm",
     sourcePath: "packages/isolated-vm/src/runner/index.ts",
   },
 ] as const satisfies readonly WorkspaceEntrypoint[];
 
+export function createEntrypointSpecifier(
+  entrypoint: WorkspaceEntrypoint,
+): string {
+  if (entrypoint.exportPath === ".") {
+    return entrypoint.packageName;
+  }
+
+  return `${entrypoint.packageName}/${entrypoint.exportPath.slice(2)}`;
+}
+
+export function createPackageSourceCondition(
+  entrypoint: WorkspaceEntrypoint,
+): string {
+  return `./${path.posix.relative(entrypoint.packageDir, entrypoint.sourcePath)}`;
+}
+
 export function createTsconfigPaths(): Record<string, string[]> {
   return Object.fromEntries(
-    workspaceEntrypoints.map(({ sourcePath, specifier }) => [
-      specifier,
-      [`./${sourcePath}`],
+    workspaceEntrypoints.map((entrypoint) => [
+      createEntrypointSpecifier(entrypoint),
+      [`./${entrypoint.sourcePath}`],
     ]),
   );
 }
@@ -70,11 +134,14 @@ export function createVitestAliases(repoRoot: string): VitestAlias[] {
   return [...workspaceEntrypoints]
     .sort(
       (left, right) =>
-        right.specifier.length - left.specifier.length ||
-        left.specifier.localeCompare(right.specifier),
+        createEntrypointSpecifier(right).length -
+          createEntrypointSpecifier(left).length ||
+        createEntrypointSpecifier(left).localeCompare(
+          createEntrypointSpecifier(right),
+        ),
     )
-    .map(({ sourcePath, specifier }) => ({
-      find: specifier,
-      replacement: path.join(repoRoot, sourcePath),
+    .map((entrypoint) => ({
+      find: createEntrypointSpecifier(entrypoint),
+      replacement: path.join(repoRoot, entrypoint.sourcePath),
     }));
 }
