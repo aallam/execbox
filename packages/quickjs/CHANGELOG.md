@@ -1,5 +1,11 @@
 # @execbox/quickjs
 
+## 0.6.0
+
+### Minor Changes
+
+- 07534e2: Remove `QuickJsExecutor({ host: "process" })` and its process-hosted runner entrypoint. Use `host: "worker"` for local hosted QuickJS execution, or `@execbox/remote` for app-owned process, container, or VM boundaries.
+
 ## 0.5.0
 
 ### Minor Changes
