@@ -13,23 +13,15 @@ npm run build
 npm run examples
 ```
 
-The `isolated-vm` example stays on its own lane because it depends on the native addon and `--no-node-snapshot`:
-
-```bash
-npm run example:execbox-isolated-vm
-npm run verify:isolated-vm
-```
-
 See the public [Examples docs](https://execbox.aallam.com/examples) for when to start with each example.
 
 ## Execbox
 
-| File                                                             | What it shows                                                     |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [`execbox-basic.ts`](./execbox-basic.ts)                         | Resolve a provider and execute guest code with QuickJS            |
-| [`execbox-process.ts`](./execbox-process.ts)                     | Run the same provider flow with QuickJS hosted in a child process |
-| [`execbox-remote.ts`](./execbox-remote.ts)                       | Run the same provider flow through a transport-backed executor    |
-| [`execbox-worker.ts`](./execbox-worker.ts)                       | Run the same provider flow with QuickJS hosted in a worker thread |
-| [`execbox-mcp-provider.ts`](./execbox-mcp-provider.ts)           | Wrap MCP tools into a provider and execute against them           |
-| [`execbox-mcp-server.ts`](./execbox-mcp-server.ts)               | Expose `mcp_search_tools`, `mcp_execute_code`, and `mcp_code`     |
-| [`execbox-isolated-vm-basic.ts`](./execbox-isolated-vm-basic.ts) | Run the same provider flow on the `isolated-vm` backend           |
+| File                                                   | What it shows                                                     |
+| ------------------------------------------------------ | ----------------------------------------------------------------- |
+| [`execbox-basic.ts`](./execbox-basic.ts)               | Resolve a provider and execute guest code with QuickJS            |
+| [`execbox-process.ts`](./execbox-process.ts)           | Run the same provider flow with QuickJS hosted in a child process |
+| [`execbox-remote.ts`](./execbox-remote.ts)             | Run the same provider flow through a transport-backed executor    |
+| [`execbox-worker.ts`](./execbox-worker.ts)             | Run the same provider flow with QuickJS hosted in a worker thread |
+| [`execbox-mcp-provider.ts`](./execbox-mcp-provider.ts) | Wrap MCP tools into a provider and execute against them           |
+| [`execbox-mcp-server.ts`](./execbox-mcp-server.ts)     | Expose `mcp_search_tools`, `mcp_execute_code`, and `mcp_code`     |

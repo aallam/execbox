@@ -31,7 +31,6 @@ Providers are explicit capability grants. If guest code can call a dangerous too
 | Off-main-thread lifecycle isolation                 | `@execbox/quickjs` with `host: "worker"`  |
 | Stronger lifecycle split and hard-kill timeout path | `@execbox/quickjs` with `host: "process"` |
 | Application-owned remote/runtime boundary           | `@execbox/remote`                         |
-| Explicit `isolated-vm` runtime choice               | `@execbox/isolated-vm`                    |
 
 For hostile-code or multi-tenant deployments, prefer `@execbox/quickjs` with `host: "process"` or `@execbox/remote` behind a container, VM, or equivalent boundary that you control operationally.
 

@@ -6,7 +6,6 @@ import { defineConfig } from "vitest/config";
 import { createVitestAliases } from "./scripts/workspace-entrypoints.ts";
 
 const repoRoot = path.dirname(fileURLToPath(import.meta.url));
-const includeIsolatedVm = process.env.VITEST_INCLUDE_ISOLATED_VM === "1";
 
 export default defineConfig({
   resolve: {
@@ -16,8 +15,5 @@ export default defineConfig({
     environment: "node",
     globals: true,
     include: ["packages/*/__tests__/**/*.test.ts"],
-    exclude: includeIsolatedVm
-      ? []
-      : ["packages/isolated-vm/__tests__/**/*.test.ts"],
   },
 });

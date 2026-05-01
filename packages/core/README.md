@@ -9,18 +9,17 @@ Core execution contract for execbox. Use it to resolve host tools into callable 
 ## Use `@execbox/core` When
 
 - you want to expose host capabilities to guest code through explicit tool providers
-- you want one execution contract across QuickJS, remote, or `isolated-vm` runtimes
+- you want one execution contract across QuickJS and remote transport-backed runtimes
 - you want to wrap MCP servers or clients into callable namespaces instead of exposing raw tool loops
 
 ## Pair It With an Executor
 
 `@execbox/core` defines the provider and tool boundary, but it does not execute guest code on its own.
 
-| Package                                                                      | Start here when                                                                |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs)         | You want the default path with inline, worker, or process-hosted QuickJS.      |
-| [`@execbox/remote`](https://www.npmjs.com/package/@execbox/remote)           | Your runtime already lives behind an application-owned transport boundary.     |
-| [`@execbox/isolated-vm`](https://www.npmjs.com/package/@execbox/isolated-vm) | You explicitly want the `isolated-vm` runtime and can support its constraints. |
+| Package                                                              | Start here when                                                            |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs) | You want the default path with inline, worker, or process-hosted QuickJS.  |
+| [`@execbox/remote`](https://www.npmjs.com/package/@execbox/remote)   | Your runtime already lives behind an application-owned transport boundary. |
 
 ## Install
 
@@ -30,7 +29,7 @@ Most users start with QuickJS:
 npm install @execbox/core @execbox/quickjs
 ```
 
-Swap in `@execbox/remote` or `@execbox/isolated-vm` when you need a different runtime boundary.
+Swap in `@execbox/remote` only when you already own the runtime transport boundary.
 
 ## Runtime Implementer Surface
 

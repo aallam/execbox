@@ -57,7 +57,6 @@ The architecture split is:
 ## How The Packages Fit Together
 
 - `QuickJsExecutor` uses the shared runner semantics from `@execbox/core/runtime` directly.
-- `IsolatedVmExecutor` uses the same runtime helper surface, but keeps a direct `isolated-vm` bridge instead of transport messages.
 - `QuickJsExecutor` in `host: "process"` and `host: "worker"` modes uses the shared host session from `@execbox/core/protocol` plus the shared QuickJS protocol endpoint inside the child or worker shell.
 - `RemoteExecutor` uses that same host session across an app-owned transport boundary.
 - The runner side of a remote deployment attaches a runtime-owned endpoint adapter; `@execbox/quickjs/remote-endpoint` is the shipped QuickJS adapter.
@@ -69,9 +68,8 @@ flowchart TB
         CORE["@execbox/core<br/>provider resolution + manifests + host tool dispatch"]
     end
 
-    subgraph InProcess["In-process executors"]
+    subgraph InProcess["In-process executor"]
         QJS["QuickJsExecutor"]
-        IVM["IsolatedVmExecutor"]
     end
 
     subgraph TransportBacked["Transport-backed executors"]
@@ -83,7 +81,6 @@ flowchart TB
     end
 
     CORE --> QJS
-    CORE --> IVM
     CORE --> PROTO
     HOSTED --> PROTO
     REM --> PROTO

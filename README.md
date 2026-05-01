@@ -6,7 +6,7 @@ Portable code execution for [Model Context Protocol](https://modelcontextprotoco
 
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
 [![Docs](https://img.shields.io/badge/docs-site-0ea5e9?style=flat-square)](https://execbox.aallam.com)
-[![Packages](https://img.shields.io/badge/packages-4-111827?style=flat-square)](#package-map)
+[![Packages](https://img.shields.io/badge/packages-3-111827?style=flat-square)](#package-map)
 
 </div>
 
@@ -14,12 +14,11 @@ Execbox turns host tool catalogs into callable guest namespaces, supports MCP wr
 
 ## Package Map
 
-| Package                                           | npm                                                                                                                                   | What it is for                                                                            |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [`@execbox/core`](./packages/core/)               | [![npm](https://img.shields.io/npm/v/%40execbox%2Fcore?style=flat-square)](https://www.npmjs.com/package/@execbox/core)               | Core execution contract, provider resolution, MCP adapters, and runtime/protocol subpaths |
-| [`@execbox/quickjs`](./packages/quickjs/)         | [![npm](https://img.shields.io/npm/v/%40execbox%2Fquickjs?style=flat-square)](https://www.npmjs.com/package/@execbox/quickjs)         | QuickJS executor for inline, worker, and process hosts                                    |
-| [`@execbox/remote`](./packages/remote/)           | [![npm](https://img.shields.io/npm/v/%40execbox%2Fremote?style=flat-square)](https://www.npmjs.com/package/@execbox/remote)           | Transport-backed remote executor                                                          |
-| [`@execbox/isolated-vm`](./packages/isolated-vm/) | [![npm](https://img.shields.io/npm/v/%40execbox%2Fisolated-vm?style=flat-square)](https://www.npmjs.com/package/@execbox/isolated-vm) | `isolated-vm` backend for execbox                                                         |
+| Package                                   | npm                                                                                                                           | What it is for                                                                            |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [`@execbox/core`](./packages/core/)       | [![npm](https://img.shields.io/npm/v/%40execbox%2Fcore?style=flat-square)](https://www.npmjs.com/package/@execbox/core)       | Core execution contract, provider resolution, MCP adapters, and runtime/protocol subpaths |
+| [`@execbox/quickjs`](./packages/quickjs/) | [![npm](https://img.shields.io/npm/v/%40execbox%2Fquickjs?style=flat-square)](https://www.npmjs.com/package/@execbox/quickjs) | QuickJS executor for inline, worker, and process hosts                                    |
+| [`@execbox/remote`](./packages/remote/)   | [![npm](https://img.shields.io/npm/v/%40execbox%2Fremote?style=flat-square)](https://www.npmjs.com/package/@execbox/remote)   | Advanced transport-backed executor for app-owned runtime boundaries                       |
 
 ## Examples
 

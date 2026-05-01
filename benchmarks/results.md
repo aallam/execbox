@@ -154,4 +154,3 @@ This suite only measures the parent Node process. It does not attempt to attribu
 - It does not prove exact throughput rankings for every workload or host. The concurrency and tool-call suites are still sensitive to local scheduler noise.
 - It does not prove memory behavior for `QuickJsExecutor({ host: "process" })`, because the memory suite intentionally avoids reporting child-process RSS as if it were host-process memory.
 - It does not measure `RemoteExecutor`, because remote performance depends on the caller-owned transport and remote runtime deployment.
-- It does not measure `IsolatedVmExecutor`, which has a separate native/runtime verification lane.
