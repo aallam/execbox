@@ -39,9 +39,9 @@
     "test": "vitest run",
     "test:dist-smoke": "node --import tsx scripts/test-dist-smoke.ts",
     "test:security": "node ./node_modules/vitest/vitest.mjs run packages/core/__tests__/security/isJsonSerializable.test.ts packages/core/__tests__/core/createToolCallDispatcher.test.ts packages/core/__tests__/protocol/hostSession.test.ts packages/quickjs/__tests__/protocolEndpoint.test.ts packages/quickjs/__tests__/remoteEndpoint.test.ts && node ./node_modules/vitest/vitest.mjs run packages/core/__tests__/mcp/penetration.test.ts packages/remote/__tests__/penetration.test.ts packages/quickjs/__tests__/hostedPenetration.test.ts && node ./node_modules/vitest/vitest.mjs run packages/quickjs/__tests__/processHostLifecycle.test.ts packages/quickjs/__tests__/workerHostLifecycle.test.ts",
-    "test:isolated-vm": "VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot ./node_modules/vitest/vitest.mjs run packages/isolated-vm/__tests__",
+    "test:isolated-vm": "VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot --import tsx scripts/check-isolated-vm-env.ts && VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot ./node_modules/vitest/vitest.mjs run packages/isolated-vm/__tests__",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && node --import tsx scripts/check-workspace-entrypoints.ts",
     "verify:isolated-vm": "npm run typecheck && npm run build --workspace @execbox/isolated-vm && npm run test:isolated-vm && npm run examples:isolated-vm"
   },
   "devDependencies": {

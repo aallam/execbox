@@ -12,6 +12,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": {
         "import": "./dist/index.d.ts",
         "require": "./dist/index.d.cts"
@@ -20,6 +21,7 @@
       "require": "./dist/index.cjs"
     },
     "./runner": {
+      "source": "./src/runner/index.ts",
       "types": {
         "import": "./dist/runner/index.d.ts",
         "require": "./dist/runner/index.d.cts"
