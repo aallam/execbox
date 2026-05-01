@@ -1,5 +1,11 @@
 # @execbox/isolated-vm
 
+## 0.1.6
+
+### Patch Changes
+
+- 3778810: Add source export conditions for workspace-aware TypeScript tooling.
+
 ## 0.1.5
 
 ### Patch Changes
