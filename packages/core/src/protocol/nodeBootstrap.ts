@@ -1,7 +1,7 @@
 const SOURCE_MODE_EXEC_ARGV = ["--conditions=source", "--import", "tsx"];
 
 /**
- * Returns the extra Node flags needed to launch transport-backed child entries
+ * Returns the extra Node flags needed to launch transport-backed worker entries
  * directly from source during local development and tests.
  */
 export function getNodeTransportExecArgv(

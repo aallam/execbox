@@ -39,7 +39,7 @@ describe("QuickJsExecutor worker host lifecycle", () => {
   });
 
   it("returns internal_error when the worker exits before sending a result", async () => {
-    const { QuickJsExecutor } = await import("../src/index");
+    const { QuickJsExecutor } = await import("../../src/index");
     const executor = new QuickJsExecutor({ host: "worker" });
 
     const result = await executor.execute("1 + 1", []);
@@ -54,7 +54,7 @@ describe("QuickJsExecutor worker host lifecycle", () => {
   });
 
   it("uses explicit source bootstrap conditions in repo source mode", async () => {
-    const { QuickJsExecutor } = await import("../src/index");
+    const { QuickJsExecutor } = await import("../../src/index");
     const executor = new QuickJsExecutor({ host: "worker" });
 
     await executor.execute("1 + 1", []);
@@ -71,7 +71,7 @@ describe("QuickJsExecutor worker host lifecycle", () => {
   it("terminates a silent worker only once when execution times out", async () => {
     vi.useFakeTimers();
     state.autoExitOnStart = false;
-    const { QuickJsExecutor } = await import("../src/index");
+    const { QuickJsExecutor } = await import("../../src/index");
     const executor = new QuickJsExecutor({
       host: "worker",
       cancelGraceMs: 0,
@@ -92,7 +92,7 @@ describe("QuickJsExecutor worker host lifecycle", () => {
   });
 
   it("does not create a worker when the caller signal is already aborted", async () => {
-    const { QuickJsExecutor } = await import("../src/index");
+    const { QuickJsExecutor } = await import("../../src/index");
     const executor = new QuickJsExecutor({ host: "worker" });
     const controller = new AbortController();
     controller.abort();
@@ -113,7 +113,7 @@ describe("QuickJsExecutor worker host lifecycle", () => {
   it("terminates a silent worker only once when the caller aborts", async () => {
     vi.useFakeTimers();
     state.autoExitOnStart = false;
-    const { QuickJsExecutor } = await import("../src/index");
+    const { QuickJsExecutor } = await import("../../src/index");
     const executor = new QuickJsExecutor({
       host: "worker",
       cancelGraceMs: 0,

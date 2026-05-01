@@ -1,5 +1,5 @@
-import { QuickJsExecutor } from "../src/index";
-import { runWrappedMcpPenetrationSuite } from "../../core/test-support/runWrappedMcpPenetrationSuite";
+import { runWrappedMcpPenetrationSuite } from "../../../core/test-support/runWrappedMcpPenetrationSuite";
+import { QuickJsExecutor } from "../../src/index";
 
 runWrappedMcpPenetrationSuite(
   "QuickJsExecutor worker host wrapped MCP",

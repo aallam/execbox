@@ -1,6 +1,6 @@
 import { QuickJsExecutor } from "@execbox/quickjs";
 
-import { runWrappedMcpPenetrationSuite } from "../../test-support/runWrappedMcpPenetrationSuite";
+import { runWrappedMcpPenetrationSuite } from "../../../test-support/runWrappedMcpPenetrationSuite";
 
 runWrappedMcpPenetrationSuite(
   "QuickJS wrapped MCP penetration tests",
