@@ -19,7 +19,7 @@ features:
   - title: Code-first tool use
     details: Let agents write code against typed tool namespaces instead of serializing every intermediate step back through tool calls.
   - title: Execution boundary choice
-    details: Start with inline QuickJS, move to worker hosts, or push execution behind your own remote transport.
+    details: Start with inline QuickJS, move QuickJS off the main thread, or run behind your own remote transport.
   - title: MCP on both sides
     details: Wrap upstream MCP tools into guest namespaces and expose execbox execution back out as MCP tools for downstream clients.
 ---
@@ -36,11 +36,11 @@ That split gives you one execution contract across inline QuickJS, worker-hosted
 
 ## Choose a backend
 
-| Backend               | Package            | Start here when                                                                  |
-| --------------------- | ------------------ | -------------------------------------------------------------------------------- |
-| In-process QuickJS    | `@execbox/quickjs` | You want the easiest install and the default development path.                   |
-| Worker-backed QuickJS | `@execbox/quickjs` | You want the runtime off the main thread with pooled worker reuse.               |
-| Remote transport      | `@execbox/remote`  | You already own the transport/runtime boundary and want execbox to plug into it. |
+| Backend               | Package            | Start here when                                                                      |
+| --------------------- | ------------------ | ------------------------------------------------------------------------------------ |
+| In-process QuickJS    | `@execbox/quickjs` | You want the easiest install and the default development path.                       |
+| Worker-backed QuickJS | `@execbox/quickjs` | You want the runtime off the main thread with pooled worker reuse.                   |
+| Remote transport      | `@execbox/remote`  | Your application owns the process, container, VM, or network boundary for a runtime. |
 
 ## Security posture
 

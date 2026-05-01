@@ -1,6 +1,6 @@
 # Execbox Executors
 
-This page explains how the available executors and QuickJS host modes differ and what trade-offs they make.
+This page explains how the available executors differ and what trade-offs they make.
 
 ## Executor Comparison
 
@@ -40,7 +40,7 @@ flowchart LR
 That design gives QuickJS two useful properties:
 
 - the runtime semantics are centralized in one runner implementation
-- the same guest/tool-call model can be reused behind hosted worker and remote transport boundaries
+- the same guest/tool-call model can be reused behind worker-hosted and remote transport boundaries
 
 ## Worker-Hosted QuickJS
 
@@ -94,7 +94,7 @@ Every `execute()` call still creates a fresh QuickJS runtime/context, reinjects 
 Pooling is implemented at the host-shell layer, not at the QuickJS runtime layer.
 
 - `@execbox/core/protocol` exposes a small bounded async `createResourcePool()` helper that owns reusable shells, idle eviction, and `prewarm()` / `dispose()` support.
-- Hosted `QuickJsExecutor` pools `Worker` shells. Each shell owns one long-lived transport wrapper plus one attached QuickJS protocol endpoint.
+- Worker-hosted `QuickJsExecutor` pools `Worker` shells. Each shell owns one long-lived transport wrapper plus one attached QuickJS protocol endpoint.
 - The worker entrypoint only attaches `attachQuickJsProtocolEndpoint(...)` once. That endpoint accepts one active `execute` message at a time and starts a fresh `runQuickJsSession()` for each message.
 - Concurrency therefore comes from pool size, not from multiplexing several executions through one shell.
 
@@ -130,5 +130,5 @@ In pooled mode, a worker can exit before the host session subscribes to close ev
 ## Choosing an Executor
 
 - Choose `QuickJsExecutor` when you want the default backend with the least operational friction.
-- Choose `RemoteExecutor` when you want the same execution API but need the runtime to live behind an application-defined transport boundary.
+- Choose `RemoteExecutor` when you want the same execution API but need the runtime to live behind an application-defined process, container, VM, or network boundary.
 - Choose `QuickJsExecutor` with `host: "worker"` when you want the QuickJS semantics off the main thread with a hard-stop termination path and low-latency pooled reuse by default.

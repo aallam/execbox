@@ -2,16 +2,16 @@
 
 Execbox is the code-execution part of the `execbox` workspace. It turns host tool catalogs into callable guest namespaces, lets those namespaces wrap MCP tools, and uses executor backends that decide where and how guest JavaScript runs.
 
-This Concepts section is for two audiences:
+This Concepts section is for library users choosing how to integrate execbox:
 
-- Integrators choosing packages and deployment shapes
-- Contributors reasoning about package boundaries, control flow, and trade-offs
+- Start here when you need the package map, trust model, and overall flow
+- Use the deeper pages when you are choosing a runtime, wrapping MCP tools, or implementing a remote runner
 
 ## Reading Guide
 
 - Start here for the package map, trust model, and overall flow.
 - Read [execbox-core.md](./execbox-core.md) for provider resolution, execution contracts, and error handling.
-- Read [execbox-executors.md](./execbox-executors.md) for QuickJS host modes and remote execution trade-offs.
+- Read [execbox-executors.md](./execbox-executors.md) for inline QuickJS, worker-hosted QuickJS, and remote execution trade-offs.
 - Read [execbox-mcp-and-protocol.md](./execbox-mcp-and-protocol.md) for MCP wrapping and where `@execbox/core/protocol` fits.
 - Read [execbox-remote-workflow.md](./execbox-remote-workflow.md) for the end-to-end remote execution control flow.
 - Read [execbox-protocol-reference.md](./execbox-protocol-reference.md) for the protocol message catalog and session rules.
@@ -99,4 +99,4 @@ Key implications:
 
 ## Architecture In One Paragraph
 
-`@execbox/core` owns the app-facing execution contract, provider resolution, MCP adapters, and the `@execbox/core/protocol` transport surface. Runtime implementers use `@execbox/core/runtime` for shared dispatch, manifest, timeout, log, and normalization helpers. `@execbox/quickjs` exposes the default runtime-specific reusable runner. Hosted `@execbox/quickjs` modes and `@execbox/remote` sit on top of `@execbox/core/protocol`, which owns the transport boundary: message shapes, shared host sessions, and reusable resource pools for transport-backed execution.
+`@execbox/core` owns the app-facing execution contract, provider resolution, MCP adapters, and the `@execbox/core/protocol` transport surface. Runtime implementers use `@execbox/core/runtime` for shared dispatch, manifest, timeout, log, and normalization helpers. `@execbox/quickjs` exposes the default runtime-specific reusable runner. Worker-hosted QuickJS and `@execbox/remote` sit on top of `@execbox/core/protocol`, which owns transport messages, shared host sessions, and reusable resource pools for transport-backed execution.

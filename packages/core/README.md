@@ -33,6 +33,8 @@ Swap in `@execbox/remote` only when you already own the runtime transport bounda
 
 ## Runtime Implementer Surface
 
+Most application code can skip this section.
+
 Application code should usually import from `@execbox/core`, `@execbox/core/mcp`, or `@execbox/core/protocol`.
 Executor and runner packages should import shared runtime helpers from `@execbox/core/runtime` instead. That subpath contains the manifest dispatcher, runtime option defaults, timeout helpers, log formatting, code normalization, and error normalization used to keep runtime implementations aligned.
 

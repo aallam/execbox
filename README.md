@@ -10,7 +10,7 @@ Portable code execution for [Model Context Protocol](https://modelcontextprotoco
 
 </div>
 
-Execbox turns host tool catalogs into callable guest namespaces, supports MCP wrapping on both sides of the boundary, and lets you place guest JavaScript where it fits your deployment: inline, behind a worker host, or across your own remote transport.
+Execbox turns host tool catalogs into callable guest namespaces, supports MCP wrapping on both sides of the boundary, and lets you place guest JavaScript where it fits your deployment: inline QuickJS, worker-hosted QuickJS, or a remote runner behind your own transport.
 
 ## Package Map
 
@@ -23,6 +23,12 @@ Execbox turns host tool catalogs into callable guest namespaces, supports MCP wr
 ## Examples
 
 Runnable examples live in [`examples/`](./examples/) and are indexed in [`examples/README.md`](./examples/README.md).
+
+## Choosing a Runtime
+
+- Start with `@execbox/quickjs` for trusted code and the smallest setup.
+- Use `new QuickJsExecutor({ host: "worker" })` when you want QuickJS off the main thread with pooled worker shells.
+- Use `@execbox/remote` when your application owns a process, container, VM, or network boundary for the runtime.
 
 ## Docs
 

@@ -1,6 +1,6 @@
 # Getting Started
 
-Execbox works best when you start with QuickJS, get one provider flow working, and then choose a stronger boundary only when your deployment needs it.
+Execbox works best when you start with inline QuickJS, get one provider flow working, and then choose a different runtime placement only when your deployment needs it.
 
 ## Requirements
 
@@ -45,9 +45,11 @@ console.log(result);
 
 ## Which package should I use?
 
-- Use `@execbox/quickjs` first unless you already know you need a separate runtime boundary.
-- Use `new QuickJsExecutor({ host: "worker" })` when you want QuickJS off the main thread with pooled workers.
-- Use `@execbox/remote` only when your runtime already lives behind an application-owned transport.
+- Use `@execbox/quickjs` first for trusted code and the smallest setup.
+- Use `new QuickJsExecutor({ host: "worker" })` when you want QuickJS off the main thread with pooled worker shells.
+- Use `@execbox/remote` when your application owns the process, container, VM, or network boundary for the runtime.
+
+Worker-hosted QuickJS improves local lifecycle control, but it still shares the host process. Read [Security](/security) before treating any runtime placement as a production trust boundary.
 
 ## Run the examples
 

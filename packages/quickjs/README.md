@@ -65,14 +65,14 @@ await executor.prewarm();
 ## Advanced Imports
 
 - `@execbox/quickjs/runner` exports the reusable QuickJS runner
-- `@execbox/quickjs/runner/protocol-endpoint` exports the low-level QuickJS protocol loop used by hosted worker integrations
+- `@execbox/quickjs/runner/protocol-endpoint` exports the low-level QuickJS protocol loop used by worker-hosted integrations
 - `@execbox/quickjs/remote-endpoint` adapts the QuickJS protocol loop to `@execbox/remote` runner ports
 
 ## Operational Notes
 
 - Each execution gets a fresh QuickJS runtime with JSON-only tool and result boundaries.
 - This package is the default deployment path, not a hard security boundary for hostile or multi-tenant code.
-- If you need a stronger deployment boundary, move execution behind `@execbox/remote`.
+- If you need a stronger deployment boundary, move execution behind `@execbox/remote` and a process, container, VM, or network boundary your application owns.
 
 ## Read Next
 

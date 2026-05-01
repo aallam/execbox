@@ -2,7 +2,7 @@
 
 This page is the message-level reference for `@execbox/core/protocol`.
 
-It describes the wire shapes and session semantics used by transport-backed execbox runtimes such as hosted QuickJS and remote execution. It is grounded in the shipped implementation and should be read as a practical reference, not as a formal RFC.
+It describes the wire shapes and session semantics used by transport-backed execbox runtimes such as worker-hosted QuickJS and remote execution. This is an advanced reference for runtime and remote-runner implementers; most application users should start with [Getting Started](../getting-started.md), [Executors](./execbox-executors.md), and [Security & Boundaries](../security.md).
 
 For the higher-level control-flow explanation, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the normative runner specification, read [execbox-runner-specification.md](./execbox-runner-specification.md).
 

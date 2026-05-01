@@ -2,16 +2,16 @@
 
 Execbox is the code-execution part of the `execbox` workspace. It turns host tool catalogs into callable guest namespaces, lets those namespaces wrap MCP tools, and uses executor backends that decide where and how guest JavaScript runs.
 
-This Concepts section is for two audiences:
+This Concepts section is for library users choosing how to integrate execbox:
 
-- integrators choosing packages and deployment shapes
-- contributors reasoning about package boundaries, control flow, and trade-offs
+- start here when you need the package map, trust model, and overall flow
+- use the deeper pages when you are choosing a runtime, wrapping MCP tools, or implementing a remote runner
 
 ## Reading guide
 
 - Start here for the package map, trust model, and overall flow.
 - Read [Core](/architecture/execbox-core) for provider resolution, execution contracts, and error handling.
-- Read [Executors](/architecture/execbox-executors) for QuickJS host modes and remote execution trade-offs.
+- Read [Executors](/architecture/execbox-executors) for inline QuickJS, worker-hosted QuickJS, and remote execution trade-offs.
 - Read [MCP And Protocol](/architecture/execbox-mcp-and-protocol) for MCP wrapping and where `@execbox/core/protocol` fits.
 - Read [Remote Workflow](/architecture/execbox-remote-workflow) for the end-to-end remote execution control flow.
 - Read [Protocol Reference](/architecture/execbox-protocol-reference) for the protocol message catalog and session rules.
