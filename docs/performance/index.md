@@ -66,4 +66,4 @@ const executor = new QuickJsExecutor({
 
 For most applications, start with `QuickJsExecutor` and move to `host: "worker"` when you want stronger local isolation without leaving the package.
 
-Use `QuickJsExecutor` only for trusted code paths. See the [security model](/security) before treating an in-process runtime as if it were a hard tenant boundary.
+Use `QuickJsExecutor` only for trusted code paths. See [Security & Boundaries](/security) before treating an in-process runtime as if it were a hard tenant boundary.

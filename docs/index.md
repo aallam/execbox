@@ -52,4 +52,4 @@ Execbox provides defense-in-depth controls around guest code execution:
 - Hard isolation depends on the executor and deployment boundary you choose.
 - The provider/tool surface is the capability boundary.
 
-Read [Security](/security) before deciding which executor to use in production.
+Read the [Concepts](/architecture/) guide, especially [Security & Boundaries](/security), before deciding which executor to use in production.

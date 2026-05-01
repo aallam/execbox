@@ -40,3 +40,4 @@ For hostile-code or multi-tenant deployments, prefer `@execbox/quickjs` with `ho
 - [Architecture Overview](/architecture/)
 - [Executors](/architecture/execbox-executors)
 - [MCP And Protocol](/architecture/execbox-mcp-and-protocol)
+- [Performance](/performance/)

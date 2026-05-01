@@ -71,5 +71,5 @@ npm run verify:isolated-vm
 Next:
 
 - [Examples](/examples) for runnable flows
-- [Architecture](/architecture/) for the deeper technical model
+- [Concepts](/architecture/) for architecture, security, and performance guidance
 - [Security](/security) before choosing a production boundary
