@@ -25,5 +25,5 @@ npm run examples
 ## What to read next
 
 - [Getting Started](/getting-started) for the minimal QuickJS install path
-- [Architecture](/architecture/) for how providers, executors, and protocol layers fit together
+- [Concepts](/architecture/) for architecture, security, and performance guidance
 - [Security](/security) before choosing a production boundary

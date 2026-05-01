@@ -1,6 +1,35 @@
 import { defineConfig } from "vitepress";
 import { withMermaid } from "vitepress-plugin-mermaid";
 
+const conceptsSidebar = [
+  { link: "/architecture/", text: "Overview" },
+  {
+    items: [
+      { link: "/architecture/execbox-core", text: "Core" },
+      { link: "/architecture/execbox-executors", text: "Executors" },
+      {
+        link: "/architecture/execbox-mcp-and-protocol",
+        text: "MCP And Protocol",
+      },
+      {
+        link: "/architecture/execbox-remote-workflow",
+        text: "Remote Workflow",
+      },
+      {
+        link: "/architecture/execbox-protocol-reference",
+        text: "Protocol Reference",
+      },
+      {
+        link: "/architecture/execbox-runner-specification",
+        text: "Runner Specification",
+      },
+    ],
+    text: "Architecture",
+  },
+  { link: "/security", text: "Security & Boundaries" },
+  { link: "/performance/", text: "Performance" },
+];
+
 export default withMermaid(
   defineConfig({
     title: "execbox",
@@ -23,46 +52,19 @@ export default withMermaid(
       nav: [
         { link: "/getting-started", text: "Getting Started" },
         { link: "/examples", text: "Examples" },
-        { link: "/architecture/", text: "Architecture" },
-        { link: "/performance/", text: "Performance" },
-        { link: "/security", text: "Security" },
+        {
+          activeMatch: "^/(architecture|performance|security)(/|$)",
+          link: "/architecture/",
+          text: "Concepts",
+        },
       ],
       search: {
         provider: "local",
       },
       sidebar: {
-        "/architecture/": [
-          {
-            items: [
-              { link: "/architecture/", text: "Overview" },
-              { link: "/architecture/execbox-core", text: "Core" },
-              { link: "/architecture/execbox-executors", text: "Executors" },
-              {
-                link: "/architecture/execbox-mcp-and-protocol",
-                text: "MCP And Protocol",
-              },
-              {
-                link: "/architecture/execbox-remote-workflow",
-                text: "Remote Workflow",
-              },
-              {
-                link: "/architecture/execbox-protocol-reference",
-                text: "Protocol Reference",
-              },
-              {
-                link: "/architecture/execbox-runner-specification",
-                text: "Runner Specification",
-              },
-            ],
-            text: "Architecture",
-          },
-        ],
-        "/performance/": [
-          {
-            items: [{ link: "/performance/", text: "Overview" }],
-            text: "Performance",
-          },
-        ],
+        "/architecture/": conceptsSidebar,
+        "/performance/": conceptsSidebar,
+        "/security": conceptsSidebar,
       },
       socialLinks: [
         { icon: "github", link: "https://github.com/aallam/execbox" },

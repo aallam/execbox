@@ -2,7 +2,7 @@
 
 Execbox is the code-execution part of the `execbox` workspace. It turns host tool catalogs into callable guest namespaces, lets those namespaces wrap MCP tools, and uses executor backends that decide where and how guest JavaScript runs.
 
-This doc set is for two audiences:
+This Concepts section is for two audiences:
 
 - integrators choosing packages and deployment shapes
 - contributors reasoning about package boundaries, control flow, and trade-offs
@@ -16,6 +16,8 @@ This doc set is for two audiences:
 - Read [Remote Workflow](/architecture/execbox-remote-workflow) for the end-to-end remote execution control flow.
 - Read [Protocol Reference](/architecture/execbox-protocol-reference) for the protocol message catalog and session rules.
 - Read [Runner Specification](/architecture/execbox-runner-specification) for the normative runner specification for non-TypeScript runners.
+- Read [Security & Boundaries](/security) before choosing a production trust boundary.
+- Read [Performance](/performance/) for latency, pooling, and executor sizing guidance.
 
 ## Package map
 
