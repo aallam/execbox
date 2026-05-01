@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { DispatcherMessage, RunnerMessage } from "@execbox/core/protocol";
 
-import { attachQuickJsProtocolEndpoint } from "../src/runner/protocolEndpoint";
+import { attachQuickJsProtocolEndpoint } from "../../src/runner/protocolEndpoint";
 
 const runtimeOptions = {
   maxLogChars: 64_000,

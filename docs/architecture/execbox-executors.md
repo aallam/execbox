@@ -114,7 +114,7 @@ If all shells are busy and the pool is already at `maxSize`, the next `acquire()
 
 - Successful executions return the shell to the pool.
 - Normal guest/runtime/tool failures also return the shell, because they do not imply a poisoned host shell.
-- `timeout` and `internal_error` results evict the shell, because those outcomes mean the worker/child or transport state may no longer be trustworthy.
+- `timeout` and `internal_error` results evict the shell, because those outcomes mean the worker or transport state may no longer be trustworthy.
 - Idle pooled shells are evicted after `idleTimeoutMs`, down to `minSize`.
 - `dispose()` tears down the executor-owned pool and any idle shells it still owns.
 
