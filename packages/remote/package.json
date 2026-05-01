@@ -12,6 +12,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": {
         "import": "./dist/index.d.ts",
         "require": "./dist/index.d.cts"
