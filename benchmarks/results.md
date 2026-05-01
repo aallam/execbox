@@ -1,6 +1,6 @@
 # execbox Performance Benchmark Results
 
-- **Date:** 2026-04-11
+- **Date:** 2026-05-01
 - **Environment:** Node v24.13.1 | darwin arm64 (Apple Silicon)
 - **Configuration:** iterations=15, warmups=3
 - **Command:** `npm run benchmark -- --iterations=15 --warmups=3`
@@ -13,17 +13,17 @@ This file records the current local benchmark run. Treat the tables as measured 
 
 | Executor             | No Tools (median) | 1 Tool Call (median) | 2 Tool Calls (median) |
 | -------------------- | ----------------- | -------------------- | --------------------- |
-| QuickJS (in-process) | 2.23ms            | **2.91ms**           | **4.13ms**            |
-| Worker (ephemeral)   | 122.59ms          | 122.77ms             | 126.03ms              |
-| Worker (pooled)      | **1.72ms**        | 3.02ms               | 4.38ms                |
-| Process (ephemeral)  | 342.67ms          | 347.26ms             | 354.62ms              |
-| Process (pooled)     | 2.11ms            | 3.47ms               | 4.86ms                |
+| QuickJS (in-process) | **1.47ms**        | **2.71ms**           | **3.94ms**            |
+| Worker (ephemeral)   | 62.40ms           | 64.16ms              | 65.67ms               |
+| Worker (pooled)      | 1.53ms            | 2.81ms               | 4.10ms                |
+| Process (ephemeral)  | 202.37ms          | 204.10ms             | 207.70ms              |
+| Process (pooled)     | 1.61ms            | 2.92ms               | 4.18ms                |
 
 ### Notes
 
 - On this machine, warmed pooled executors stayed close to QuickJS for trivial scripts.
 - Ephemeral executors remained far slower than pooled executors because each execution still pays worker or process startup cost.
-- Process pooled stayed low-latency in median terms, but its variability was still visibly wider than worker pooled on the no-tool case.
+- Process pooled stayed low-latency in median terms, but its process startup path remained much more expensive than worker startup.
 
 ---
 
@@ -33,11 +33,11 @@ Only pooled executors expose explicit `prewarm()`. QuickJS and ephemeral executo
 
 | Executor             | Cold First-Run (median) | Warm First-Run (median) | Speedup |
 | -------------------- | ----------------------- | ----------------------- | ------- |
-| QuickJS (in-process) | 1.90ms                  | N/A                     | N/A     |
-| Worker (ephemeral)   | 123.82ms                | N/A                     | N/A     |
-| Worker (pooled)      | 126.61ms                | 2.51ms                  | 98.0%   |
-| Process (ephemeral)  | 352.19ms                | N/A                     | N/A     |
-| Process (pooled)     | 350.72ms                | 3.44ms                  | 99.0%   |
+| QuickJS (in-process) | 1.46ms                  | N/A                     | N/A     |
+| Worker (ephemeral)   | 62.70ms                 | N/A                     | N/A     |
+| Worker (pooled)      | 62.30ms                 | 1.81ms                  | 97.1%   |
+| Process (ephemeral)  | 202.51ms                | N/A                     | N/A     |
+| Process (pooled)     | 202.31ms                | 2.32ms                  | 98.9%   |
 
 ### Notes
 
@@ -50,18 +50,18 @@ Only pooled executors expose explicit `prewarm()`. QuickJS and ephemeral executo
 
 | Tool Calls | QuickJS (median) | Worker Pooled (median) |
 | ---------- | ---------------- | ---------------------- |
-| 0          | 1.58ms           | 1.81ms                 |
-| 1          | 2.83ms           | 3.23ms                 |
-| 5          | 7.83ms           | 8.60ms                 |
-| 10         | 13.67ms          | 14.44ms                |
+| 0          | 1.39ms           | 1.48ms                 |
+| 1          | 2.63ms           | 2.77ms                 |
+| 5          | 7.65ms           | 7.88ms                 |
+| 10         | 13.93ms          | 14.28ms                |
 
 **Marginal cost per tool call**
 
 |               | QuickJS     | Worker (pooled) |
 | ------------- | ----------- | --------------- |
-| From 1 call   | 1.25ms/call | 1.42ms/call     |
-| From 5 calls  | 1.25ms/call | 1.36ms/call     |
-| From 10 calls | 1.21ms/call | 1.26ms/call     |
+| From 1 call   | 1.24ms/call | 1.29ms/call     |
+| From 5 calls  | 1.25ms/call | 1.28ms/call     |
+| From 10 calls | 1.25ms/call | 1.28ms/call     |
 
 ### Notes
 
@@ -72,15 +72,15 @@ Only pooled executors expose explicit `prewarm()`. QuickJS and ephemeral executo
 
 ## 4. Schema Validation Overhead
 
-| Executor             | With Schema (median) | Without Schema (median) | Overhead      |
-| -------------------- | -------------------- | ----------------------- | ------------- |
-| QuickJS (in-process) | 2.79ms               | 2.72ms                  | 0.08ms (2.8%) |
-| Worker (pooled)      | 3.19ms               | 2.95ms                  | 0.24ms (8.1%) |
+| Executor             | With Schema (median) | Without Schema (median) | Overhead        |
+| -------------------- | -------------------- | ----------------------- | --------------- |
+| QuickJS (in-process) | 2.72ms               | 2.76ms                  | -0.05ms (-1.7%) |
+| Worker (pooled)      | 2.82ms               | 2.79ms                  | 0.04ms (1.4%)   |
 
 ### Notes
 
 - Schema validation remained a small absolute cost in this run.
-- The QuickJS delta was near zero, which reinforces the earlier guidance that schema validation is not the place to chase meaningful latency gains.
+- The measured deltas are close enough to local noise that this still reinforces the guidance that schema validation is not the place to chase meaningful latency gains.
 
 ---
 
@@ -90,15 +90,15 @@ The pooled benchmark factories in this suite use a fixed `pool.maxSize: 2`.
 
 | Executor             | Conc=1 (exec/s) | Conc=2 | Conc=4 | Conc=8     |
 | -------------------- | --------------- | ------ | ------ | ---------- |
-| QuickJS (in-process) | 361.6           | 683.8  | 1178.7 | **1759.0** |
-| Worker (pooled)      | 323.2           | 637.6  | 654.7  | 653.3      |
-| Process (pooled)     | 322.6           | 573.8  | 564.0  | 542.3      |
+| QuickJS (in-process) | **395.3**       | 684.6  | 1078.8 | **1635.1** |
+| Worker (pooled)      | 356.5           | 722.9  | 706.4  | 749.8      |
+| Process (pooled)     | 352.3           | 653.2  | 634.5  | 675.1      |
 
 ### Notes
 
-- QuickJS was the highest-throughput path in this run for trusted, in-process workloads.
-- Worker pooled tracked closely through concurrency 2, then paid visible queueing once demand moved past the benchmark pool size.
-- Process pooled stayed competitive, but it still trailed worker pooled at every tested concurrency level above 2.
+- QuickJS stayed the strongest path for trusted, in-process workloads at low and high concurrency in this run, while worker pooled edged ahead at concurrency 2.
+- Worker and process pooled executors paid visible queueing once demand moved past the benchmark pool size.
+- Process pooled stayed competitive, but it still trailed worker pooled at every tested concurrency level.
 
 ---
 
@@ -106,12 +106,12 @@ The pooled benchmark factories in this suite use a fixed `pool.maxSize: 2`.
 
 | Executor | Pool Size | Throughput (exec/s) | Median Latency | P95 Latency | Max Latency |
 | -------- | --------- | ------------------- | -------------- | ----------- | ----------- |
-| Worker   | 1         | 326.2               | 24.40ms        | 25.73ms     | 26.11ms     |
-| Worker   | 2         | 633.1               | 12.17ms        | 13.81ms     | 15.50ms     |
-| Worker   | 4         | **1117.0**          | 6.51ms         | 8.86ms      | 8.92ms      |
-| Process  | 1         | 309.5               | 25.58ms        | 27.46ms     | 27.83ms     |
-| Process  | 2         | 546.4               | 13.44ms        | 16.39ms     | 17.81ms     |
-| Process  | 4         | 793.5               | 8.14ms         | 12.03ms     | 12.45ms     |
+| Worker   | 1         | 362.6               | 22.18ms        | 22.51ms     | 22.53ms     |
+| Worker   | 2         | 704.2               | 10.97ms        | 11.64ms     | 12.39ms     |
+| Worker   | 4         | **1327.2**          | 5.60ms         | 6.95ms      | 6.99ms      |
+| Process  | 1         | 351.0               | 22.54ms        | 23.66ms     | 23.97ms     |
+| Process  | 2         | 693.3               | 11.02ms        | 12.95ms     | 12.99ms     |
+| Process  | 4         | 1111.3              | 6.50ms         | 8.73ms      | 8.75ms      |
 
 ### Notes
 
@@ -127,14 +127,15 @@ This suite only measures the parent Node process. It does not attempt to attribu
 
 | Executor             | Heap Delta | RSS Delta | External Delta |
 | -------------------- | ---------- | --------- | -------------- |
-| QuickJS (in-process) | -0.49MB    | +2.48MB   | -0.02MB        |
-| Worker (ephemeral)   | +0.01MB    | -8.42MB   | 0.00MB         |
-| Worker (pooled)      | +0.01MB    | +0.52MB   | 0.00MB         |
+| QuickJS (in-process) | -0.47MB    | +0.02MB   | -0.03MB        |
+| Worker (ephemeral)   | +0.01MB    | -30.92MB  | 0.00MB         |
+| Worker (pooled)      | +0.01MB    | +1.45MB   | 0.00MB         |
 
 ### Notes
 
 - This is a host-process stability signal, not a full-system memory profile.
 - No obvious upward host-process heap trend showed up in this run, but that should not be interpreted as a complete leak analysis for every executor mode.
+- RSS deltas are noisy for worker teardown paths, especially in the ephemeral worker case.
 
 ---
 
@@ -142,7 +143,7 @@ This suite only measures the parent Node process. It does not attempt to attribu
 
 ### High-value takeaways from this snapshot
 
-- QuickJS remained the lowest-latency and highest-throughput option for trusted, in-process workloads on this machine.
+- QuickJS remained the lowest-latency option for trusted, in-process workloads on this machine.
 - True `prewarm()` delivered the intended first-request benefit for pooled worker and pooled process executors.
 - Worker pooled remained the strongest general-purpose local trade-off between isolation, throughput, and tail latency.
 - Process pooled stayed viable when process isolation matters, but it still trailed worker pooled on throughput and tail latency.
@@ -152,3 +153,5 @@ This suite only measures the parent Node process. It does not attempt to attribu
 
 - It does not prove exact throughput rankings for every workload or host. The concurrency and tool-call suites are still sensitive to local scheduler noise.
 - It does not prove memory behavior for `QuickJsExecutor({ host: "process" })`, because the memory suite intentionally avoids reporting child-process RSS as if it were host-process memory.
+- It does not measure `RemoteExecutor`, because remote performance depends on the caller-owned transport and remote runtime deployment.
+- It does not measure `IsolatedVmExecutor`, which has a separate native/runtime verification lane.
