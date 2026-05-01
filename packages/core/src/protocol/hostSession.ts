@@ -27,7 +27,7 @@ export interface TransportCloseReason {
 }
 
 /**
- * Minimal parent-side transport contract for worker/process-backed execution.
+ * Minimal parent-side transport contract for transport-backed execution.
  */
 export interface HostTransport {
   dispose(): Promise<void> | void;

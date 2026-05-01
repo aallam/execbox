@@ -15,7 +15,7 @@ import type { ToolCallResult } from "@execbox/core";
 import { runQuickJsSession } from "./index.ts";
 
 /**
- * Minimal worker/process-side port used by the shared QuickJS protocol endpoint.
+ * Minimal worker-side port used by the shared QuickJS protocol endpoint.
  */
 export interface QuickJsProtocolPort {
   onMessage(handler: (message: DispatcherMessage) => void): void | (() => void);
@@ -23,7 +23,7 @@ export interface QuickJsProtocolPort {
 }
 
 /**
- * Attaches the shared QuickJS protocol loop to a worker/process messaging port.
+ * Attaches the shared QuickJS protocol loop to a worker messaging port.
  */
 export function attachQuickJsProtocolEndpoint(
   port: QuickJsProtocolPort,

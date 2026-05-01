@@ -6,7 +6,7 @@ import type {
 /**
  * Host boundary options available to the QuickJS executor.
  */
-export type QuickJsExecutorHost = "inline" | "worker" | "process";
+export type QuickJsExecutorHost = "inline" | "worker";
 
 /**
  * Lifecycle modes for hosted QuickJS shells.
@@ -57,26 +57,8 @@ export interface QuickJsWorkerExecutorOptions extends ExecutorRuntimeOptions {
 }
 
 /**
- * Options for constructing a process-backed QuickJS executor.
- */
-export interface QuickJsProcessExecutorOptions extends ExecutorRuntimeOptions {
-  /** Uses a child process to host each QuickJS runtime. */
-  host: "process";
-
-  /** Time to wait before forcefully tearing down a hung hosted shell. */
-  cancelGraceMs?: number;
-
-  /** Whether to reuse hosted shells or spawn a fresh one per execution. */
-  mode?: QuickJsHostedMode;
-
-  /** Pool sizing and idle-eviction settings for pooled hosted shells. */
-  pool?: ExecutorPoolOptions;
-}
-
-/**
  * Options for constructing a QuickJS executor.
  */
 export type QuickJsExecutorOptions =
   | QuickJsInlineExecutorOptions
-  | QuickJsWorkerExecutorOptions
-  | QuickJsProcessExecutorOptions;
+  | QuickJsWorkerExecutorOptions;

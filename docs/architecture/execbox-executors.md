@@ -4,12 +4,11 @@ This page explains how the available executors and QuickJS host modes differ and
 
 ## Executor Comparison
 
-| Executor or mode                         | Runtime boundary                      | Tool bridge style               | Main strengths                                   | Main constraints                                   |
-| ---------------------------------------- | ------------------------------------- | ------------------------------- | ------------------------------------------------ | -------------------------------------------------- |
-| `QuickJsExecutor`                        | Fresh in-process QuickJS runtime      | Shared runner callback          | No native addon, simple install, default backend | Still in-process                                   |
-| `QuickJsExecutor` with `host: "worker"`  | Worker thread + fresh QuickJS runtime | Shared host session + messages  | Hard-stop worker termination, pooled by default  | Still same OS process; ephemeral mode is slower    |
-| `QuickJsExecutor` with `host: "process"` | Child process + fresh QuickJS runtime | Shared host session + IPC       | Hard-kill process termination, pooled by default | Still not a container/VM; ephemeral mode is slower |
-| `RemoteExecutor`                         | App-defined remote transport boundary | Shared host session + transport | Same API across a remote boundary                | You own transport/runtime deployment               |
+| Executor or mode                        | Runtime boundary                      | Tool bridge style               | Main strengths                                   | Main constraints                                |
+| --------------------------------------- | ------------------------------------- | ------------------------------- | ------------------------------------------------ | ----------------------------------------------- |
+| `QuickJsExecutor`                       | Fresh in-process QuickJS runtime      | Shared runner callback          | No native addon, simple install, default backend | Still in-process                                |
+| `QuickJsExecutor` with `host: "worker"` | Worker thread + fresh QuickJS runtime | Shared host session + messages  | Hard-stop worker termination, pooled by default  | Still same OS process; ephemeral mode is slower |
+| `RemoteExecutor`                        | App-defined remote transport boundary | Shared host session + transport | Same API across a remote boundary                | You own transport/runtime deployment            |
 
 ```mermaid
 flowchart LR
@@ -19,24 +18,18 @@ flowchart LR
     REM["RemoteExecutor"]
     REMRT["Remote runner"]
     WQJS["QuickJsExecutor\nhost: worker"]
-    PQJS["QuickJsExecutor\nhost: process"]
-    PROCCHILD["Child process"]
     THREAD["Worker thread"]
     RUNNER["core runner semantics"]
     PROTO["@execbox/core/protocol<br/>messages + host session"]
     WQJSRT["QuickJS runtime in worker"]
-    PQJSRT["QuickJS runtime in child process"]
 
     HOST --> QJS --> QJSRT
     HOST --> REM --> REMRT
-    HOST --> PQJS --> PROCCHILD --> PQJSRT
     HOST --> WQJS --> THREAD --> WQJSRT
     QJS --> RUNNER
     REM --> PROTO
     REMRT --> RUNNER
-    PQJS --> PROTO
     WQJS --> PROTO
-    PROCCHILD --> RUNNER
     THREAD --> RUNNER
 ```
 
@@ -47,7 +40,7 @@ flowchart LR
 That design gives QuickJS two useful properties:
 
 - the runtime semantics are centralized in one runner implementation
-- the same guest/tool-call model can be reused behind hosted worker, hosted process, and remote transport boundaries
+- the same guest/tool-call model can be reused behind hosted worker and remote transport boundaries
 
 ## Worker-Hosted QuickJS
 
@@ -70,53 +63,29 @@ sequenceDiagram
     Exec-->>Host: ExecuteResult
 ```
 
-## Process-Hosted QuickJS
-
-`QuickJsExecutor` with `host: "process"` uses the same message-driven model as the worker host, but runs it behind a child-process boundary. It loads the same QuickJS session runner used by the inline QuickJS executor, reuses the same QuickJS protocol endpoint inside the child, and uses the shared `@execbox/core/protocol` host session on the parent side. By default it keeps a child-process shell warm between executions; `mode: "ephemeral"` switches to a fresh child process per execution.
-
-```mermaid
-sequenceDiagram
-    participant Host as Host app
-    participant Exec as QuickJsExecutor(host=process)
-    participant Child as Child process
-    participant Runner as QuickJS runner
-
-    Host->>Exec: execute(code, providers)
-    Exec->>Child: execute message + manifests
-    Child->>Runner: start QuickJS session
-    Runner-->>Exec: started
-    Runner-->>Exec: tool_call
-    Exec-->>Runner: tool_result
-    Runner-->>Exec: done
-    Exec-->>Host: ExecuteResult
-```
-
 ## Timeout, Memory, and Abort Trade-offs
 
 The available executors expose the same public result shape, but they enforce limits differently.
 
-| Concern             | QuickJS inline                            | Remote                                                                     | QuickJS host: process                                                   | QuickJS host: worker                                                            |
-| ------------------- | ----------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Timeout             | QuickJS interrupt/deadline handling       | Shared host-session timeout + remote cancel + transport teardown           | Shared host-session timeout + process cancellation + `SIGKILL` backstop | Shared host-session timeout + worker cancellation + worker termination backstop |
-| Memory              | QuickJS runtime memory limit              | Remote runtime decides the hard boundary; execbox still forwards limits    | QuickJS runtime memory limit inside the child process                   | QuickJS memory limit inside worker, optional worker resource limits as backstop |
-| Abort to host tools | Abort signal passed through core callback | Abort signal passed through shared host session                            | Abort signal passed through shared host session                         | Abort signal passed through shared host session                                 |
-| Log capture         | Captured inside runner                    | Captured inside the remote runner and returned over the transport boundary | Captured inside child-side QuickJS runner                               | Captured inside worker-side QuickJS runner                                      |
+| Concern             | QuickJS inline                            | Remote                                                                     | QuickJS host: worker                                                            |
+| ------------------- | ----------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Timeout             | QuickJS interrupt/deadline handling       | Shared host-session timeout + remote cancel + transport teardown           | Shared host-session timeout + worker cancellation + worker termination backstop |
+| Memory              | QuickJS runtime memory limit              | Remote runtime decides the hard boundary; execbox still forwards limits    | QuickJS memory limit inside worker, optional worker resource limits as backstop |
+| Abort to host tools | Abort signal passed through core callback | Abort signal passed through shared host session                            | Abort signal passed through shared host session                                 |
+| Log capture         | Captured inside runner                    | Captured inside the remote runner and returned over the transport boundary | Captured inside worker-side QuickJS runner                                      |
 
 ## Security and Operational Trade-offs
 
 - All executor modes provide defense-in-depth measures, not standalone hard hostile-code boundaries.
 - QuickJS is the easiest operational default and has the cleanest shared runtime story.
 - Remote execution keeps the same executor API while moving the runtime behind an app-defined boundary, but execbox deliberately does not ship the network stack for you.
-- Process-hosted QuickJS gives a stronger lifecycle split than worker threads, but it is still not equivalent to a container or VM boundary.
 - Worker-hosted QuickJS improves lifecycle isolation and hard-stop behavior, but not process-level trust isolation.
-- Worker and process executors share the same host-session and child-endpoint semantics, so most behavioral differences come from the transport boundary rather than from duplicated executor logic.
 
 ## Pooled QuickJS Shells
 
 The QuickJS-backed executors that benefit from pooling can keep the expensive outer shell warm without reusing guest runtime state:
 
 - `QuickJsExecutor` with `host: "worker"`: pooled-by-default reusable worker threads, with `mode: "ephemeral"` opt-out
-- `QuickJsExecutor` with `host: "process"`: pooled-by-default reusable child processes, with `mode: "ephemeral"` opt-out
 
 Every `execute()` call still creates a fresh QuickJS runtime/context, reinjects providers, and discards guest globals afterward. Timeouts and internal transport failures evict the affected shell from the pool instead of returning it to circulation.
 
@@ -125,8 +94,8 @@ Every `execute()` call still creates a fresh QuickJS runtime/context, reinjects 
 Pooling is implemented at the host-shell layer, not at the QuickJS runtime layer.
 
 - `@execbox/core/protocol` exposes a small bounded async `createResourcePool()` helper that owns reusable shells, idle eviction, and `prewarm()` / `dispose()` support.
-- Hosted `QuickJsExecutor` pools either `ChildProcess` or `Worker` shells. Each shell owns one long-lived transport wrapper plus one attached QuickJS protocol endpoint.
-- The child/worker entrypoint only attaches `attachQuickJsProtocolEndpoint(...)` once. That endpoint accepts one active `execute` message at a time and starts a fresh `runQuickJsSession()` for each message.
+- Hosted `QuickJsExecutor` pools `Worker` shells. Each shell owns one long-lived transport wrapper plus one attached QuickJS protocol endpoint.
+- The worker entrypoint only attaches `attachQuickJsProtocolEndpoint(...)` once. That endpoint accepts one active `execute` message at a time and starts a fresh `runQuickJsSession()` for each message.
 - Concurrency therefore comes from pool size, not from multiplexing several executions through one shell.
 
 At execution time the flow is:
@@ -151,7 +120,7 @@ If all shells are busy and the pool is already at `maxSize`, the next `acquire()
 
 ### Early Exit Handling
 
-In pooled mode, a child or worker can exit before the host session subscribes to close events. The pooled transport wrappers retain the first close reason and replay it to later `onClose(...)` subscribers, so an early shell death still resolves as `internal_error` instead of hanging the execution.
+In pooled mode, a worker can exit before the host session subscribes to close events. The pooled transport wrappers retain the first close reason and replay it to later `onClose(...)` subscribers, so an early shell death still resolves as `internal_error` instead of hanging the execution.
 
 ### What Is Not Pooled
 
@@ -162,5 +131,4 @@ In pooled mode, a child or worker can exit before the host session subscribes to
 
 - Choose `QuickJsExecutor` when you want the default backend with the least operational friction.
 - Choose `RemoteExecutor` when you want the same execution API but need the runtime to live behind an application-defined transport boundary.
-- Choose `QuickJsExecutor` with `host: "process"` when you want the QuickJS semantics behind a child-process boundary with a hard-kill timeout path and low-latency pooled reuse by default.
 - Choose `QuickJsExecutor` with `host: "worker"` when you want the QuickJS semantics off the main thread with a hard-stop termination path and low-latency pooled reuse by default.

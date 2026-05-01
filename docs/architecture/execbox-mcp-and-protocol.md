@@ -45,8 +45,8 @@ It owns:
 
 - the `execute`, `cancel`, `started`, `tool_call`, `tool_result`, and `done` message types
 - the shared host transport session used by hosted `@execbox/quickjs` modes and `@execbox/remote`
-- Node transport bootstrap helpers for worker and child-process execution
-- the reusable async resource pool used by pooled worker and process shells
+- Node transport bootstrap helpers for worker execution
+- the reusable async resource pool used by pooled worker shells
 
 The architecture split is:
 
@@ -57,10 +57,10 @@ The architecture split is:
 ## How The Packages Fit Together
 
 - `QuickJsExecutor` uses the shared runner semantics from `@execbox/core/runtime` directly.
-- `QuickJsExecutor` in `host: "process"` and `host: "worker"` modes uses the shared host session from `@execbox/core/protocol` plus the shared QuickJS protocol endpoint inside the child or worker shell.
+- `QuickJsExecutor` in `host: "worker"` mode uses the shared host session from `@execbox/core/protocol` plus the shared QuickJS protocol endpoint inside the worker shell.
 - `RemoteExecutor` uses that same host session across an app-owned transport boundary.
 - The runner side of a remote deployment attaches a runtime-owned endpoint adapter; `@execbox/quickjs/remote-endpoint` is the shipped QuickJS adapter.
-- Pooled process and worker execution reuse only the outer host shell. Each `execute()` call still starts a fresh QuickJS runtime through the shared protocol endpoint.
+- Pooled worker execution reuses only the outer host shell. Each `execute()` call still starts a fresh QuickJS runtime through the shared protocol endpoint.
 
 ```mermaid
 flowchart TB
@@ -76,7 +76,7 @@ flowchart TB
         PROTO["@execbox/core/protocol<br/>messages + host session + resource pool"]
         HOSTED["QuickJsExecutor host modes"]
         REM["RemoteExecutor"]
-        QJS_ENDPOINT["QuickJS protocol endpoint<br/>worker/process side"]
+        QJS_ENDPOINT["QuickJS protocol endpoint<br/>worker side"]
         REMOTE_ENDPOINT["Runtime-owned remote endpoint<br/>QuickJS adapter is shipped"]
     end
 

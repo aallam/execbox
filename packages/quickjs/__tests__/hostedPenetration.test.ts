@@ -10,13 +10,3 @@ runWrappedMcpPenetrationSuite(
     });
   },
 );
-
-runWrappedMcpPenetrationSuite(
-  "QuickJsExecutor process host wrapped MCP",
-  (options) => {
-    return new QuickJsExecutor({
-      ...options,
-      host: "process",
-    });
-  },
-);

@@ -10,14 +10,14 @@ Portable code execution for [Model Context Protocol](https://modelcontextprotoco
 
 </div>
 
-Execbox turns host tool catalogs into callable guest namespaces, supports MCP wrapping on both sides of the boundary, and lets you place guest JavaScript where it fits your deployment: inline, behind a worker or child-process host, or across your own remote transport.
+Execbox turns host tool catalogs into callable guest namespaces, supports MCP wrapping on both sides of the boundary, and lets you place guest JavaScript where it fits your deployment: inline, behind a worker host, or across your own remote transport.
 
 ## Package Map
 
 | Package                                   | npm                                                                                                                           | What it is for                                                                            |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | [`@execbox/core`](./packages/core/)       | [![npm](https://img.shields.io/npm/v/%40execbox%2Fcore?style=flat-square)](https://www.npmjs.com/package/@execbox/core)       | Core execution contract, provider resolution, MCP adapters, and runtime/protocol subpaths |
-| [`@execbox/quickjs`](./packages/quickjs/) | [![npm](https://img.shields.io/npm/v/%40execbox%2Fquickjs?style=flat-square)](https://www.npmjs.com/package/@execbox/quickjs) | QuickJS executor for inline, worker, and process hosts                                    |
+| [`@execbox/quickjs`](./packages/quickjs/) | [![npm](https://img.shields.io/npm/v/%40execbox%2Fquickjs?style=flat-square)](https://www.npmjs.com/package/@execbox/quickjs) | QuickJS executor for inline and worker hosts                                              |
 | [`@execbox/remote`](./packages/remote/)   | [![npm](https://img.shields.io/npm/v/%40execbox%2Fremote?style=flat-square)](https://www.npmjs.com/package/@execbox/remote)   | Advanced transport-backed executor for app-owned runtime boundaries                       |
 
 ## Examples

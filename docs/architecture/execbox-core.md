@@ -189,12 +189,12 @@ Executors are responsible for their own runtime-specific classification rules, b
 
 ## Why the Core Stays Small
 
-The core package does not own QuickJS, worker threads, child processes, or transport mechanics. That separation keeps the core useful for:
+The core package does not own QuickJS, worker threads, process boundaries, or transport mechanics. That separation keeps the core useful for:
 
 - direct in-process runtimes
 - worker-backed runtimes
 - MCP wrapper servers
-- process or remote execution models
+- remote execution models
 
 The consequence is deliberate separation between:
 

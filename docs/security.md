@@ -25,14 +25,13 @@ Providers are explicit capability grants. If guest code can call a dangerous too
 
 ## Choosing the right boundary
 
-| Need                                                | Recommended path                          |
-| --------------------------------------------------- | ----------------------------------------- |
-| Lowest friction                                     | `@execbox/quickjs`                        |
-| Off-main-thread lifecycle isolation                 | `@execbox/quickjs` with `host: "worker"`  |
-| Stronger lifecycle split and hard-kill timeout path | `@execbox/quickjs` with `host: "process"` |
-| Application-owned remote/runtime boundary           | `@execbox/remote`                         |
+| Need                                      | Recommended path                         |
+| ----------------------------------------- | ---------------------------------------- |
+| Lowest friction                           | `@execbox/quickjs`                       |
+| Off-main-thread lifecycle isolation       | `@execbox/quickjs` with `host: "worker"` |
+| Application-owned remote/runtime boundary | `@execbox/remote`                        |
 
-For hostile-code or multi-tenant deployments, prefer `@execbox/quickjs` with `host: "process"` or `@execbox/remote` behind a container, VM, or equivalent boundary that you control operationally.
+For hostile-code or multi-tenant deployments, prefer `@execbox/remote` behind a container, VM, or equivalent boundary that you control operationally.
 
 ## Deeper reading
 
