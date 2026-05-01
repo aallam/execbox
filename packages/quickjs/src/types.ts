@@ -9,7 +9,7 @@ import type {
 export type QuickJsExecutorHost = "inline" | "worker";
 
 /**
- * Lifecycle modes for hosted QuickJS shells.
+ * Lifecycle modes for worker-hosted QuickJS shells.
  */
 export type QuickJsHostedMode = "pooled" | "ephemeral";
 
@@ -43,13 +43,13 @@ export interface QuickJsWorkerExecutorOptions extends ExecutorRuntimeOptions {
   /** Uses a worker thread to host each QuickJS runtime. */
   host: "worker";
 
-  /** Time to wait before forcefully tearing down a hung hosted shell. */
+  /** Time to wait before forcefully tearing down a hung worker shell. */
   cancelGraceMs?: number;
 
-  /** Whether to reuse hosted shells or spawn a fresh one per execution. */
+  /** Whether to reuse worker shells or spawn a fresh one per execution. */
   mode?: QuickJsHostedMode;
 
-  /** Pool sizing and idle-eviction settings for pooled hosted shells. */
+  /** Pool sizing and idle-eviction settings for pooled worker shells. */
   pool?: ExecutorPoolOptions;
 
   /** Optional worker thread V8 limits used as a coarse safety backstop. */

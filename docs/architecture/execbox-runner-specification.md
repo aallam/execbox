@@ -1,6 +1,6 @@
 # Execbox Runner Specification
 
-This page defines the runner specification for transport-backed execbox runners.
+This page defines the runner specification for transport-backed execbox runners. It is an advanced reference for users implementing their own runner boundary.
 
 Use it when you want to implement a non-TypeScript runner, such as a Go remote runner, without reverse-engineering the shipped TypeScript implementation. For the control-flow walkthrough, read [execbox-remote-workflow.md](./execbox-remote-workflow.md). For the message catalog, read [execbox-protocol-reference.md](./execbox-protocol-reference.md).
 

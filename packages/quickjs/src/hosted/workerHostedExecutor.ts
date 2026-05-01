@@ -173,7 +173,7 @@ export class WorkerHostedQuickJsExecutor implements Executor {
   private readonly warmup: Promise<void> | undefined;
 
   /**
-   * Creates a hosted QuickJS executor that launches worker-thread shells on demand.
+   * Creates a QuickJS executor that launches worker-thread shells on demand.
    */
   constructor(options: QuickJsWorkerExecutorOptions) {
     this.cancelGraceMs = options.cancelGraceMs ?? DEFAULT_CANCEL_GRACE_MS;

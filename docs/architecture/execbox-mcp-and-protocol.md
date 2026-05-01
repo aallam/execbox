@@ -44,7 +44,7 @@ flowchart LR
 It owns:
 
 - the `execute`, `cancel`, `started`, `tool_call`, `tool_result`, and `done` message types
-- the shared host transport session used by hosted `@execbox/quickjs` modes and `@execbox/remote`
+- the shared host transport session used by worker-hosted `@execbox/quickjs` and `@execbox/remote`
 - Node transport bootstrap helpers for worker execution
 - the reusable async resource pool used by pooled worker shells
 
@@ -74,7 +74,7 @@ flowchart TB
 
     subgraph TransportBacked["Transport-backed executors"]
         PROTO["@execbox/core/protocol<br/>messages + host session + resource pool"]
-        HOSTED["QuickJsExecutor host modes"]
+        HOSTED["QuickJsExecutor host: worker"]
         REM["RemoteExecutor"]
         QJS_ENDPOINT["QuickJS protocol endpoint<br/>worker side"]
         REMOTE_ENDPOINT["Runtime-owned remote endpoint<br/>QuickJS adapter is shipped"]
@@ -91,7 +91,7 @@ flowchart TB
 
 ## Transport-Backed Execution Flow
 
-The same host-session model is used for hosted QuickJS and remote execution:
+The same host-session model is used for worker-hosted QuickJS and remote execution:
 
 ```mermaid
 sequenceDiagram

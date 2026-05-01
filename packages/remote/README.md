@@ -10,7 +10,7 @@ Transport-backed executor for execbox. Use it when you want the execbox API on t
 
 - you want execbox execution to live outside the application process
 - you already own the network stack, process topology, or runtime placement
-- you want to keep the same provider/executor model while moving the runtime behind your own boundary
+- you want to keep the same provider/executor model while moving the runtime behind your own process, container, VM, or network boundary
 
 ## Install
 

@@ -14,12 +14,12 @@ import type {
 } from "@execbox/core";
 
 /**
- * Default grace period before a hosted shell is forcefully terminated.
+ * Default grace period before a worker-hosted shell is forcefully terminated.
  */
 const DEFAULT_CANCEL_GRACE_MS = 25;
 
 /**
- * Default pooling limits shared by the hosted QuickJS executors.
+ * Default pooling limits shared by worker-hosted QuickJS executors.
  */
 const DEFAULT_POOL_OPTIONS: Required<ExecutorPoolOptions> = {
   idleTimeoutMs: 30_000,
@@ -29,7 +29,7 @@ const DEFAULT_POOL_OPTIONS: Required<ExecutorPoolOptions> = {
 };
 
 /**
- * Minimal code used to warm a hosted shell without touching user providers.
+ * Minimal code used to warm a worker shell without touching user providers.
  */
 const DEFAULT_PREWARM_CODE = "undefined";
 
