@@ -1,6 +1,6 @@
 {
   "name": "@execbox/remote",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Transport-backed remote executor for the execbox core package.",
   "license": "MIT",
   "type": "module",

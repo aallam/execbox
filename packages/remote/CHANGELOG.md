@@ -1,5 +1,11 @@
 # @execbox/remote
 
+## 0.3.1
+
+### Patch Changes
+
+- 3778810: Add source export conditions for workspace-aware TypeScript tooling.
+
 ## 0.3.0
 
 ### Minor Changes
