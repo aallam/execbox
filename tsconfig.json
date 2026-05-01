@@ -15,21 +15,15 @@
       "@execbox/quickjs/runner/protocol-endpoint": [
         "./packages/quickjs/src/runner/protocolEndpoint.ts"
       ],
-      "@execbox/remote": ["./packages/remote/src/index.ts"],
-      "@execbox/isolated-vm": ["./packages/isolated-vm/src/index.ts"],
-      "@execbox/isolated-vm/runner": [
-        "./packages/isolated-vm/src/runner/index.ts"
-      ]
+      "@execbox/remote": ["./packages/remote/src/index.ts"]
     },
     "types": ["node", "vitest/globals"]
   },
   "include": [
     "examples/**/*.ts",
-    "examples/execbox-isolated-vm-basic.ts",
     "packages/core/**/*.ts",
     "packages/quickjs/**/*.ts",
     "packages/remote/**/*.ts",
-    "packages/isolated-vm/**/*.ts",
     "scripts/**/*.ts",
     "vitest.config.ts"
   ],

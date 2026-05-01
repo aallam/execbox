@@ -23,7 +23,6 @@ This guide is for both humans and coding agents. Agent-specific operating instru
 - Package export, manifest, or published type-resolution changes: `npm run package:check`
 - Docs site changes: `npm run docs:build`
 - Security or execution-boundary changes: `npm run test:security`
-- `@execbox/isolated-vm` changes: `npm run test:isolated-vm` or `npm run verify:isolated-vm`
 
 Choose the smallest verification set that covers your change, and include the commands you ran in your PR or handoff notes when the context would help reviewers.
 

@@ -48,8 +48,7 @@ console.log(result);
 - Use `@execbox/quickjs` first unless you already know you need a separate runtime boundary.
 - Use `new QuickJsExecutor({ host: "worker" })` when you want QuickJS off the main thread with pooled workers.
 - Use `new QuickJsExecutor({ host: "process" })` when you want QuickJS semantics in a separate child process.
-- Use `@execbox/remote` when your runtime already lives behind an application-owned transport.
-- Use `@execbox/isolated-vm` only when you explicitly want that runtime and can support `--no-node-snapshot`.
+- Use `@execbox/remote` only when your runtime already lives behind an application-owned transport.
 
 ## Run the examples
 
@@ -59,13 +58,6 @@ The repo includes runnable examples for each main deployment shape:
 npm install
 npm run build
 npm run examples
-```
-
-For the isolated-vm lane:
-
-```bash
-npm run example:execbox-isolated-vm
-npm run verify:isolated-vm
 ```
 
 Next:

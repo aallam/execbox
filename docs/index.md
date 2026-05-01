@@ -32,17 +32,16 @@ Execbox is a Node.js library for running guest JavaScript against host-defined t
 - where guest code runs
 - how calls cross boundaries
 
-That split gives you one execution contract across inline QuickJS, hosted QuickJS, remote, and `isolated-vm` backends.
+That split gives you one execution contract across inline QuickJS, hosted QuickJS, and remote transport-backed execution.
 
 ## Choose a backend
 
-| Backend                | Package                | Start here when                                                                   |
-| ---------------------- | ---------------------- | --------------------------------------------------------------------------------- |
-| In-process QuickJS     | `@execbox/quickjs`     | You want the easiest install and the default development path.                    |
-| Worker-backed QuickJS  | `@execbox/quickjs`     | You want the runtime off the main thread with pooled worker reuse.                |
-| Process-backed QuickJS | `@execbox/quickjs`     | You want a stronger lifecycle boundary and hard-kill timeout behavior.            |
-| Remote transport       | `@execbox/remote`      | You already own the transport/runtime boundary and want execbox to plug into it.  |
-| isolated-vm            | `@execbox/isolated-vm` | You explicitly want `isolated-vm` and can support its native/runtime constraints. |
+| Backend                | Package            | Start here when                                                                  |
+| ---------------------- | ------------------ | -------------------------------------------------------------------------------- |
+| In-process QuickJS     | `@execbox/quickjs` | You want the easiest install and the default development path.                   |
+| Worker-backed QuickJS  | `@execbox/quickjs` | You want the runtime off the main thread with pooled worker reuse.               |
+| Process-backed QuickJS | `@execbox/quickjs` | You want a stronger lifecycle boundary and hard-kill timeout behavior.           |
+| Remote transport       | `@execbox/remote`  | You already own the transport/runtime boundary and want execbox to plug into it. |
 
 ## Security posture
 

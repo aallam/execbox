@@ -106,7 +106,6 @@ sequenceDiagram
 This seam is what lets execbox share semantics across:
 
 - the in-process QuickJS executor
-- the in-process `isolated-vm` executor
 - transport-backed executors that reuse the same manifest and dispatcher model through `@execbox/core/protocol`
 
 without forcing every runtime through the same transport implementation.
@@ -190,7 +189,7 @@ Executors are responsible for their own runtime-specific classification rules, b
 
 ## Why the Core Stays Small
 
-The core package does not own QuickJS, `isolated-vm`, worker threads, or transport mechanics. That separation keeps the core useful for:
+The core package does not own QuickJS, worker threads, child processes, or transport mechanics. That separation keeps the core useful for:
 
 - direct in-process runtimes
 - worker-backed runtimes

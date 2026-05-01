@@ -87,22 +87,6 @@ export const workspaceEntrypoints = [
     packageName: "@execbox/remote",
     sourcePath: "packages/remote/src/index.ts",
   },
-  {
-    apiReportFileName: "execbox-isolated-vm.api.md",
-    declarationPath: "dist/index.d.ts",
-    exportPath: ".",
-    packageDir: "packages/isolated-vm",
-    packageName: "@execbox/isolated-vm",
-    sourcePath: "packages/isolated-vm/src/index.ts",
-  },
-  {
-    apiReportFileName: "execbox-isolated-vm-runner.api.md",
-    declarationPath: "dist/runner/index.d.ts",
-    exportPath: "./runner",
-    packageDir: "packages/isolated-vm",
-    packageName: "@execbox/isolated-vm",
-    sourcePath: "packages/isolated-vm/src/runner/index.ts",
-  },
 ] as const satisfies readonly WorkspaceEntrypoint[];
 
 export function createEntrypointSpecifier(

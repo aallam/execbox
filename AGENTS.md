@@ -4,7 +4,7 @@
 
 - `execbox` is a Node.js 22+ npm workspace that publishes the `@execbox/*` package family.
 - Core source lives under `packages/*/src`, tests live under `packages/*/__tests__`, runnable examples live under `examples/`, and the public docs site lives under `docs/`.
-- The workspace currently contains `@execbox/core`, `@execbox/quickjs`, `@execbox/remote`, and `@execbox/isolated-vm`.
+- The workspace currently contains `@execbox/core`, `@execbox/quickjs`, and `@execbox/remote`.
 - Keep changes aligned with existing package boundaries. Prefer changing the owning package instead of introducing cross-package shortcuts.
 
 ## Setup Commands
@@ -17,8 +17,6 @@
 - Validate published package metadata and type resolution: `npm run package:check`
 - Build docs site: `npm run docs:build`
 - Run security-focused suites: `npm run test:security`
-- Run isolated-vm tests only when needed: `npm run test:isolated-vm`
-- Run the full isolated-vm verification lane: `npm run verify:isolated-vm`
 
 ## Codebase Conventions
 
@@ -35,7 +33,6 @@
 - If you change the public API of any entrypoint listed in `scripts/workspace-entrypoints.ts`, including `@execbox/core/runtime` and `@execbox/quickjs/remote-endpoint`, also run `npm run api:check`.
 - If you change docs site content, navigation, or VitePress config, also run `npm run docs:build`.
 - If you touch execution boundaries, timeout handling, abort propagation, schema validation, or log/memory controls, also run `npm run test:security`.
-- If you touch `@execbox/isolated-vm` or codepaths guarded by `VITEST_INCLUDE_ISOLATED_VM`, run `npm run test:isolated-vm` or `npm run verify:isolated-vm`.
 
 ## Security Notes
 

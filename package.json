@@ -10,8 +10,7 @@
   "workspaces": [
     "packages/core",
     "packages/quickjs",
-    "packages/remote",
-    "packages/isolated-vm"
+    "packages/remote"
   ],
   "scripts": {
     "api:check": "npm run build && node --import tsx scripts/run-api-extractor.ts",
@@ -22,7 +21,6 @@
     "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",
     "example:execbox": "node --import tsx examples/execbox-basic.ts",
-    "example:execbox-isolated-vm": "NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot --import tsx examples/execbox-isolated-vm-basic.ts",
     "example:execbox-mcp-provider": "node --import tsx examples/execbox-mcp-provider.ts",
     "example:execbox-mcp-server": "node --import tsx examples/execbox-mcp-server.ts",
     "example:execbox-process": "node --import tsx examples/execbox-process.ts",
@@ -30,7 +28,6 @@
     "example:execbox-worker": "node --import tsx examples/execbox-worker.ts",
     "benchmark": "node --expose-gc --import tsx benchmarks/benchmark.ts",
     "examples": "npm run example:execbox && npm run example:execbox-process && npm run example:execbox-remote && npm run example:execbox-worker && npm run example:execbox-mcp-provider && npm run example:execbox-mcp-server",
-    "examples:isolated-vm": "npm run example:execbox-isolated-vm",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --ext .ts",
@@ -39,10 +36,8 @@
     "test": "vitest run",
     "test:dist-smoke": "node --import tsx scripts/test-dist-smoke.ts",
     "test:security": "node ./node_modules/vitest/vitest.mjs run packages/core/__tests__/security/isJsonSerializable.test.ts packages/core/__tests__/core/createToolCallDispatcher.test.ts packages/core/__tests__/protocol/hostSession.test.ts packages/quickjs/__tests__/protocolEndpoint.test.ts packages/quickjs/__tests__/remoteEndpoint.test.ts && node ./node_modules/vitest/vitest.mjs run packages/core/__tests__/mcp/penetration.test.ts packages/remote/__tests__/penetration.test.ts packages/quickjs/__tests__/hostedPenetration.test.ts && node ./node_modules/vitest/vitest.mjs run packages/quickjs/__tests__/processHostLifecycle.test.ts packages/quickjs/__tests__/workerHostLifecycle.test.ts",
-    "test:isolated-vm": "VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot --import tsx scripts/check-isolated-vm-env.ts && VITEST_INCLUDE_ISOLATED_VM=1 NODE_OPTIONS=--no-node-snapshot node --no-node-snapshot ./node_modules/vitest/vitest.mjs run packages/isolated-vm/__tests__",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit && node --import tsx scripts/check-workspace-entrypoints.ts",
-    "verify:isolated-vm": "npm run typecheck && npm run build --workspace @execbox/isolated-vm && npm run test:isolated-vm && npm run examples:isolated-vm"
+    "typecheck": "tsc --noEmit && node --import tsx scripts/check-workspace-entrypoints.ts"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
