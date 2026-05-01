@@ -3,6 +3,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
+import { workspaceEntrypoints } from "./workspace-entrypoints.ts";
+
 export interface ApiExtractorTarget {
   entryPointFilePath: string;
   packageDir: string;
@@ -10,74 +12,13 @@ export interface ApiExtractorTarget {
   workspace: string;
 }
 
-export const apiExtractorTargets: ApiExtractorTarget[] = [
-  {
-    entryPointFilePath: "dist/index.d.ts",
-    packageDir: "packages/core",
-    reportFileName: "execbox-core.api.md",
-    workspace: "@execbox/core",
-  },
-  {
-    entryPointFilePath: "dist/mcp/index.d.ts",
-    packageDir: "packages/core",
-    reportFileName: "execbox-core-mcp.api.md",
-    workspace: "@execbox/core",
-  },
-  {
-    entryPointFilePath: "dist/protocol/index.d.ts",
-    packageDir: "packages/core",
-    reportFileName: "execbox-core-protocol.api.md",
-    workspace: "@execbox/core",
-  },
-  {
-    entryPointFilePath: "dist/runtime.d.ts",
-    packageDir: "packages/core",
-    reportFileName: "execbox-core-runtime.api.md",
-    workspace: "@execbox/core",
-  },
-  {
-    entryPointFilePath: "dist/index.d.ts",
-    packageDir: "packages/quickjs",
-    reportFileName: "execbox-quickjs.api.md",
-    workspace: "@execbox/quickjs",
-  },
-  {
-    entryPointFilePath: "dist/runner/index.d.ts",
-    packageDir: "packages/quickjs",
-    reportFileName: "execbox-quickjs-runner.api.md",
-    workspace: "@execbox/quickjs",
-  },
-  {
-    entryPointFilePath: "dist/runner/protocolEndpoint.d.ts",
-    packageDir: "packages/quickjs",
-    reportFileName: "execbox-quickjs-runner-protocol-endpoint.api.md",
-    workspace: "@execbox/quickjs",
-  },
-  {
-    entryPointFilePath: "dist/remoteEndpoint.d.ts",
-    packageDir: "packages/quickjs",
-    reportFileName: "execbox-quickjs-remote-endpoint.api.md",
-    workspace: "@execbox/quickjs",
-  },
-  {
-    entryPointFilePath: "dist/index.d.ts",
-    packageDir: "packages/remote",
-    reportFileName: "execbox-remote.api.md",
-    workspace: "@execbox/remote",
-  },
-  {
-    entryPointFilePath: "dist/index.d.ts",
-    packageDir: "packages/isolated-vm",
-    reportFileName: "execbox-isolated-vm.api.md",
-    workspace: "@execbox/isolated-vm",
-  },
-  {
-    entryPointFilePath: "dist/runner/index.d.ts",
-    packageDir: "packages/isolated-vm",
-    reportFileName: "execbox-isolated-vm-runner.api.md",
-    workspace: "@execbox/isolated-vm",
-  },
-];
+export const apiExtractorTargets: ApiExtractorTarget[] =
+  workspaceEntrypoints.map((entrypoint) => ({
+    entryPointFilePath: entrypoint.declarationPath,
+    packageDir: entrypoint.packageDir,
+    reportFileName: entrypoint.apiReportFileName,
+    workspace: entrypoint.packageName,
+  }));
 
 export function createApiExtractorConfig(target: ApiExtractorTarget): unknown {
   return {
