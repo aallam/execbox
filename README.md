@@ -33,5 +33,5 @@ Runnable examples live in [`examples/`](./examples/) and are indexed in [`exampl
 ## Docs
 
 - [Public Docs](https://execbox.aallam.com)
-- [Getting Started Guide](./docs/getting-started.md)
-- [Execbox Architecture Overview](./docs/architecture/README.md)
+- [Getting Started Guide](./docs/src/content/docs/getting-started.md)
+- [Execbox Architecture Overview](./docs/src/content/docs/architecture/index.md)

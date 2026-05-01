@@ -10,6 +10,8 @@ export default tseslint.config(
   {
     ignores: [
       ".worktrees/**",
+      "docs/.astro/**",
+      "docs/dist/**",
       "docs/.vitepress/cache/**",
       "docs/.vitepress/dist/**",
       "dist/**",

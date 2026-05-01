@@ -1,4 +1,7 @@
-# Execbox Executors
+---
+title: Execbox Executors
+description: Compare inline QuickJS, worker-hosted QuickJS, and remote executor trade-offs.
+---
 
 This page explains how the available executors differ and what trade-offs they make.
 

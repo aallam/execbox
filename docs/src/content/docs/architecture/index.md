@@ -1,4 +1,7 @@
-# Execbox Architecture Overview
+---
+title: Execbox Architecture Overview
+description: The package map, trust model, and execution flow behind execbox.
+---
 
 Execbox is the code-execution part of the `execbox` workspace. It turns host tool catalogs into callable guest namespaces, lets those namespaces wrap MCP tools, and uses executor backends that decide where and how guest JavaScript runs.
 
@@ -10,13 +13,13 @@ This Concepts section is for library users choosing how to integrate execbox:
 ## Reading guide
 
 - Start here for the package map, trust model, and overall flow.
-- Read [Core](/architecture/execbox-core) for provider resolution, execution contracts, and error handling.
-- Read [Executors](/architecture/execbox-executors) for inline QuickJS, worker-hosted QuickJS, and remote execution trade-offs.
-- Read [MCP And Protocol](/architecture/execbox-mcp-and-protocol) for MCP wrapping and where `@execbox/core/protocol` fits.
-- Read [Remote Workflow](/architecture/execbox-remote-workflow) for the end-to-end remote execution control flow.
-- Read [Protocol Reference](/architecture/execbox-protocol-reference) for the protocol message catalog and session rules.
-- Read [Runner Specification](/architecture/execbox-runner-specification) for the normative runner specification for non-TypeScript runners.
-- Read [Security & Boundaries](/security) before choosing a production trust boundary.
+- Read [Core](/architecture/execbox-core/) for provider resolution, execution contracts, and error handling.
+- Read [Executors](/architecture/execbox-executors/) for inline QuickJS, worker-hosted QuickJS, and remote execution trade-offs.
+- Read [MCP And Protocol](/architecture/execbox-mcp-and-protocol/) for MCP wrapping and where `@execbox/core/protocol` fits.
+- Read [Remote Workflow](/architecture/execbox-remote-workflow/) for the end-to-end remote execution control flow.
+- Read [Protocol Reference](/architecture/execbox-protocol-reference/) for the protocol message catalog and session rules.
+- Read [Runner Specification](/architecture/execbox-runner-specification/) for the normative runner specification for non-TypeScript runners.
+- Read [Security & Boundaries](/security/) before choosing a production trust boundary.
 - Read [Performance](/performance/) for latency, pooling, and executor sizing guidance.
 
 ## Package map

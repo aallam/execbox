@@ -1,4 +1,7 @@
-# Examples
+---
+title: Examples
+description: Runnable examples for each main execbox integration and runtime shape.
+---
 
 Use these examples when you want a runnable starting point instead of reading package-by-package reference material first.
 
@@ -22,6 +25,6 @@ npm run examples
 
 ## What to read next
 
-- [Getting Started](/getting-started) for the minimal QuickJS install path
+- [Getting Started](/getting-started/) for the minimal QuickJS install path
 - [Concepts](/architecture/) for architecture, security, and performance guidance
-- [Security](/security) before choosing a production boundary
+- [Security](/security/) before choosing a production boundary

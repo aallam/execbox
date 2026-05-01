@@ -1,4 +1,7 @@
-# Execbox Core Architecture
+---
+title: Execbox Core Architecture
+description: Provider resolution, execution contracts, shared runner semantics, and errors in execbox core.
+---
 
 This page covers the parts of execbox that stay stable regardless of which executor package you choose.
 
