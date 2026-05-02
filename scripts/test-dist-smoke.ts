@@ -31,10 +31,16 @@ const quickjsRemoteEndpoint = await import(
 );
 
 assert.equal(typeof core.resolveProvider, "function");
+assert.equal(core.assertValidIdentifier, undefined);
 assert.equal(core.createToolCallDispatcher, undefined);
 assert.equal(typeof coreMcp.createMcpToolProvider, "function");
 assert.equal(typeof coreMcp.openMcpToolProvider, "function");
 assert.equal(typeof coreMcp.codeMcpServer, "function");
+assert.equal(core.generateTypesFromJsonSchema, undefined);
+assert.equal(core.isJsonSerializable, undefined);
+assert.equal(core.sanitizeIdentifier, undefined);
+assert.equal(core.sanitizeToolName, undefined);
+assert.equal(core.serializePropertyName, undefined);
 assert.equal(typeof coreProtocol.runHostTransportSession, "function");
 assert.equal(typeof coreProtocol.createResourcePool, "function");
 assert.equal(typeof coreProtocol.getNodeTransportExecArgv, "function");

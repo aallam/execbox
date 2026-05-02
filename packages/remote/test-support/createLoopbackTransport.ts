@@ -1,4 +1,4 @@
-import { attachQuickJsProtocolEndpoint } from "@execbox/quickjs/runner/protocol-endpoint";
+import { attachQuickJsRemoteEndpoint } from "@execbox/quickjs/remote-endpoint";
 import type {
   DispatcherMessage,
   HostTransport,
@@ -25,15 +25,16 @@ export function createLoopbackTransport(): HostTransport {
     }
   };
 
-  attachQuickJsProtocolEndpoint({
+  attachQuickJsRemoteEndpoint({
     onMessage(handler) {
-      runnerHandlers.add(handler);
-      return () => runnerHandlers.delete(handler);
+      const runnerHandler = handler as RunnerMessageHandler;
+      runnerHandlers.add(runnerHandler);
+      return () => runnerHandlers.delete(runnerHandler);
     },
     send(message) {
       queueMicrotask(() => {
         for (const handler of messageHandlers) {
-          handler(message);
+          handler(message as RunnerMessage);
         }
       });
     },

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isJsonSerializable } from "@execbox/core";
+import { isJsonSerializable } from "@execbox/core/runtime";
 
 function buildDag(depth: number): Record<string, unknown> {
   let current: Record<string, unknown> = { leaf: true };

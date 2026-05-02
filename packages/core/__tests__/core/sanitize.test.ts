@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeIdentifier, sanitizeToolName } from "@execbox/core";
+import { sanitizeIdentifier } from "../../src/identifier";
+import { sanitizeToolName } from "../../src/sanitize";
 
 describe("sanitizeToolName", () => {
   it("replaces punctuation and spaces with underscores", () => {

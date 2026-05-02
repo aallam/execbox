@@ -10,7 +10,6 @@ import { Executor } from '@execbox/core';
 import { ExecutorRuntimeOptions } from '@execbox/core';
 import { HostTransport } from '@execbox/core/protocol';
 import { ResolvedToolProvider } from '@execbox/core';
-import { TransportCloseReason } from '@execbox/core/protocol';
 
 // @public
 export class RemoteExecutor implements Executor {
@@ -22,14 +21,6 @@ export class RemoteExecutor implements Executor {
 export interface RemoteExecutorOptions extends ExecutorRuntimeOptions {
     cancelGraceMs?: number;
     connectTransport: RemoteTransportFactory;
-}
-
-// @public
-export interface RemoteRunnerPort {
-    onClose?(handler: (reason?: TransportCloseReason) => void): void | (() => void);
-    onError?(handler: (error: Error) => void): void | (() => void);
-    onMessage(handler: (message: unknown) => void): void | (() => void);
-    send(message: unknown): void | Promise<void>;
 }
 
 // @public

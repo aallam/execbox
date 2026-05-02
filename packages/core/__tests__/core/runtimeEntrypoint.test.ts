@@ -12,9 +12,15 @@ describe("@execbox/core/runtime", () => {
   });
 
   it("keeps executor-author helpers out of the app-facing core entrypoint", () => {
+    expect(core).not.toHaveProperty("assertValidIdentifier");
     expect(core).not.toHaveProperty("createToolCallDispatcher");
     expect(core).not.toHaveProperty("createTimeoutExecuteResult");
     expect(core).not.toHaveProperty("formatConsoleLine");
+    expect(core).not.toHaveProperty("generateTypesFromJsonSchema");
+    expect(core).not.toHaveProperty("isJsonSerializable");
     expect(core).not.toHaveProperty("normalizeThrownMessage");
+    expect(core).not.toHaveProperty("sanitizeIdentifier");
+    expect(core).not.toHaveProperty("sanitizeToolName");
+    expect(core).not.toHaveProperty("serializePropertyName");
   });
 });
