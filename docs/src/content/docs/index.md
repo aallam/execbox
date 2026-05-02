@@ -5,46 +5,76 @@ template: splash
 next: false
 hero:
   title: execbox
-  tagline: Portable code execution for MCP tools and wrapped MCP servers, with runtime boundaries you choose.
+  tagline: Run guest JavaScript against host-defined tools and wrapped MCP servers with one portable execution contract.
   actions:
     - text: Getting Started
       link: /getting-started/
       variant: primary
 ---
 
-## What execbox does
+<section class="execbox-start">
+  <div>
+    <p class="execbox-eyebrow">Node.js 22+ library for tool-backed JavaScript execution</p>
+    <h2>Start with one provider and one guest call.</h2>
+    <p>
+      Execbox turns host tool catalogs into scoped guest namespaces. Begin with
+      the QuickJS package, execute a small provider flow, then move into examples
+      or MCP wrapping when the contract is clear.
+    </p>
+  </div>
+  <div class="execbox-command" aria-label="Install execbox">
+    <div class="execbox-command__bar">
+      <span>Install</span>
+      <code>npm</code>
+    </div>
+    <pre><code>npm install @execbox/core @execbox/quickjs</code></pre>
+  </div>
+</section>
 
-Execbox is a Node.js library for running guest JavaScript against host-defined tools and wrapped MCP servers. It separates:
+<section class="execbox-paths" aria-labelledby="start-building">
+  <div class="execbox-section-heading">
+    <p class="execbox-eyebrow">Start building</p>
+    <h2 id="start-building">Follow the shortest path into the docs.</h2>
+  </div>
+  <div class="execbox-path-grid">
+    <a class="execbox-path execbox-path--primary" href="/getting-started/">
+      <span class="execbox-path__step">01</span>
+      <h3>Run the smallest example</h3>
+      <p>Install the packages, define one host tool, and call it from guest JavaScript.</p>
+      <strong>Open Getting Started</strong>
+    </a>
+    <a class="execbox-path" href="/examples/">
+      <span class="execbox-path__step">02</span>
+      <h3>Try the runnable flows</h3>
+      <p>Compare the basic, worker, remote, MCP provider, and MCP server examples.</p>
+      <strong>Browse Examples</strong>
+    </a>
+    <a class="execbox-path" href="/architecture/execbox-mcp-and-protocol/">
+      <span class="execbox-path__step">03</span>
+      <h3>Wrap MCP tools</h3>
+      <p>Expose upstream MCP catalogs as callable guest namespaces through the execbox protocol.</p>
+      <strong>Read MCP Provider</strong>
+    </a>
+  </div>
+</section>
 
-- what tools are available
-- where guest code runs
-- how calls cross boundaries
-
-That split gives you one execution contract across inline QuickJS, worker-hosted QuickJS, and remote transport-backed execution.
-
-<div class="execbox-card-grid">
-  <a class="execbox-card" href="/getting-started/">
-    <h3>Install and run</h3>
-    <p>Start with the smallest QuickJS example and one provider flow.</p>
-  </a>
-  <a class="execbox-card" href="/runtime-choices/">
-    <h3>Choose a runtime</h3>
-    <p>Pick inline QuickJS, worker-hosted QuickJS, or a remote runner.</p>
-  </a>
-  <a class="execbox-card" href="/architecture/execbox-mcp-and-protocol/">
-    <h3>Wrap MCP tools</h3>
-    <p>Expose upstream MCP catalogs as callable guest namespaces.</p>
-  </a>
-  <a class="execbox-card" href="/security/">
-    <h3>Review boundaries</h3>
-    <p>Understand the provider capability surface before production use.</p>
-  </a>
-</div>
-
-## Runtime packages
-
-| Backend               | Package            | Start here when                                                                      |
-| --------------------- | ------------------ | ------------------------------------------------------------------------------------ |
-| In-process QuickJS    | `@execbox/quickjs` | You want the easiest install and the default development path.                       |
-| Worker-backed QuickJS | `@execbox/quickjs` | You want the runtime off the main thread with pooled worker reuse.                   |
-| Remote transport      | `@execbox/remote`  | Your application owns the process, container, VM, or network boundary for a runtime. |
+<section class="execbox-contract" aria-labelledby="contract">
+  <div class="execbox-section-heading">
+    <p class="execbox-eyebrow">What stays consistent</p>
+    <h2 id="contract">A small contract between host tools and guest code.</h2>
+  </div>
+  <div class="execbox-contract-grid">
+    <div>
+      <h3>Host-owned capabilities</h3>
+      <p>Applications decide which tools exist and how each call is executed.</p>
+    </div>
+    <div>
+      <h3>Scoped guest namespaces</h3>
+      <p>Guest code calls named providers instead of reaching into host internals.</p>
+    </div>
+    <div>
+      <h3>JSON-only transport shape</h3>
+      <p>Inputs, outputs, logs, and tool calls stay serializable across boundaries.</p>
+    </div>
+  </div>
+</section>
