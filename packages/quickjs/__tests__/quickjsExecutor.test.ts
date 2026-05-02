@@ -6,7 +6,7 @@ describe("QuickJsExecutor host selection", () => {
     expect(
       () => new QuickJsExecutor({ host: "process" } as never),
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: QuickJsExecutor host "process" is no longer supported. Use host "worker" for local hosted execution, or @execbox/remote for process, container, or VM boundaries.]`,
+      `[Error: QuickJsExecutor host "process" is no longer supported. Use host "worker" for local hosted execution.]`,
     );
   });
 });

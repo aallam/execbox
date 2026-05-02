@@ -50,7 +50,6 @@ console.log(result);
 
 - Use `@execbox/quickjs` first for trusted code and the smallest setup.
 - Use `new QuickJsExecutor({ host: "worker" })` when you want QuickJS off the main thread with pooled worker shells.
-- Use `@execbox/remote` when your application owns the process, container, VM, or network boundary for the runtime.
 
 Worker-hosted QuickJS improves local lifecycle control, but it still shares the host process. Read [Security](/security/) before treating any runtime placement as a production trust boundary.
 

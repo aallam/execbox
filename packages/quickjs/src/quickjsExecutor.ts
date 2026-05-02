@@ -51,8 +51,7 @@ export class QuickJsExecutor implements Executor {
     if (unsupportedHost !== undefined) {
       throw new Error(
         `QuickJsExecutor host "${unsupportedHost}" is no longer supported. ` +
-          'Use host "worker" for local hosted execution, or @execbox/remote ' +
-          "for process, container, or VM boundaries.",
+          'Use host "worker" for local hosted execution.',
       );
     }
 

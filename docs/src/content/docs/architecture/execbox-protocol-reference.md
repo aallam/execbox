@@ -1,13 +1,11 @@
 ---
 title: Execbox Core Protocol Reference
-description: Protocol messages and session semantics for transport-backed execbox runtimes.
+description: Protocol messages and session semantics for worker-hosted execbox runtimes.
 ---
 
 This page is the message-level reference for `@execbox/core/protocol`.
 
-It describes the wire shapes and session semantics used by transport-backed execbox runtimes such as worker-hosted QuickJS and remote execution. This is an advanced reference for runtime and remote-runner implementers; most application users should start with [Getting Started](/getting-started/), [Executors](/architecture/execbox-executors/), and [Security & Boundaries](/security/).
-
-For the higher-level control-flow explanation, read [Remote Workflow](/architecture/execbox-remote-workflow/). For the normative runner specification, read [Runner Specification](/architecture/execbox-runner-specification/).
+It describes the wire shapes and session semantics used by worker-hosted QuickJS. This is an advanced reference for execbox runtime maintainers; most application users should start with [Getting Started](/getting-started/), [Executors](/architecture/execbox-executors/), and [Security & Boundaries](/security/).
 
 ## Table of Contents
 
@@ -186,7 +184,7 @@ Two ids are used for different scopes:
 
 Host-session behavior:
 
-- runner messages with an `id` that does not match the active session are ignored
+- runner messages are accepted only when their `id` matches the active session
 - `tool_result` is correlated by `callId`
 - `done` settles the execution and ends the session
 
@@ -209,7 +207,7 @@ Host-session behavior:
 }
 ```
 
-The manifest intentionally does not include:
+The manifest includes only runtime-safe metadata. Host-owned values stay on the trusted side:
 
 - executable host closures
 - upstream client objects
@@ -240,7 +238,7 @@ Host-session behavior:
 
 - caller abort or timeout sends `cancel`
 - host also aborts its own tool-dispatch signal immediately
-- if the runner does not finish within the configured cancel grace window, the host may terminate the transport
+- the host may terminate the transport after the configured cancel grace window
 - unexpected transport close or transport error fails the session
 
 Important nuance:
@@ -256,7 +254,7 @@ Trusted host guarantees:
 
 - host tool dispatch validates and classifies tool failures before sending `tool_result`
 - non-serializable host values are rejected before they are sent back to the runner
-- guest runtime does not receive host closures directly
+- guest runtime receives proxy metadata while host closures stay on the trusted side
 
 Runner guarantees:
 
@@ -277,9 +275,9 @@ Example execution with one tool call:
 
 ## Scope Of This Reference
 
-This reference describes the message contract and host-session semantics used inside the execbox package family. It does not specify:
+This reference describes the message contract and host-session semantics used inside the execbox package family. Application deployments own the surrounding operational policy:
 
-- a built-in network transport such as HTTP or WebSocket
-- multi-execution multiplexing over one shared long-lived channel
-- authentication, tenancy, or deployment policy
-- a formal compatibility promise beyond the current implementation
+- transport selection such as worker threads, HTTP, or WebSocket
+- session ownership and channel lifecycle
+- authentication, tenancy, and deployment policy
+- compatibility policy for external runner implementations

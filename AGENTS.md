@@ -4,7 +4,7 @@
 
 - `execbox` is a Node.js 22+ npm workspace that publishes the `@execbox/*` package family.
 - Core source lives under `packages/*/src`, tests live under `packages/*/__tests__`, runnable examples live under `examples/`, and the public docs site lives under `docs/`.
-- The workspace currently contains `@execbox/core`, `@execbox/quickjs`, and `@execbox/remote`.
+- The workspace currently contains `@execbox/core` and `@execbox/quickjs`.
 - Keep changes aligned with existing package boundaries. Prefer changing the owning package instead of introducing cross-package shortcuts.
 
 ## Setup Commands
@@ -30,8 +30,9 @@
 
 - For most code changes, run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
 - If you change package exports, manifest fields, or published type-resolution behavior, also run `npm run package:check`.
-- If you change the public API of any entrypoint listed in `scripts/workspace-entrypoints.ts`, including `@execbox/core/runtime` and `@execbox/quickjs/remote-endpoint`, also run `npm run api:check`.
-- If you change docs site content, navigation, or VitePress config, also run `npm run docs:build`.
+- If you change the public API of any entrypoint listed in `scripts/workspace-entrypoints.ts`, including `@execbox/core/runtime`, also run `npm run api:check`.
+- If you change examples or runtime guidance, also run `npm run examples`.
+- If you change docs site content, navigation, or Starlight/Astro config, also run `npm run docs:build`.
 - If you touch execution boundaries, timeout handling, abort propagation, schema validation, or log/memory controls, also run `npm run test:security`.
 
 ## Security Notes
@@ -51,6 +52,6 @@
 ## Useful References
 
 - Start with `README.md` for the package map.
-- Use `docs/getting-started.md` for install and example expectations.
-- Use `docs/security.md` and `docs/architecture/README.md` before changing execution boundaries or runtime claims.
+- Use `docs/src/content/docs/getting-started.md` for install and example expectations.
+- Use `docs/src/content/docs/security.md` and `docs/src/content/docs/architecture/index.md` before changing execution boundaries or runtime claims.
 - For the human-oriented contribution workflow, see `CONTRIBUTING.md`.

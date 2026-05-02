@@ -19,15 +19,6 @@
       },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    },
-    "./remote-endpoint": {
-      "source": "./src/remoteEndpoint.ts",
-      "types": {
-        "import": "./dist/remoteEndpoint.d.ts",
-        "require": "./dist/remoteEndpoint.d.cts"
-      },
-      "import": "./dist/remoteEndpoint.js",
-      "require": "./dist/remoteEndpoint.cjs"
     }
   },
   "sideEffects": false,

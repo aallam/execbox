@@ -139,4 +139,3 @@ This suite only measures the parent Node process.
 ### What this snapshot does not prove
 
 - It does not prove exact throughput rankings for every workload or host. The concurrency and tool-call suites are still sensitive to local scheduler noise.
-- It does not measure `RemoteExecutor`, because remote performance depends on the caller-owned transport and remote runtime deployment.

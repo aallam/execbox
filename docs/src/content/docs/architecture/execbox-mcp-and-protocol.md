@@ -8,7 +8,7 @@ This page covers two related but separate parts of the execbox architecture:
 - MCP adapters in `@execbox/core`
 - transport-safe execution plumbing in `@execbox/core/protocol`
 
-Use this page as the overview. For the remote execution control flow, read [Remote Workflow](/architecture/execbox-remote-workflow/). For the message-level protocol contract, read [Protocol Reference](/architecture/execbox-protocol-reference/). For the normative runner specification, read [Runner Specification](/architecture/execbox-runner-specification/).
+Use this page as the overview. For the message-level protocol contract behind worker-hosted QuickJS, read [Protocol Reference](/architecture/execbox-protocol-reference/).
 
 ## MCP Adapter Responsibilities
 
@@ -31,7 +31,7 @@ The MCP adapter layer lets execbox sit on either side of an MCP tool catalog:
 It owns:
 
 - the `execute`, `cancel`, `started`, `tool_call`, `tool_result`, and `done` message types
-- the shared host transport session used by worker-hosted `@execbox/quickjs` and `@execbox/remote`
+- the shared host transport session used by worker-hosted `@execbox/quickjs`
 - Node transport bootstrap helpers for worker execution
 - the reusable async resource pool used by pooled worker shells
 
@@ -45,8 +45,6 @@ The architecture split is:
 
 - `QuickJsExecutor` uses the shared runner semantics from `@execbox/core/runtime` directly.
 - `QuickJsExecutor` in `host: "worker"` mode uses the shared host session from `@execbox/core/protocol` plus the shared QuickJS protocol endpoint inside the worker shell.
-- `RemoteExecutor` uses that same host session across an app-owned transport boundary.
-- The runner side of a remote deployment attaches a runtime-owned endpoint adapter; `@execbox/quickjs/remote-endpoint` is the shipped QuickJS adapter.
 - Pooled worker execution reuses only the outer host shell. Each `execute()` call still starts a fresh QuickJS runtime through the shared protocol endpoint.
 
 ```mermaid
@@ -59,32 +57,27 @@ flowchart TB
         QJS["QuickJsExecutor"]
     end
 
-    subgraph TransportBacked["Transport-backed executors"]
+    subgraph WorkerHosted["Worker-hosted execution"]
         PROTO["@execbox/core/protocol<br/>messages + host session + resource pool"]
         HOSTED["QuickJsExecutor host: worker"]
-        REM["RemoteExecutor"]
         QJS_ENDPOINT["QuickJS protocol endpoint<br/>worker side"]
-        REMOTE_ENDPOINT["Runtime-owned remote endpoint<br/>QuickJS adapter is shipped"]
     end
 
     CORE --> QJS
     CORE --> PROTO
     HOSTED --> PROTO
-    REM --> PROTO
     HOSTED --> QJS_ENDPOINT
-    REM -. runner side .-> REMOTE_ENDPOINT
-    REMOTE_ENDPOINT -. QuickJS example .-> QJS_ENDPOINT
 ```
 
-## Transport-Backed Execution Flow
+## Worker-Hosted Execution Flow
 
-The same host-session model is used for worker-hosted QuickJS and remote execution:
+Worker-hosted QuickJS uses the host-session model to keep host tool closures on the trusted side while QuickJS runs in the worker shell:
 
 ```mermaid
 sequenceDiagram
     participant Host as Trusted host
     participant Session as Host transport session
-    participant Runner as Transport-backed runner
+    participant Runner as Worker-side QuickJS endpoint
     participant Tool as Resolved tool wrapper
 
     Host->>Session: execute(code, providers, options)
@@ -109,4 +102,4 @@ Important implications:
 - MCP adapters decide how tool catalogs are discovered, wrapped, and re-exposed.
 - The protocol decides how a transport-backed runtime asks the trusted host to invoke those tools.
 - The provider surface remains the real capability boundary.
-- Transport-backed execution changes where guest code runs, not who owns host capabilities.
+- Worker-hosted execution changes where guest code runs while host capabilities remain controlled by the provider surface.

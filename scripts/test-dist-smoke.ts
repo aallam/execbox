@@ -25,10 +25,6 @@ const coreRuntime = await import(
 const coreRuntimeCjs = require(
   path.join(repoRoot, "packages/core/dist/runtime.cjs"),
 ) as Record<string, unknown>;
-const quickjsRemoteEndpoint = await import(
-  pathToFileURL(path.join(repoRoot, "packages/quickjs/dist/remoteEndpoint.js"))
-    .href
-);
 
 assert.equal(typeof core.resolveProvider, "function");
 assert.equal(core.assertValidIdentifier, undefined);
@@ -48,9 +44,5 @@ assert.equal(typeof coreRuntime.resolveExecutorRuntimeOptions, "function");
 assert.equal(typeof coreRuntime.createTimeoutExecuteResult, "function");
 assert.equal(typeof coreRuntimeCjs.resolveExecutorRuntimeOptions, "function");
 assert.equal(typeof coreRuntimeCjs.createTimeoutExecuteResult, "function");
-assert.equal(
-  typeof quickjsRemoteEndpoint.attachQuickJsRemoteEndpoint,
-  "function",
-);
 
 console.log("Built dist smoke test passed");

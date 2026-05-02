@@ -21,12 +21,13 @@ This guide is for both humans and coding agents. Agent-specific operating instru
 
 - General code changes: `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`
 - Package export, manifest, or published type-resolution changes: `npm run package:check`
+- Example or runtime guidance changes: `npm run examples`
 - Docs site changes: `npm run docs:build`
 - Security or execution-boundary changes: `npm run test:security`
 
 Choose the smallest verification set that covers your change, and include the commands you ran in your PR or handoff notes when the context would help reviewers.
 
-- Public API changes to any entrypoint listed in `scripts/workspace-entrypoints.ts`, including `@execbox/core/runtime` and `@execbox/quickjs/remote-endpoint`: run `npm run api:check`
+- Public API changes to any entrypoint listed in `scripts/workspace-entrypoints.ts`, including `@execbox/core/runtime`: run `npm run api:check`
 - Put security-focused specs under `packages/*/__tests__/security/`; `npm run test:security` runs those grouped suites.
 
 ## Changesets

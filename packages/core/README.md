@@ -9,17 +9,16 @@ Core execution contract for execbox. Use it to resolve host tools into callable 
 ## Use `@execbox/core` When
 
 - you want to expose host capabilities to guest code through explicit tool providers
-- you want one execution contract across QuickJS and remote transport-backed runtimes
+- you want one execution contract across inline and worker-hosted QuickJS
 - you want to wrap MCP servers or clients into callable namespaces instead of exposing raw tool loops
 
 ## Pair It With an Executor
 
 `@execbox/core` defines the provider and tool boundary, but it does not execute guest code on its own.
 
-| Package                                                              | Start here when                                                            |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs) | You want the default path with inline or worker-hosted QuickJS.            |
-| [`@execbox/remote`](https://www.npmjs.com/package/@execbox/remote)   | Your runtime already lives behind an application-owned transport boundary. |
+| Package                                                              | Start here when                                                 |
+| -------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [`@execbox/quickjs`](https://www.npmjs.com/package/@execbox/quickjs) | You want the default path with inline or worker-hosted QuickJS. |
 
 ## Install
 
@@ -29,14 +28,12 @@ Most users start with QuickJS:
 npm install @execbox/core @execbox/quickjs
 ```
 
-Swap in `@execbox/remote` only when you already own the runtime transport boundary.
-
 ## Runtime Implementer Surface
 
 Most application code can skip this section.
 
-Application code should usually import from `@execbox/core`, `@execbox/core/mcp`, or `@execbox/core/protocol`.
-Executor and runner packages should import shared runtime helpers from `@execbox/core/runtime` instead. That subpath contains the manifest dispatcher, runtime option defaults, timeout helpers, log formatting, code normalization, and error normalization used to keep runtime implementations aligned.
+Application code should usually import from `@execbox/core` or `@execbox/core/mcp`.
+The `@execbox/core/protocol` and `@execbox/core/runtime` subpaths exist for execbox-owned runtime packages. `@execbox/core/protocol` carries the worker-hosted QuickJS message contract, while `@execbox/core/runtime` contains the manifest dispatcher, runtime option defaults, timeout helpers, log formatting, code normalization, and error normalization used to keep runtime implementations aligned.
 
 ## Smallest Working Usage
 

@@ -55,22 +55,6 @@ export const workspaceEntrypoints = [
     packageName: "@execbox/quickjs",
     sourcePath: "packages/quickjs/src/index.ts",
   },
-  {
-    apiReportFileName: "execbox-quickjs-remote-endpoint.api.md",
-    declarationPath: "dist/remoteEndpoint.d.ts",
-    exportPath: "./remote-endpoint",
-    packageDir: "packages/quickjs",
-    packageName: "@execbox/quickjs",
-    sourcePath: "packages/quickjs/src/remoteEndpoint.ts",
-  },
-  {
-    apiReportFileName: "execbox-remote.api.md",
-    declarationPath: "dist/index.d.ts",
-    exportPath: ".",
-    packageDir: "packages/remote",
-    packageName: "@execbox/remote",
-    sourcePath: "packages/remote/src/index.ts",
-  },
 ] as const satisfies readonly WorkspaceEntrypoint[];
 
 export function createEntrypointSpecifier(

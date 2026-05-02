@@ -9,8 +9,7 @@
   },
   "workspaces": [
     "packages/core",
-    "packages/quickjs",
-    "packages/remote"
+    "packages/quickjs"
   ],
   "scripts": {
     "api:check": "npm run build && node --import tsx scripts/run-api-extractor.ts",
@@ -23,10 +22,9 @@
     "example:execbox": "node --import tsx examples/execbox-basic.ts",
     "example:execbox-mcp-provider": "node --import tsx examples/execbox-mcp-provider.ts",
     "example:execbox-mcp-server": "node --import tsx examples/execbox-mcp-server.ts",
-    "example:execbox-remote": "node --import tsx examples/execbox-remote.ts",
     "example:execbox-worker": "node --import tsx examples/execbox-worker.ts",
     "benchmark": "node --expose-gc --import tsx benchmarks/benchmark.ts",
-    "examples": "npm run example:execbox && npm run example:execbox-remote && npm run example:execbox-worker && npm run example:execbox-mcp-provider && npm run example:execbox-mcp-server",
+    "examples": "npm run example:execbox && npm run example:execbox-worker && npm run example:execbox-mcp-provider && npm run example:execbox-mcp-server",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --ext .ts",

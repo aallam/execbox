@@ -43,10 +43,6 @@ export default defineConfig({
               label: "MCP Provider",
               slug: "architecture/execbox-mcp-and-protocol",
             },
-            {
-              label: "Remote Runner",
-              slug: "architecture/execbox-remote-workflow",
-            },
           ],
         },
         {
@@ -63,10 +59,6 @@ export default defineConfig({
             {
               label: "Protocol",
               slug: "architecture/execbox-protocol-reference",
-            },
-            {
-              label: "Runner Specification",
-              slug: "architecture/execbox-runner-specification",
             },
           ],
         },
