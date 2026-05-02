@@ -17,7 +17,7 @@
     "api:update": "npm run build && node --import tsx scripts/run-api-extractor.ts --local",
     "build": "npm run build --workspaces --if-present",
     "clean": "rm -rf coverage dist docs/.astro docs/dist packages/*/dist packages/*/temp",
-    "docs:build": "astro --root docs build",
+    "docs:build": "astro --root docs build && cp docs/dist/sitemap-index.xml docs/dist/sitemap.xml",
     "docs:dev": "astro --root docs dev",
     "docs:preview": "astro --root docs preview",
     "example:execbox": "node --import tsx examples/execbox-basic.ts",
