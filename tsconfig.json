@@ -7,11 +7,7 @@
       "@execbox/core/runtime": ["./packages/core/src/runtime.ts"],
       "@execbox/core/mcp": ["./packages/core/src/mcp/index.ts"],
       "@execbox/core/protocol": ["./packages/core/src/protocol/index.ts"],
-      "@execbox/quickjs": ["./packages/quickjs/src/index.ts"],
-      "@execbox/quickjs/remote-endpoint": [
-        "./packages/quickjs/src/remoteEndpoint.ts"
-      ],
-      "@execbox/remote": ["./packages/remote/src/index.ts"]
+      "@execbox/quickjs": ["./packages/quickjs/src/index.ts"]
     },
     "types": ["node", "vitest/globals"]
   },
@@ -19,7 +15,6 @@
     "examples/**/*.ts",
     "packages/core/**/*.ts",
     "packages/quickjs/**/*.ts",
-    "packages/remote/**/*.ts",
     "scripts/**/*.ts",
     "vitest.config.ts"
   ],

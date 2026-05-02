@@ -71,7 +71,7 @@ The resolved provider also carries two maps:
 
 ## Guest Code Normalization
 
-Executors do not evaluate arbitrary snippets directly. Runtime implementers import `normalizeCode()` from `@execbox/core/runtime` to turn model- or user-produced text into a consistent async function body.
+Executors normalize snippets before evaluation. Runtime implementers import `normalizeCode()` from `@execbox/core/runtime` to turn model- or user-produced text into a consistent async function body.
 
 That normalization handles:
 
@@ -129,7 +129,7 @@ interface Executor {
 }
 ```
 
-The core package intentionally does not decide where the code runs. It only defines what the runtime must honor.
+The core package defines what every runtime must honor while executor packages decide where code runs.
 
 ```mermaid
 sequenceDiagram
@@ -194,12 +194,11 @@ Executors are responsible for their own runtime-specific classification rules, b
 
 ## Why the Core Stays Small
 
-The core package does not own QuickJS, worker threads, process boundaries, or transport mechanics. That separation keeps the core useful for:
+The core package stays focused on provider, execution, MCP, runtime-helper, and protocol contracts. That separation keeps the core useful for:
 
 - direct in-process runtimes
 - worker-backed runtimes
 - MCP wrapper servers
-- remote execution models
 
 The consequence is deliberate separation between:
 

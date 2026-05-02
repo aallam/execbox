@@ -62,15 +62,11 @@ const executor = new QuickJsExecutor({
 await executor.prewarm();
 ```
 
-## Advanced Imports
-
-- `@execbox/quickjs/remote-endpoint` adapts the QuickJS protocol loop to `@execbox/remote` runner ports
-
 ## Operational Notes
 
 - Each execution gets a fresh QuickJS runtime with JSON-only tool and result boundaries.
-- This package is the default deployment path, not a hard security boundary for hostile or multi-tenant code.
-- If you need a stronger deployment boundary, move execution behind `@execbox/remote` and a process, container, VM, or network boundary your application owns.
+- Inline mode and worker mode are execution placement choices, not hard security boundaries for hostile or multi-tenant code.
+- Worker mode moves QuickJS off the main thread but still shares the same host process.
 
 ## Read Next
 

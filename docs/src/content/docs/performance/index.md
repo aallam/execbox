@@ -9,12 +9,11 @@ This page summarizes practical performance guidance for choosing and configuring
 
 Each executor makes a different trade-off between runtime placement, startup cost, and steady-state latency.
 
-| Executor                                        | Runtime placement                                            | Relative Latency                         | Best For                                                            |
-| ----------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------- | ------------------------------------------------------------------- |
-| `QuickJsExecutor`                               | In-process QuickJS runtime                                   | Fastest steady-state path                | Trusted code and the lowest possible latency                        |
-| `QuickJsExecutor` (`host: "worker"`, pooled)    | Worker thread shell with a fresh guest runtime per execution | Low latency after startup                | Off-main-thread execution with good local throughput                |
-| `QuickJsExecutor` (`host: "worker"`, ephemeral) | Fresh worker per execution                                   | High startup cost                        | Fresh worker lifecycle per execution when higher latency is allowed |
-| `RemoteExecutor`                                | Caller-owned transport to a remote runner                    | Depends on the transport and remote host | App-owned runtime boundaries, remote capacity, or remote scheduling |
+| Executor                                        | Runtime placement                                            | Relative Latency          | Best For                                                            |
+| ----------------------------------------------- | ------------------------------------------------------------ | ------------------------- | ------------------------------------------------------------------- |
+| `QuickJsExecutor`                               | In-process QuickJS runtime                                   | Fastest steady-state path | Trusted code and the lowest possible latency                        |
+| `QuickJsExecutor` (`host: "worker"`, pooled)    | Worker thread shell with a fresh guest runtime per execution | Low latency after startup | Off-main-thread execution with good local throughput                |
+| `QuickJsExecutor` (`host: "worker"`, ephemeral) | Fresh worker per execution                                   | High startup cost         | Fresh worker lifecycle per execution when higher latency is allowed |
 
 ## Practical Characteristics
 
@@ -22,7 +21,7 @@ Each executor makes a different trade-off between runtime placement, startup cos
 
 Worker-hosted `QuickJsExecutor` defaults to pooled mode. Pooling reuses the worker shell while still creating a fresh guest runtime for each execution. That keeps the off-main-thread shell warm without paying worker startup cost on every call.
 
-If you care about request latency or throughput, start with pooled mode. Ephemeral mode is primarily an isolation choice, not a speed choice.
+If you care about request latency or throughput, start with pooled mode. Ephemeral mode prioritizes a fresh worker lifecycle for every execution.
 
 ### Tool-call overhead is usually not the bottleneck
 
@@ -55,12 +54,11 @@ const executor = new QuickJsExecutor({
 
 ## Choosing An Executor
 
-| Priority                                      | Recommended                                            |
-| --------------------------------------------- | ------------------------------------------------------ |
-| Lowest latency for trusted code               | `QuickJsExecutor`                                      |
-| Best local off-main-thread throughput         | `QuickJsExecutor` with `host: "worker"` in pooled mode |
-| Fresh worker lifecycle every execution        | `QuickJsExecutor` with worker `mode: "ephemeral"`      |
-| App-owned runtime boundary or remote capacity | `RemoteExecutor`                                       |
+| Priority                               | Recommended                                            |
+| -------------------------------------- | ------------------------------------------------------ |
+| Lowest latency for trusted code        | `QuickJsExecutor`                                      |
+| Best local off-main-thread throughput  | `QuickJsExecutor` with `host: "worker"` in pooled mode |
+| Fresh worker lifecycle every execution | `QuickJsExecutor` with worker `mode: "ephemeral"`      |
 
 For most applications, start with `QuickJsExecutor` and move to `host: "worker"` when you want local execution off the main thread without leaving the package.
 

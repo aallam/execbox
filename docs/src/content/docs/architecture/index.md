@@ -8,17 +8,15 @@ Execbox is the code-execution part of the `execbox` workspace. It turns host too
 This Concepts section is for library users choosing how to integrate execbox:
 
 - start here when you need the package map, trust model, and overall flow
-- use the deeper pages when you are choosing a runtime, wrapping MCP tools, or implementing a remote runner
+- use the deeper pages when you are choosing a runtime, wrapping MCP tools, or understanding the worker protocol
 
 ## Reading guide
 
 - Start here for the package map, trust model, and overall flow.
 - Read [Core](/architecture/execbox-core/) for provider resolution, execution contracts, and error handling.
-- Read [Executors](/architecture/execbox-executors/) for inline QuickJS, worker-hosted QuickJS, and remote execution trade-offs.
+- Read [Executors](/architecture/execbox-executors/) for inline QuickJS and worker-hosted QuickJS trade-offs.
 - Read [MCP And Protocol](/architecture/execbox-mcp-and-protocol/) for MCP wrapping and where `@execbox/core/protocol` fits.
-- Read [Remote Workflow](/architecture/execbox-remote-workflow/) for the end-to-end remote execution control flow.
 - Read [Protocol Reference](/architecture/execbox-protocol-reference/) for the protocol message catalog and session rules.
-- Read [Runner Specification](/architecture/execbox-runner-specification/) for the normative runner specification for non-TypeScript runners.
 - Read [Security & Boundaries](/security/) before choosing a production trust boundary.
 - Read [Performance](/performance/) for latency, pooling, and executor sizing guidance.
 
@@ -28,17 +26,14 @@ This Concepts section is for library users choosing how to integrate execbox:
 flowchart LR
     APP["Host application"]
     CORE["@execbox/core<br/>provider resolution + MCP adapters + runtime helpers"]
-    QJS["@execbox/quickjs<br/>QuickJS executor + reusable runner"]
-    REM["@execbox/remote<br/>transport-backed remote executor"]
-    PROTO["@execbox/core/protocol<br/>transport messages + shared host session"]
+    QJS["@execbox/quickjs<br/>inline + worker-hosted QuickJS executor"]
+    PROTO["@execbox/core/protocol<br/>worker messages + shared host session"]
     MCP["MCP sources and wrapped servers"]
 
     APP --> CORE
     APP --> QJS
-    APP --> REM
     CORE --> MCP
     QJS --> PROTO
-    REM --> PROTO
 ```
 
 ## End-to-end execution model
@@ -58,5 +53,5 @@ Key implications:
 
 - The provider/tool surface is the capability boundary, not the JavaScript syntax itself.
 - Fresh runtimes, schema validation, JSON-only boundaries, timeouts, memory limits, and bounded logs are defense-in-depth features.
-- In-process and worker-hosted execution still share the host process. Use `@execbox/remote` behind a separate process, container, VM, or similar boundary when the code source is hostile or multi-tenant.
+- In-process and worker-hosted execution share the host process. For hostile-code or multi-tenant deployments, run the application-level execution service behind a process, container, VM, or equivalent operational boundary.
 - Wrapping third-party MCP servers is a separate dependency-trust decision from letting end users author guest code.
