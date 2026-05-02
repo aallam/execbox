@@ -11,10 +11,6 @@
       "@execbox/quickjs/remote-endpoint": [
         "./packages/quickjs/src/remoteEndpoint.ts"
       ],
-      "@execbox/quickjs/runner": ["./packages/quickjs/src/runner/index.ts"],
-      "@execbox/quickjs/runner/protocol-endpoint": [
-        "./packages/quickjs/src/runner/protocolEndpoint.ts"
-      ],
       "@execbox/remote": ["./packages/remote/src/index.ts"]
     },
     "types": ["node", "vitest/globals"]

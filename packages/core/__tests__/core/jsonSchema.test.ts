@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateTypesFromJsonSchema } from "@execbox/core";
+import { generateTypesFromJsonSchema } from "../../src/typegen/jsonSchema";
 
 describe("generateTypesFromJsonSchema", () => {
   it("emits namespace declarations for object schemas with required and optional fields", () => {

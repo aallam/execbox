@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Public API for the `@execbox/quickjs/runner/protocol-endpoint` entrypoint.
+ * Internal QuickJS protocol endpoint used by hosted and remote adapters.
  */
 import { randomUUID } from "node:crypto";
 
@@ -9,8 +9,8 @@ import type {
   DispatcherMessage,
   ExecuteMessage,
   RunnerMessage,
+  ToolCallResult,
 } from "@execbox/core/protocol";
-import type { ToolCallResult } from "@execbox/core";
 
 import { runQuickJsSession } from "./index.ts";
 

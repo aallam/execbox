@@ -64,22 +64,6 @@ export const workspaceEntrypoints = [
     sourcePath: "packages/quickjs/src/remoteEndpoint.ts",
   },
   {
-    apiReportFileName: "execbox-quickjs-runner.api.md",
-    declarationPath: "dist/runner/index.d.ts",
-    exportPath: "./runner",
-    packageDir: "packages/quickjs",
-    packageName: "@execbox/quickjs",
-    sourcePath: "packages/quickjs/src/runner/index.ts",
-  },
-  {
-    apiReportFileName: "execbox-quickjs-runner-protocol-endpoint.api.md",
-    declarationPath: "dist/runner/protocolEndpoint.d.ts",
-    exportPath: "./runner/protocol-endpoint",
-    packageDir: "packages/quickjs",
-    packageName: "@execbox/quickjs",
-    sourcePath: "packages/quickjs/src/runner/protocolEndpoint.ts",
-  },
-  {
     apiReportFileName: "execbox-remote.api.md",
     declarationPath: "dist/index.d.ts",
     exportPath: ".",

@@ -23,7 +23,7 @@ The core package exposes three main responsibilities:
 - Define the stable app-facing execution contract
 - Provide runtime implementers with shared runner semantics through `@execbox/core/runtime`
 
-The main public concepts are:
+The main app-facing concepts are:
 
 | Concept                | Purpose                                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------- |
@@ -32,8 +32,10 @@ The main public concepts are:
 | `Executor`             | Runtime-specific implementation of `execute(code, providers)`                       |
 | `ExecuteResult`        | Stable success/error envelope returned by every executor                            |
 | `ToolExecutionContext` | Abort-aware metadata passed to each tool invocation                                 |
-| `ProviderManifest`     | Transport-safe view of a resolved provider exposed to reusable runners              |
-| `ToolCallResult`       | Trusted host response to a runner-emitted tool call                                 |
+
+Runtime implementer concepts such as `ProviderManifest` and `ToolCallResult`
+live on `@execbox/core/runtime` and `@execbox/core/protocol`, not the main
+`@execbox/core` entrypoint.
 
 ## Provider Resolution Pipeline
 

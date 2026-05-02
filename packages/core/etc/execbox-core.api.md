@@ -8,9 +8,6 @@ import { ZodRawShape } from 'zod';
 import { ZodTypeAny } from 'zod';
 
 // @public
-export function assertValidIdentifier(value: string, label?: string): void;
-
-// @public
 export interface ExecuteError {
     code: ExecuteErrorCode;
     message: string;
@@ -80,42 +77,10 @@ export interface ExecutorRuntimeOptions {
 }
 
 // @public
-export function generateTypesFromJsonSchema(providerName: string, tools: Record<string, TypegenToolDescriptor>): string;
-
-// @public
 export function isExecuteFailure(value: unknown): value is ExecuteFailure;
 
 // @public
-export function isJsonSerializable(value: unknown, active?: Set<object>, memo?: WeakSet<object>): boolean;
-
-// @public
-export function isReservedWord(value: string): boolean;
-
-// @public
-export function isValidIdentifier(value: string): boolean;
-
-// @public
 export type JsonSchema = Record<string, unknown>;
-
-// @public
-export interface ProviderManifest {
-    // (undocumented)
-    name: string;
-    // (undocumented)
-    tools: Record<string, ProviderToolManifest>;
-    // (undocumented)
-    types: string;
-}
-
-// @public
-export interface ProviderToolManifest {
-    // (undocumented)
-    description?: string;
-    // (undocumented)
-    originalName: string;
-    // (undocumented)
-    safeName: string;
-}
 
 // @public
 export interface ResolvedToolDescriptor {
@@ -138,34 +103,6 @@ export interface ResolvedToolProvider {
 
 // @public
 export function resolveProvider(provider: ToolProvider): ResolvedToolProvider;
-
-// @public
-export function sanitizeIdentifier(value: string): string;
-
-// @public
-export function sanitizeToolName(name: string): string;
-
-// @public
-export function serializePropertyName(name: string): string;
-
-// @public
-export interface ToolCall {
-    // (undocumented)
-    input: unknown;
-    // (undocumented)
-    providerName: string;
-    // (undocumented)
-    safeToolName: string;
-}
-
-// @public
-export type ToolCallResult = {
-    ok: true;
-    result: unknown;
-} | {
-    error: ExecuteError;
-    ok: false;
-};
 
 // @public
 export interface ToolDescriptor {
@@ -192,8 +129,5 @@ export interface ToolProvider {
 
 // @public
 export type ToolSchema = JsonSchema | ZodTypeAny | ZodRawShape;
-
-// @public
-export type TypegenToolDescriptor = Pick<ResolvedToolDescriptor, "description" | "inputSchema" | "outputSchema"> & Partial<Pick<ResolvedToolDescriptor, "execute">>;
 
 ```
