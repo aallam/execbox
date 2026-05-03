@@ -1,13 +1,16 @@
 ---
 title: Performance
-description: Practical performance guidance for choosing and configuring execbox executors.
+description: Practical performance guidance for inline and worker-hosted QuickJS.
 ---
 
-This page summarizes practical performance guidance for choosing and configuring execbox executors.
+Performance in execbox is mostly about where QuickJS runs, whether worker shells
+are warm, and how much work your host tools perform.
 
-## Executor Comparison
+## Runtime comparison
 
-Each executor makes a different trade-off between runtime placement, startup cost, and steady-state latency.
+Inline QuickJS has the fewest moving parts. Worker-hosted QuickJS adds a worker
+message boundary and can reuse warm worker shells for better steady-state
+throughput off the main thread.
 
 | Executor                                        | Runtime placement                                            | Relative Latency          | Best For                                                            |
 | ----------------------------------------------- | ------------------------------------------------------------ | ------------------------- | ------------------------------------------------------------------- |
@@ -15,7 +18,7 @@ Each executor makes a different trade-off between runtime placement, startup cos
 | `QuickJsExecutor` (`host: "worker"`, pooled)    | Worker thread shell with a fresh guest runtime per execution | Low latency after startup | Off-main-thread execution with good local throughput                |
 | `QuickJsExecutor` (`host: "worker"`, ephemeral) | Fresh worker per execution                                   | High startup cost         | Fresh worker lifecycle per execution when higher latency is allowed |
 
-## Practical Characteristics
+## Practical characteristics
 
 ### Pooled executors are the default hot-path choice
 
@@ -60,6 +63,9 @@ const executor = new QuickJsExecutor({
 | Best local off-main-thread throughput  | `QuickJsExecutor` with `host: "worker"` in pooled mode |
 | Fresh worker lifecycle every execution | `QuickJsExecutor` with worker `mode: "ephemeral"`      |
 
-For most applications, start with `QuickJsExecutor` and move to `host: "worker"` when you want local execution off the main thread without leaving the package.
+For most applications, start with inline `QuickJsExecutor` and move to
+`host: "worker"` when you want local execution off the main thread while keeping
+the same package and provider contract.
 
-Use `QuickJsExecutor` only for trusted code paths. See [Security & Boundaries](/security/) before treating an in-process runtime as if it were a hard tenant boundary.
+Read [Security & Boundaries](/security/) before choosing a production deployment
+boundary for hostile-code or multi-tenant execution.

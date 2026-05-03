@@ -1,6 +1,7 @@
 # @execbox/quickjs
 
-Default execbox executor for most deployments. It runs guest JavaScript in QuickJS and lets you keep the same API as you move between inline and worker-hosted execution.
+Default execbox executor. It runs guest JavaScript in QuickJS and keeps the same
+API as you move between inline and worker-hosted execution.
 
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fquickjs?style=flat-square)](https://www.npmjs.com/package/@execbox/quickjs)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
@@ -47,7 +48,7 @@ console.log(result);
 
 | Mode             | Use it when                                                     |
 | ---------------- | --------------------------------------------------------------- |
-| Inline (default) | You want the lowest-friction development path.                  |
+| Inline (default) | You want the smallest trusted-code path.                        |
 | `host: "worker"` | You want QuickJS off the main thread with pooled worker shells. |
 
 ```ts
@@ -65,13 +66,15 @@ await executor.prewarm();
 ## Operational Notes
 
 - Each execution gets a fresh QuickJS runtime with JSON-only tool and result boundaries.
-- Inline mode and worker mode are execution placement choices, not hard security boundaries for hostile or multi-tenant code.
-- Worker mode moves QuickJS off the main thread but still shares the same host process.
+- Inline mode and worker mode are local execution placement choices.
+- Worker mode moves QuickJS off the main thread and keeps the same provider API.
+- For hostile-code or multi-tenant deployments, put the application-level execution service behind a process, container, VM, or equivalent operational boundary.
 
 ## Read Next
 
 - [Getting Started](https://execbox.aallam.com/getting-started)
+- [Providers & Tools](https://execbox.aallam.com/providers-and-tools)
+- [Runtime Choices](https://execbox.aallam.com/runtime-choices)
 - [Examples](https://execbox.aallam.com/examples)
 - [Security & Boundaries](https://execbox.aallam.com/security)
-- [Executors](https://execbox.aallam.com/architecture/execbox-executors)
-- [MCP And Protocol](https://execbox.aallam.com/architecture/execbox-mcp-and-protocol)
+- [MCP Integration](https://execbox.aallam.com/mcp-integration)

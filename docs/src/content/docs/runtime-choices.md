@@ -3,11 +3,13 @@ title: Runtime Choices
 description: Choose between inline QuickJS and worker-hosted QuickJS for execbox.
 ---
 
-Execbox keeps the execution contract stable while letting you move guest JavaScript to the runtime boundary that fits your deployment.
+Execbox v1 has one executor package: `@execbox/quickjs`. Start inline, then move
+to worker-hosted QuickJS when your application needs off-main-thread execution
+or pooled worker shells.
 
-## Start with QuickJS
+## Inline QuickJS
 
-Use `@execbox/quickjs` first when you want the smallest setup and the default development path.
+Inline QuickJS is the default constructor path and the smallest setup.
 
 ```ts
 import { QuickJsExecutor } from "@execbox/quickjs";
@@ -15,11 +17,14 @@ import { QuickJsExecutor } from "@execbox/quickjs";
 const executor = new QuickJsExecutor();
 ```
 
-Inline QuickJS is the lowest-friction path for trusted code. It gives each execution fresh runtime state inside the host process.
+Use it when you are proving out provider shape, running trusted code paths, or
+optimizing for the fewest moving parts. Each execution gets fresh QuickJS runtime
+state while host tools stay in the application process.
 
-## Move QuickJS to a worker
+## Worker-hosted QuickJS
 
-Use worker-hosted QuickJS when you want guest execution off the main thread while staying in the same package.
+Worker-hosted QuickJS keeps the same `QuickJsExecutor` API and moves guest
+runtime work into a worker thread.
 
 ```ts
 import { QuickJsExecutor } from "@execbox/quickjs";
@@ -29,17 +34,30 @@ const executor = new QuickJsExecutor({
 });
 ```
 
-Worker mode is useful for lifecycle control, pooled worker reuse, and keeping guest runtime work away from the main thread. It runs in a worker thread that shares the host process.
+Use it when you want worker lifecycle control, pooled worker reuse, and guest
+runtime work away from the main thread. Worker mode is pooled by default; use
+`mode: "ephemeral"` when a fresh worker shell per execution is more important
+than latency.
 
 ## Decision guide
 
-| Need                                        | Recommended path                         |
-| ------------------------------------------- | ---------------------------------------- |
-| Smallest install and development path       | `@execbox/quickjs`                       |
-| Off-main-thread local execution             | `@execbox/quickjs` with `host: "worker"` |
-| Host wrapping of upstream MCP tool catalogs | MCP provider guide                       |
+| Need                                  | Recommended path                          |
+| ------------------------------------- | ----------------------------------------- |
+| Smallest install and development path | `new QuickJsExecutor()`                   |
+| Lowest local latency                  | Inline QuickJS                            |
+| Off-main-thread execution             | `new QuickJsExecutor({ host: "worker" })` |
+| Warm reusable worker shells           | Worker-hosted QuickJS with pooled mode    |
+| Fresh worker shell per execution      | Worker-hosted QuickJS with ephemeral mode |
+
+## Production boundary guidance
+
+Inline and worker-hosted QuickJS are local runtime placement choices. For
+hostile-code or multi-tenant deployments, put the application-level execution
+service behind a process, container, VM, or equivalent operational boundary and
+keep providers scoped to the capabilities each caller should receive.
 
 Next:
 
 - [Getting Started](/getting-started/) for the smallest working example
-- [Security](/security/) before choosing a production boundary
+- [Providers & Tools](/providers-and-tools/) for provider design
+- [Security](/security/) before choosing a production deployment shape

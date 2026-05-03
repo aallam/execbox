@@ -1,57 +1,66 @@
 ---
-title: Execbox Architecture Overview
-description: The package map, trust model, and execution flow behind execbox.
+title: Architecture
+description: The execbox package map and execution flow for library adopters.
 ---
 
-Execbox is the code-execution part of the `execbox` workspace. It turns host tool catalogs into callable guest namespaces, lets those namespaces wrap MCP tools, and uses executor backends that decide where and how guest JavaScript runs.
-
-This Concepts section is for library users choosing how to integrate execbox:
-
-- start here when you need the package map, trust model, and overall flow
-- use the deeper pages when you are choosing a runtime, wrapping MCP tools, or understanding the worker protocol
-
-## Reading guide
-
-- Start here for the package map, trust model, and overall flow.
-- Read [Core](/architecture/execbox-core/) for provider resolution, execution contracts, and error handling.
-- Read [Executors](/architecture/execbox-executors/) for inline QuickJS and worker-hosted QuickJS trade-offs.
-- Read [MCP And Protocol](/architecture/execbox-mcp-and-protocol/) for MCP wrapping and where `@execbox/core/protocol` fits.
-- Read [Protocol Reference](/architecture/execbox-protocol-reference/) for the protocol message catalog and session rules.
-- Read [Security & Boundaries](/security/) before choosing a production trust boundary.
-- Read [Performance](/performance/) for latency, pooling, and executor sizing guidance.
+Execbox has two adopter-facing packages. `@execbox/core` owns provider and MCP
+contracts. `@execbox/quickjs` owns inline and worker-hosted QuickJS execution.
 
 ## Package map
 
 ```mermaid
 flowchart LR
     APP["Host application"]
-    CORE["@execbox/core<br/>provider resolution + MCP adapters + runtime helpers"]
+    CORE["@execbox/core<br/>providers + schemas + MCP adapters"]
     QJS["@execbox/quickjs<br/>inline + worker-hosted QuickJS executor"]
-    PROTO["@execbox/core/protocol<br/>worker messages + shared host session"]
-    MCP["MCP sources and wrapped servers"]
+    MCP["MCP clients or servers"]
+    PROTO["@execbox/core/protocol<br/>advanced worker message contract"]
 
     APP --> CORE
     APP --> QJS
-    CORE --> MCP
-    QJS --> PROTO
+    CORE <--> MCP
+    QJS -. worker mode .-> PROTO
 ```
 
-## End-to-end execution model
+## Execution flow
 
-At a high level, execbox always follows the same model:
+The normal library flow is:
 
-1. Host code defines or discovers tools.
+1. Host code defines tools or wraps an MCP catalog.
 2. `@execbox/core` resolves those tools into a deterministic guest namespace.
-3. An executor runs guest JavaScript against that resolved namespace.
-4. Guest tool calls cross a host-controlled boundary and return structured JSON-compatible results.
+3. `@execbox/quickjs` runs guest JavaScript against the resolved namespace.
+4. Guest tool calls cross back to trusted host tool implementations.
+5. The executor returns a stable `ExecuteResult` envelope.
 
-## Trust model and security posture
+```mermaid
+sequenceDiagram
+    participant App as Host application
+    participant Core as @execbox/core
+    participant Exec as @execbox/quickjs
+    participant Tool as Host tool
 
-Execbox provides defense-in-depth controls around guest execution, but hard isolation still depends on the executor and deployment boundary you choose.
+    App->>Core: resolveProvider(tools)
+    Core-->>App: ResolvedToolProvider
+    App->>Exec: execute(code, providers)
+    Exec->>Tool: validated tool call
+    Tool-->>Exec: JSON-compatible result
+    Exec-->>App: ExecuteResult
+```
 
-Key implications:
+## Worker-hosted flow
 
-- The provider/tool surface is the capability boundary, not the JavaScript syntax itself.
-- Fresh runtimes, schema validation, JSON-only boundaries, timeouts, memory limits, and bounded logs are defense-in-depth features.
-- In-process and worker-hosted execution share the host process. For hostile-code or multi-tenant deployments, run the application-level execution service behind a process, container, VM, or equivalent operational boundary.
-- Wrapping third-party MCP servers is a separate dependency-trust decision from letting end users author guest code.
+Worker-hosted QuickJS keeps host tools on the trusted host side. The worker
+receives code, runtime options, and provider metadata; host tool closures stay
+in the application process and are invoked through the shared protocol session.
+
+`@execbox/core/protocol` documents that message contract for execbox runtime
+maintainers. Most application users only need the `QuickJsExecutor` worker mode
+described in [Runtime Choices](/runtime-choices/).
+
+## Where to go next
+
+- [Providers & Tools](/providers-and-tools/) for the provider boundary
+- [Runtime Choices](/runtime-choices/) for inline and worker-hosted QuickJS
+- [MCP Integration](/mcp-integration/) for MCP adapters and wrapper tools
+- [Protocol](/architecture/execbox-protocol-reference/) for the advanced worker
+  message reference

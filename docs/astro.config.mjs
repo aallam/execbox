@@ -15,7 +15,7 @@ export default defineConfig({
     starlight({
       title: "execbox",
       description:
-        "Portable code execution for MCP tools and wrapped MCP servers.",
+        "Portable code execution for host tools and MCP integrations.",
       customCss: ["/src/styles/custom.css"],
       lastUpdated: true,
       pagefind: true,
@@ -32,6 +32,7 @@ export default defineConfig({
           items: [
             { label: "Overview", link: "/" },
             { label: "Getting Started", slug: "getting-started" },
+            { label: "Providers & Tools", slug: "providers-and-tools" },
             { label: "Runtime Choices", slug: "runtime-choices" },
           ],
         },
@@ -39,10 +40,7 @@ export default defineConfig({
           label: "Use",
           items: [
             { label: "Examples", slug: "examples" },
-            {
-              label: "MCP Provider",
-              slug: "architecture/execbox-mcp-and-protocol",
-            },
+            { label: "MCP Integration", slug: "mcp-integration" },
           ],
         },
         {

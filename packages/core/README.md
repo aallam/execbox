@@ -1,6 +1,8 @@
 # @execbox/core
 
-Core execution contract for execbox. Use it to resolve host tools into callable guest namespaces, validate tool boundaries, and bridge MCP servers or clients into the same execution model.
+Provider, schema, and MCP adapter contracts for execbox. Use it to resolve host
+tools into callable guest namespaces before running code with an executor such
+as `@execbox/quickjs`.
 
 [![npm version](https://img.shields.io/npm/v/%40execbox%2Fcore?style=flat-square)](https://www.npmjs.com/package/@execbox/core)
 [![License](https://img.shields.io/github/license/aallam/execbox?style=flat-square)](https://github.com/aallam/execbox/blob/main/LICENSE)
@@ -10,11 +12,12 @@ Core execution contract for execbox. Use it to resolve host tools into callable 
 
 - you want to expose host capabilities to guest code through explicit tool providers
 - you want one execution contract across inline and worker-hosted QuickJS
-- you want to wrap MCP servers or clients into callable namespaces instead of exposing raw tool loops
+- you want to wrap MCP servers or clients into callable namespaces
 
 ## Pair It With an Executor
 
-`@execbox/core` defines the provider and tool boundary, but it does not execute guest code on its own.
+`@execbox/core` defines the provider and tool boundary. Guest execution happens
+in an executor package.
 
 | Package                                                              | Start here when                                                 |
 | -------------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -28,12 +31,28 @@ Most users start with QuickJS:
 npm install @execbox/core @execbox/quickjs
 ```
 
+## Provider Boundary
+
+Providers are explicit capability grants. `resolveProvider()` validates the
+namespace, normalizes tool schemas, creates guest-safe tool names, wraps tool
+execution with schema checks, and keeps original-to-safe name maps for callers
+that need to explain MCP or generated tool names.
+
+Tool inputs and results should be JSON-compatible data. Keep host-only values
+such as clients, handles, secrets, and tenant routing inside the tool
+implementation.
+
 ## Runtime Implementer Surface
 
 Most application code can skip this section.
 
 Application code should usually import from `@execbox/core` or `@execbox/core/mcp`.
-The `@execbox/core/protocol` and `@execbox/core/runtime` subpaths exist for execbox-owned runtime packages. `@execbox/core/protocol` carries the worker-hosted QuickJS message contract, while `@execbox/core/runtime` contains the manifest dispatcher, runtime option defaults, timeout helpers, log formatting, code normalization, and error normalization used to keep runtime implementations aligned.
+The `@execbox/core/protocol` and `@execbox/core/runtime` subpaths exist for
+execbox-owned runtime packages. `@execbox/core/protocol` carries the
+worker-hosted QuickJS message contract, while `@execbox/core/runtime` contains
+the manifest dispatcher, runtime option defaults, timeout helpers, log
+formatting, code normalization, and error normalization used to keep runtime
+implementations aligned.
 
 ## Smallest Working Usage
 
@@ -69,7 +88,8 @@ console.log(result);
 
 ## MCP Support
 
-Use `@execbox/core/mcp` when you want MCP on either side of the boundary:
+Use `@execbox/core/mcp` when you want MCP on either side of the provider
+boundary:
 
 - wrap an upstream MCP server or client into a provider with `createMcpToolProvider()` or `openMcpToolProvider()`
 - expose execbox code execution back out through an MCP server with `codeMcpServer()`
@@ -84,8 +104,9 @@ Use `@execbox/core/mcp` when you want MCP on either side of the boundary:
 ## Read Next
 
 - [Getting Started](https://execbox.aallam.com/getting-started)
+- [Providers & Tools](https://execbox.aallam.com/providers-and-tools)
+- [Runtime Choices](https://execbox.aallam.com/runtime-choices)
+- [MCP Integration](https://execbox.aallam.com/mcp-integration)
 - [Examples](https://execbox.aallam.com/examples)
 - [Security & Boundaries](https://execbox.aallam.com/security)
 - [Architecture Overview](https://execbox.aallam.com/architecture/)
-- [Core Architecture](https://execbox.aallam.com/architecture/execbox-core)
-- [MCP And Protocol](https://execbox.aallam.com/architecture/execbox-mcp-and-protocol)
