@@ -1,11 +1,15 @@
 ---
-title: Execbox Core Protocol Reference
+title: Protocol
 description: Protocol messages and session semantics for worker-hosted execbox runtimes.
 ---
 
 This page is the message-level reference for `@execbox/core/protocol`.
 
-It describes the wire shapes and session semantics used by worker-hosted QuickJS. This is an advanced reference for execbox runtime maintainers; most application users should start with [Getting Started](/getting-started/), [Executors](/architecture/execbox-executors/), and [Security & Boundaries](/security/).
+It describes the wire shapes and session semantics used by worker-hosted
+QuickJS. This is an advanced reference for execbox runtime maintainers; most
+application users should start with [Getting Started](/getting-started/),
+[Providers & Tools](/providers-and-tools/), [Runtime Choices](/runtime-choices/),
+and [Security & Boundaries](/security/).
 
 ## Table of Contents
 
@@ -243,7 +247,7 @@ Host-session behavior:
 
 Important nuance:
 
-- `cancel` is a request for prompt termination, not a guarantee that the runner will stop instantly
+- `cancel` requests prompt termination; runners may need a short grace window to stop
 - timeout classification is still decided by trusted host logic, not by guest-thrown error strings
 
 ## JSON And Trust Boundaries
@@ -277,7 +281,7 @@ Example execution with one tool call:
 
 This reference describes the message contract and host-session semantics used inside the execbox package family. Application deployments own the surrounding operational policy:
 
-- transport selection such as worker threads, HTTP, or WebSocket
+- transport selection
 - session ownership and channel lifecycle
 - authentication, tenancy, and deployment policy
 - compatibility policy for external runner implementations

@@ -3,36 +3,52 @@ title: Security & Boundaries
 description: Understand execbox's defense-in-depth controls, capability boundary, and production trust model.
 ---
 
-Execbox provides defense-in-depth controls for guest code execution. The supported v1 runtime choices are inline QuickJS and worker-hosted QuickJS, with the provider surface acting as the capability boundary.
+Execbox provides defense-in-depth controls for guest code execution. The
+supported v1 runtime choices are inline QuickJS and worker-hosted QuickJS, with
+the provider surface acting as the application capability boundary.
 
 ## Built-in controls
 
-- Fresh execution state per call
-- JSON-only tool and result boundaries
-- Schema validation around host tool execution
-- Bounded logs
-- Timeout and memory controls
+- Fresh execution state for every call
+- JSON-compatible tool inputs and results
+- Schema validation before and after host tool execution
+- Bounded log capture
+- Timeout and memory controls in the executor
 - Abort propagation into in-flight host tool work
 
 ## The real capability boundary
 
 The provider/tool surface is the capability boundary.
 
-Providers are explicit capability grants. Guest code receives only the tool namespaces you resolve and pass into an executor. Keep production providers small, tenant-aware, and scoped to the exact operations the guest code should be able to request.
+Providers are explicit capability grants. Guest code receives the tool
+namespaces you resolve and pass into an executor. Keep production providers
+small, tenant-aware, and scoped to the exact operations the guest code should be
+able to request.
 
-## Choosing the right boundary
+## Choosing the deployment boundary
 
-| Need                                | Recommended path                         |
-| ----------------------------------- | ---------------------------------------- |
-| Lowest friction                     | `@execbox/quickjs`                       |
-| Off-main-thread lifecycle isolation | `@execbox/quickjs` with `host: "worker"` |
+| Need                                 | Recommended path                                                                              |
+| ------------------------------------ | --------------------------------------------------------------------------------------------- |
+| Smallest trusted-code path           | Inline `QuickJsExecutor`                                                                      |
+| Off-main-thread local execution      | `QuickJsExecutor` with `host: "worker"`                                                       |
+| Hostile-code or multi-tenant service | Process, container, VM, or equivalent boundary around the application-level execution service |
 
-For hostile-code or multi-tenant deployments, run the application-level execution service behind a process, container, VM, or equivalent boundary that you control operationally, and keep the provider surface minimal.
+Inline and worker-hosted QuickJS are runtime placement choices inside a Node.js
+application. For hostile-code or multi-tenant deployments, run the
+application-level execution service behind an operational boundary you control
+and pass only the providers each caller should receive.
+
+## MCP and upstream tools
+
+Wrapping MCP tools is a dependency-trust decision as well as a provider design
+decision. Treat an upstream MCP catalog as host capability, then expose a small
+resolved provider to guest code. Keep upstream client ownership, authentication,
+and tenant routing in host code.
 
 ## Deeper reading
 
 - [Architecture Overview](/architecture/)
 - [Runtime Choices](/runtime-choices/)
-- [Executors](/architecture/execbox-executors/)
-- [MCP And Protocol](/architecture/execbox-mcp-and-protocol/)
+- [Providers & Tools](/providers-and-tools/)
+- [MCP Integration](/mcp-integration/)
 - [Performance](/performance/)
