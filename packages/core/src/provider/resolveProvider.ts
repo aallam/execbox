@@ -85,7 +85,7 @@ export function resolveProvider(provider: ToolProvider): ResolvedToolProvider {
   // Keep provider schemas permissive for generated schemas and extension keywords.
   const ajv = new Ajv({
     allErrors: true,
-    strictKeywords: false,
+    strict: false,
   });
 
   const originalToSafeName: Record<string, string> = {};
