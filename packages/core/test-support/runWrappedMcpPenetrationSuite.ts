@@ -164,8 +164,8 @@ export function runWrappedMcpPenetrationSuite(
 
       expect(tools.tools.map((tool) => tool.name)).toEqual(
         expect.arrayContaining([
-          "mcp_code",
           "mcp_execute_code",
+          "mcp_get_tool_details",
           "mcp_search_tools",
         ]),
       );
@@ -179,12 +179,24 @@ export function runWrappedMcpPenetrationSuite(
         ]),
       );
       expect(searchResult.structuredContent).toMatchObject({
-        originalToSafeName: {
-          "1tool": "_1tool",
-          default: "default_",
-          "search-docs": "search_docs",
-          search_docs: "search_docs__2",
-        },
+        tools: expect.arrayContaining([
+          expect.objectContaining({
+            originalName: "1tool",
+            safeName: "_1tool",
+          }),
+          expect.objectContaining({
+            originalName: "default",
+            safeName: "default_",
+          }),
+          expect.objectContaining({
+            originalName: "search-docs",
+            safeName: "search_docs",
+          }),
+          expect.objectContaining({
+            originalName: "search_docs",
+            safeName: "search_docs__2",
+          }),
+        ]),
       });
       expect(executeResult.structuredContent).toMatchObject({
         ok: true,

@@ -52,11 +52,33 @@ const server = await codeMcpServer(
 
 The wrapper server exposes:
 
-| Tool               | Purpose                                              |
-| ------------------ | ---------------------------------------------------- |
-| `mcp_search_tools` | Search the wrapped MCP catalog                       |
-| `mcp_execute_code` | Execute guest JavaScript against the wrapped catalog |
-| `mcp_code`         | Return the code-execution tool description           |
+| Tool                   | Purpose                                                   |
+| ---------------------- | --------------------------------------------------------- |
+| `mcp_search_tools`     | Search the wrapped MCP catalog with concise metadata      |
+| `mcp_get_tool_details` | Inspect schemas and generated types for one selected tool |
+| `mcp_execute_code`     | Execute guest JavaScript against the wrapped catalog      |
+
+The default `codeMcpServer()` mode is progressive: MCP clients can search the
+catalog, inspect only the tools they need, then execute code. Use
+`mode: "single"` only when a client needs the legacy all-in-one `mcp_code` tool
+whose description embeds the full generated namespace. Use `mode: "both"` to
+expose the progressive tools and `mcp_code` together.
+
+```ts
+const search = await client.callTool({
+  name: "mcp_search_tools",
+  arguments: { query: "search docs" },
+});
+
+const details = await client.callTool({
+  name: "mcp_get_tool_details",
+  arguments: { safeName: "search_docs" },
+});
+```
+
+`mcp_search_tools` returns only names, descriptions, and annotations.
+`mcp_get_tool_details` returns the selected tool's input schema, output schema,
+and generated TypeScript declaration.
 
 ## Result handling
 
@@ -78,6 +100,10 @@ provider surface remains the capability boundary:
 - keep upstream clients, secrets, and tenant routing in host code
 - close handles returned by `openMcpToolProvider()`
 - choose inline or worker-hosted QuickJS separately from the MCP adapter shape
+
+The code-execution tools are annotated as potentially destructive because MCP
+tool annotations are static while guest code can call any wrapped tool exposed
+through the provider. Search and details tools are annotated read-only.
 
 ## Examples
 

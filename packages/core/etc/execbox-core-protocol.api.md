@@ -147,6 +147,7 @@ export interface ProviderManifest {
 
 // @public
 export interface ProviderToolManifest {
+    annotations?: ToolAnnotations;
     // (undocumented)
     description?: string;
     // (undocumented)
@@ -157,6 +158,7 @@ export interface ProviderToolManifest {
 
 // @public
 export interface ResolvedToolDescriptor {
+    annotations?: ToolAnnotations;
     description?: string;
     execute: (input: unknown, context: ToolExecutionContext) => Promise<unknown>;
     inputSchema?: JsonSchema;
@@ -218,6 +220,15 @@ export interface StartedMessage {
     id: string;
     // (undocumented)
     type: "started";
+}
+
+// @public
+export interface ToolAnnotations {
+    destructiveHint?: boolean;
+    idempotentHint?: boolean;
+    openWorldHint?: boolean;
+    readOnlyHint?: boolean;
+    title?: string;
 }
 
 // @public

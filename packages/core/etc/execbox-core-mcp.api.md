@@ -15,8 +15,9 @@ export function codeMcpServer(source: McpToolSource, options: CodeMcpServerOptio
 export interface CodeMcpServerOptions extends CreateMcpToolProviderOptions {
     executor: Executor;
     maxTextChars?: number;
-    mode?: "both" | "single" | "split";
+    mode?: "both" | "progressive" | "single";
     names?: {
+        details?: string;
         execute?: string;
         search?: string;
         single?: string;
@@ -100,6 +101,7 @@ export interface McpToolProviderHandle {
     close: () => Promise<void>;
     provider: ResolvedToolProvider;
     serverInfo?: Implementation;
+    toolDefinitions: Record<string, McpWrappedToolDefinition>;
 }
 
 // @public
@@ -112,10 +114,21 @@ export type McpToolServerSource = {
 export type McpToolSource = McpToolClientSource | McpToolServerSource;
 
 // @public
+export interface McpWrappedToolDefinition {
+    annotations?: ToolAnnotations;
+    description?: string;
+    inputSchema?: JsonSchema;
+    originalName: string;
+    outputSchema?: JsonSchema;
+    safeName: string;
+}
+
+// @public
 export function openMcpToolProvider(source: McpToolSource, options?: CreateMcpToolProviderOptions): Promise<McpToolProviderHandle>;
 
 // @public
 export interface ResolvedToolDescriptor {
+    annotations?: ToolAnnotations;
     description?: string;
     execute: (input: unknown, context: ToolExecutionContext) => Promise<unknown>;
     inputSchema?: JsonSchema;
@@ -131,6 +144,15 @@ export interface ResolvedToolProvider {
     safeToOriginalName: Record<string, string>;
     tools: Record<string, ResolvedToolDescriptor>;
     types: string;
+}
+
+// @public
+export interface ToolAnnotations {
+    destructiveHint?: boolean;
+    idempotentHint?: boolean;
+    openWorldHint?: boolean;
+    readOnlyHint?: boolean;
+    title?: string;
 }
 
 // @public

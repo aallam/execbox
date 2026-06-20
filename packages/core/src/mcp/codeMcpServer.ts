@@ -3,12 +3,14 @@ import type { Implementation } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod";
 
 import type { Executor } from "../executor/executor";
-import type { ResolvedToolProvider } from "../types";
+import type { ResolvedToolProvider, ToolAnnotations } from "../types";
 import {
   openMcpToolProvider,
   type CreateMcpToolProviderOptions,
+  type McpWrappedToolDefinition,
   type McpToolSource,
 } from "./createMcpToolProvider";
+import { generateMcpWrappedSingleToolTypes } from "./mcpWrappedToolTypes";
 
 /**
  * Options for exposing wrapped MCP tool execution through an MCP server.
@@ -21,9 +23,10 @@ export interface CodeMcpServerOptions extends CreateMcpToolProviderOptions {
   /** Maximum number of text characters returned in text content blocks. */
   maxTextChars?: number;
   /** Wrapper tool layout to expose on the returned server. */
-  mode?: "both" | "single" | "split";
+  mode?: "both" | "progressive" | "single";
   /** Optional custom names for the wrapper tools. */
   names?: {
+    details?: string;
     execute?: string;
     search?: string;
     single?: string;
@@ -31,6 +34,18 @@ export interface CodeMcpServerOptions extends CreateMcpToolProviderOptions {
 }
 
 const DEFAULT_MAX_TEXT_CHARS = 24_000;
+const CODE_EXECUTION_TOOL_ANNOTATIONS = {
+  destructiveHint: true,
+  idempotentHint: false,
+  openWorldHint: true,
+  readOnlyHint: false,
+} satisfies ToolAnnotations;
+const READ_ONLY_TOOL_ANNOTATIONS = {
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+  readOnlyHint: true,
+} satisfies ToolAnnotations;
 const DEFAULT_MCP_CODE_WRAPPER_SERVER_INFO = {
   name: "mcp-code-wrapper",
   version: "0.0.0",
@@ -45,19 +60,13 @@ function renderText(value: unknown, maxTextChars: number): string {
 }
 
 function searchTools(
-  provider: ResolvedToolProvider,
+  toolDefinitions: Record<string, McpWrappedToolDefinition>,
+  namespace: string,
   query: string | undefined,
   limit: number,
 ): Record<string, unknown> {
   const normalizedQuery = query?.toLowerCase().trim();
-  const matches = Object.entries(provider.tools)
-    .map(([safeName, descriptor]) => ({
-      description: descriptor.description,
-      inputSchema: descriptor.inputSchema,
-      originalName: descriptor.originalName,
-      outputSchema: descriptor.outputSchema,
-      safeName,
-    }))
+  const matches = Object.values(toolDefinitions)
     .filter((tool) => {
       if (!normalizedQuery) {
         return true;
@@ -67,14 +76,39 @@ function searchTools(
         (field) => field.toLowerCase().includes(normalizedQuery),
       );
     })
-    .slice(0, limit);
+    .slice(0, limit)
+    .map((tool) => ({
+      annotations: tool.annotations,
+      description: tool.description,
+      originalName: tool.originalName,
+      safeName: tool.safeName,
+    }));
 
   return {
-    namespace: provider.name,
-    originalToSafeName: provider.originalToSafeName,
-    safeToOriginalName: provider.safeToOriginalName,
+    namespace,
     tools: matches,
-    types: provider.types,
+  };
+}
+
+function getToolDetails(
+  provider: ResolvedToolProvider,
+  toolDefinitions: Record<string, McpWrappedToolDefinition>,
+  safeName: string,
+): Record<string, unknown> {
+  const tool = toolDefinitions[safeName];
+
+  if (!tool) {
+    throw new Error(`Unknown wrapped MCP tool: ${safeName}`);
+  }
+
+  return {
+    annotations: tool.annotations,
+    description: tool.description,
+    inputSchema: tool.inputSchema,
+    originalName: tool.originalName,
+    outputSchema: tool.outputSchema,
+    safeName: tool.safeName,
+    types: generateMcpWrappedSingleToolTypes(provider, safeName),
   };
 }
 
@@ -91,6 +125,7 @@ function registerExecuteTool(
   const registerTool = server.registerTool.bind(server) as (
     toolName: string,
     config: {
+      annotations: ToolAnnotations;
       description: string;
       inputSchema: Record<string, z.ZodTypeAny>;
     },
@@ -104,6 +139,7 @@ function registerExecuteTool(
   registerTool(
     name,
     {
+      annotations: CODE_EXECUTION_TOOL_ANNOTATIONS,
       description,
       inputSchema: {
         code: z.string(),
@@ -125,13 +161,15 @@ function registerExecuteTool(
 function registerSearchTool(
   server: McpServer,
   name: string,
-  provider: ResolvedToolProvider,
+  namespace: string,
+  toolDefinitions: Record<string, McpWrappedToolDefinition>,
   maxTextChars: number,
 ): void {
   // Cast required: same rationale as registerExecuteTool above.
   const registerTool = server.registerTool.bind(server) as (
     toolName: string,
     config: {
+      annotations: ToolAnnotations;
       description: string;
       inputSchema: Record<string, z.ZodTypeAny>;
     },
@@ -144,7 +182,8 @@ function registerSearchTool(
   registerTool(
     name,
     {
-      description: `Search wrapped MCP tools exposed under the ${provider.name} namespace.`,
+      annotations: READ_ONLY_TOOL_ANNOTATIONS,
+      description: `Search wrapped MCP tools exposed under the ${namespace} namespace. Returns concise catalog entries only; call the details tool for schemas.`,
       inputSchema: {
         limit: z.number().int().optional(),
         query: z.string().optional(),
@@ -152,9 +191,56 @@ function registerSearchTool(
     },
     async (args: { limit?: number; query?: string }) => {
       const structuredContent = searchTools(
-        provider,
+        toolDefinitions,
+        namespace,
         args.query,
         args.limit ?? 20,
+      );
+      return {
+        content: [
+          { text: renderText(structuredContent, maxTextChars), type: "text" },
+        ],
+        structuredContent,
+      };
+    },
+  );
+}
+
+function registerDetailsTool(
+  server: McpServer,
+  name: string,
+  provider: ResolvedToolProvider,
+  toolDefinitions: Record<string, McpWrappedToolDefinition>,
+  maxTextChars: number,
+): void {
+  // Cast required: same rationale as registerExecuteTool above.
+  const registerTool = server.registerTool.bind(server) as (
+    toolName: string,
+    config: {
+      annotations: ToolAnnotations;
+      description: string;
+      inputSchema: Record<string, z.ZodTypeAny>;
+    },
+    handler: (args: { safeName: string }) => Promise<{
+      content: Array<{ text: string; type: "text" }>;
+      structuredContent: Record<string, unknown>;
+    }>,
+  ) => void;
+
+  registerTool(
+    name,
+    {
+      annotations: READ_ONLY_TOOL_ANNOTATIONS,
+      description: `Return the full schema and generated TypeScript declaration for one wrapped ${provider.name} MCP tool.`,
+      inputSchema: {
+        safeName: z.string(),
+      },
+    },
+    async (args: { safeName: string }) => {
+      const structuredContent = getToolDetails(
+        provider,
+        toolDefinitions,
+        args.safeName,
       );
       return {
         content: [
@@ -203,8 +289,9 @@ export async function codeMcpServer(
   options: CodeMcpServerOptions,
 ): Promise<McpServer> {
   const maxTextChars = options.maxTextChars ?? DEFAULT_MAX_TEXT_CHARS;
-  const mode = options.mode ?? "both";
+  const mode = options.mode ?? "progressive";
   const names = {
+    details: options.names?.details ?? "mcp_get_tool_details",
     execute: options.names?.execute ?? "mcp_execute_code",
     search: options.names?.search ?? "mcp_search_tools",
     single: options.names?.single ?? "mcp_code",
@@ -221,15 +308,28 @@ export async function codeMcpServer(
   );
 
   try {
-    if (mode === "both" || mode === "split") {
-      registerSearchTool(server, names.search, provider, maxTextChars);
+    if (mode === "both" || mode === "progressive") {
+      registerSearchTool(
+        server,
+        names.search,
+        provider.name,
+        handle.toolDefinitions,
+        maxTextChars,
+      );
+      registerDetailsTool(
+        server,
+        names.details,
+        provider,
+        handle.toolDefinitions,
+        maxTextChars,
+      );
       registerExecuteTool(
         server,
         names.execute,
         provider,
         options.executor,
         maxTextChars,
-        `Execute JavaScript against the wrapped ${provider.name} MCP tool namespace.`,
+        `Execute JavaScript against the wrapped ${provider.name} MCP tool namespace. Use the search and details tools before writing code.`,
       );
     }
 

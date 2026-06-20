@@ -50,6 +50,25 @@ export type ExecuteResult<T = unknown> =
     };
 
 /**
+ * MCP-compatible behavior hints for a tool.
+ *
+ * These values are advisory metadata for clients and models. They are not
+ * enforced by execbox and must not be treated as a security boundary.
+ */
+export interface ToolAnnotations {
+  /** Human-readable title for UI display. */
+  title?: string;
+  /** If true, the tool does not modify its environment. */
+  readOnlyHint?: boolean;
+  /** If true, the tool may perform destructive updates to its environment. */
+  destructiveHint?: boolean;
+  /** If true, repeated calls with the same arguments have no additional effect. */
+  idempotentHint?: boolean;
+  /** If true, the tool may interact with external entities outside a closed domain. */
+  openWorldHint?: boolean;
+}
+
+/**
  * Context passed to every tool execution.
  */
 export interface ToolExecutionContext {
@@ -67,6 +86,8 @@ export interface ToolExecutionContext {
  * Host-side tool definition before provider resolution.
  */
 export interface ToolDescriptor {
+  /** Optional MCP-compatible behavior hints used by discovery surfaces. */
+  annotations?: ToolAnnotations;
   /** Optional human-readable description used in generated types and docs. */
   description?: string;
   /** Optional input schema validated before the tool is invoked. */
@@ -96,6 +117,8 @@ export interface ToolProvider {
  * Tool descriptor after validation, sanitization, and execution wrapping.
  */
 export interface ResolvedToolDescriptor {
+  /** Optional MCP-compatible behavior hints used by discovery surfaces. */
+  annotations?: ToolAnnotations;
   /** Optional human-readable description used in generated types and docs. */
   description?: string;
   /** Normalized JSON Schema validated before the tool is invoked. */

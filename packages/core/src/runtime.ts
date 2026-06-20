@@ -40,6 +40,7 @@ export type {
   JsonSchema,
   ResolvedToolDescriptor,
   ResolvedToolProvider,
+  ToolAnnotations,
   ToolDescriptor,
   ToolExecutionContext,
   ToolProvider,

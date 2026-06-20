@@ -12,6 +12,7 @@ export {
   type McpToolProviderHandle,
   type McpToolServerSource,
   type McpToolSource,
+  type McpWrappedToolDefinition,
 } from "./createMcpToolProvider";
 export type { Executor } from "../executor/executor";
 export type { ExecutionOptions, ExecutorRuntimeOptions } from "../runner";
@@ -22,5 +23,6 @@ export type {
   JsonSchema,
   ResolvedToolDescriptor,
   ResolvedToolProvider,
+  ToolAnnotations,
   ToolExecutionContext,
 } from "../types";

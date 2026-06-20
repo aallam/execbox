@@ -62,6 +62,10 @@ async function main(): Promise<void> {
     name: "mcp_search_tools",
     arguments: { query: "search" },
   });
+  const detailsResult = await wrappedClient.callTool({
+    name: "mcp_get_tool_details",
+    arguments: { safeName: "search_docs" },
+  });
   const executeResult = await wrappedClient.callTool({
     name: "mcp_execute_code",
     arguments: {
@@ -73,6 +77,7 @@ async function main(): Promise<void> {
   console.log(
     JSON.stringify(
       {
+        detailsResult: detailsResult.structuredContent,
         executeResult: executeResult.structuredContent,
         searchResult: searchResult.structuredContent,
         toolNames: tools.tools.map((tool) => tool.name),

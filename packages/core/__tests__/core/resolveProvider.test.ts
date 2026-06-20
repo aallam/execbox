@@ -62,6 +62,32 @@ describe("resolveProvider", () => {
     });
   });
 
+  it("preserves tool annotations on resolved descriptors", () => {
+    const provider = resolveProvider({
+      name: "mcp",
+      tools: {
+        "delete-document": {
+          annotations: {
+            destructiveHint: true,
+            idempotentHint: false,
+            openWorldHint: false,
+            readOnlyHint: false,
+            title: "Delete document",
+          },
+          execute: async () => ({ ok: true }),
+        },
+      },
+    });
+
+    expect(provider.tools.delete_document.annotations).toEqual({
+      destructiveHint: true,
+      idempotentHint: false,
+      openWorldHint: false,
+      readOnlyHint: false,
+      title: "Delete document",
+    });
+  });
+
   it("validates input before calling the original execute function", async () => {
     let called = false;
 
