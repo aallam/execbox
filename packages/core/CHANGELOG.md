@@ -1,5 +1,11 @@
 # @execbox/core
 
+## 0.7.0
+
+### Minor Changes
+
+- e09761a: Add MCP-compatible tool annotations and make code MCP servers expose progressive search, inspect, and execute tools by default.
+
 ## 0.6.0
 
 ### Minor Changes
