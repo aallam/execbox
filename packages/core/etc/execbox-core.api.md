@@ -84,6 +84,7 @@ export type JsonSchema = Record<string, unknown>;
 
 // @public
 export interface ResolvedToolDescriptor {
+    annotations?: ToolAnnotations;
     description?: string;
     execute: (input: unknown, context: ToolExecutionContext) => Promise<unknown>;
     inputSchema?: JsonSchema;
@@ -105,7 +106,17 @@ export interface ResolvedToolProvider {
 export function resolveProvider(provider: ToolProvider): ResolvedToolProvider;
 
 // @public
+export interface ToolAnnotations {
+    destructiveHint?: boolean;
+    idempotentHint?: boolean;
+    openWorldHint?: boolean;
+    readOnlyHint?: boolean;
+    title?: string;
+}
+
+// @public
 export interface ToolDescriptor {
+    annotations?: ToolAnnotations;
     description?: string;
     execute: (input: unknown, context: ToolExecutionContext) => Promise<unknown> | unknown;
     inputSchema?: ToolSchema;

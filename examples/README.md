@@ -19,12 +19,12 @@ start with each example.
 
 ## Example index
 
-| File                                                   | What it shows                                                 |
-| ------------------------------------------------------ | ------------------------------------------------------------- |
-| [`execbox-basic.ts`](./execbox-basic.ts)               | Resolve a provider and execute guest code with inline QuickJS |
-| [`execbox-worker.ts`](./execbox-worker.ts)             | Run the same provider flow with worker-hosted QuickJS         |
-| [`execbox-mcp-provider.ts`](./execbox-mcp-provider.ts) | Wrap MCP tools into a provider and execute against them       |
-| [`execbox-mcp-server.ts`](./execbox-mcp-server.ts)     | Expose `mcp_search_tools`, `mcp_execute_code`, and `mcp_code` |
+| File                                                   | What it shows                                                      |
+| ------------------------------------------------------ | ------------------------------------------------------------------ |
+| [`execbox-basic.ts`](./execbox-basic.ts)               | Resolve a provider and execute guest code with inline QuickJS      |
+| [`execbox-worker.ts`](./execbox-worker.ts)             | Run the same provider flow with worker-hosted QuickJS              |
+| [`execbox-mcp-provider.ts`](./execbox-mcp-provider.ts) | Wrap MCP tools into a provider and execute against them            |
+| [`execbox-mcp-server.ts`](./execbox-mcp-server.ts)     | Expose progressive MCP code tools for search, inspect, and execute |
 
 Read [Providers & Tools](https://execbox.aallam.com/providers-and-tools),
 [Runtime Choices](https://execbox.aallam.com/runtime-choices), and

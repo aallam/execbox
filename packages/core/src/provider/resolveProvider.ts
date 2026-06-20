@@ -1,4 +1,4 @@
-import Ajv, { type AnySchemaObject, type ValidateFunction } from "ajv";
+import Ajv from "ajv";
 
 import {
   ExecuteFailure,
@@ -13,28 +13,64 @@ import type {
   JsonSchema,
   ResolvedToolDescriptor,
   ResolvedToolProvider,
+  ToolAnnotations,
   ToolExecutionContext,
   ToolProvider,
   TypegenToolDescriptor,
 } from "../types";
 
 const DEFAULT_PROVIDER_NAME = "codemode";
+type AjvInstance = InstanceType<typeof Ajv>;
+type AjvValidateFunction = ReturnType<AjvInstance["compile"]>;
+
 function assertValidNamespace(name: string): void {
   assertValidIdentifier(name, "provider namespace");
 }
 
+function cloneToolAnnotations(
+  annotations: ToolAnnotations | undefined,
+): ToolAnnotations | undefined {
+  if (!annotations) {
+    return undefined;
+  }
+
+  const clone: ToolAnnotations = {};
+
+  if (annotations.title !== undefined) {
+    clone.title = annotations.title;
+  }
+
+  if (annotations.readOnlyHint !== undefined) {
+    clone.readOnlyHint = annotations.readOnlyHint;
+  }
+
+  if (annotations.destructiveHint !== undefined) {
+    clone.destructiveHint = annotations.destructiveHint;
+  }
+
+  if (annotations.idempotentHint !== undefined) {
+    clone.idempotentHint = annotations.idempotentHint;
+  }
+
+  if (annotations.openWorldHint !== undefined) {
+    clone.openWorldHint = annotations.openWorldHint;
+  }
+
+  return Object.keys(clone).length === 0 ? undefined : clone;
+}
+
 function compileValidator(
-  ajv: Ajv,
+  ajv: AjvInstance,
   schema: JsonSchema | undefined,
-): ValidateFunction | undefined {
-  return schema ? ajv.compile(schema as AnySchemaObject) : undefined;
+): AjvValidateFunction | undefined {
+  return schema ? ajv.compile(schema as object) : undefined;
 }
 
 function formatValidationMessage(
-  ajv: Ajv,
+  ajv: AjvInstance,
   phase: "input" | "output",
   toolName: string,
-  validator: ValidateFunction,
+  validator: AjvValidateFunction,
 ): string {
   return `Invalid ${phase} for tool ${toolName}: ${ajv.errorsText(validator.errors)}`;
 }
@@ -46,8 +82,7 @@ export function resolveProvider(provider: ToolProvider): ResolvedToolProvider {
   const name = provider.name ?? DEFAULT_PROVIDER_NAME;
   assertValidNamespace(name);
 
-  // strict: false allows schemas with extra keywords (e.g. Zod-generated $schema)
-  // that don't conform to the strict JSON Schema vocabulary.
+  // Keep provider schemas permissive for generated schemas and extension keywords.
   const ajv = new Ajv({
     allErrors: true,
     strict: false,
@@ -87,6 +122,7 @@ export function resolveProvider(provider: ToolProvider): ResolvedToolProvider {
     const outputValidator = compileValidator(ajv, outputSchema);
 
     resolvedTools[safeName] = {
+      annotations: cloneToolAnnotations(descriptor.annotations),
       description: descriptor.description,
       execute: async (
         input: unknown,

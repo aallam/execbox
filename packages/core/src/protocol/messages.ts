@@ -14,6 +14,24 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
+function isToolAnnotations(value: unknown): boolean {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    (value.title === undefined || typeof value.title === "string") &&
+    (value.readOnlyHint === undefined ||
+      typeof value.readOnlyHint === "boolean") &&
+    (value.destructiveHint === undefined ||
+      typeof value.destructiveHint === "boolean") &&
+    (value.idempotentHint === undefined ||
+      typeof value.idempotentHint === "boolean") &&
+    (value.openWorldHint === undefined ||
+      typeof value.openWorldHint === "boolean")
+  );
+}
+
 function isRuntimeOptions(value: unknown): value is ExecutorRuntimeOptions {
   if (!isRecord(value)) {
     return false;
@@ -41,6 +59,7 @@ function isProviderManifest(value: unknown): value is ProviderManifest {
       isRecord(tool) &&
       typeof tool.originalName === "string" &&
       typeof tool.safeName === "string" &&
+      (tool.annotations === undefined || isToolAnnotations(tool.annotations)) &&
       (tool.description === undefined || typeof tool.description === "string"),
   );
 }

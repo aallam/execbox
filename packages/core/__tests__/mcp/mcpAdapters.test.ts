@@ -27,6 +27,13 @@ function createUpstreamServer(): McpServer {
   const registerTool = server.registerTool.bind(server) as unknown as (
     name: string,
     config: {
+      annotations?: {
+        destructiveHint?: boolean;
+        idempotentHint?: boolean;
+        openWorldHint?: boolean;
+        readOnlyHint?: boolean;
+        title?: string;
+      };
       description?: string;
       inputSchema?: unknown;
       outputSchema?: unknown;
@@ -37,6 +44,13 @@ function createUpstreamServer(): McpServer {
   registerTool(
     "search-docs",
     {
+      annotations: {
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+        readOnlyHint: true,
+        title: "Search docs",
+      },
       description: "Search documentation",
       inputSchema: searchDocsInputSchema,
       outputSchema: searchDocsOutputSchema,
@@ -97,6 +111,13 @@ describe("MCP adapters", () => {
       "search-docs": "search_docs",
       explode: "explode",
     });
+    expect(provider.tools.search_docs.annotations).toEqual({
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+      readOnlyHint: true,
+      title: "Search docs",
+    });
     expect(provider.types).toContain("declare namespace mcp");
     expect(provider.types).toContain("Inspect structuredContent first");
     expect(provider.types).toContain("structuredContent?: unknown;");
@@ -134,7 +155,7 @@ describe("MCP adapters", () => {
     ).rejects.toThrow(/openMcpToolProvider/);
   });
 
-  it("wraps a connected client with both MCP code tools by default", async () => {
+  it("wraps a connected client with progressive MCP code tools by default", async () => {
     const upstreamServer = createUpstreamServer();
     const upstreamClient = await connectClient(upstreamServer);
     const wrappedServer = await codeMcpServer(
@@ -144,14 +165,36 @@ describe("MCP adapters", () => {
     const wrappedClient = await connectClient(wrappedServer);
 
     const tools = await wrappedClient.listTools();
-    expect(tools.tools.map((tool) => tool.name)).toEqual(
-      expect.arrayContaining([
-        "mcp_code",
-        "mcp_search_tools",
-        "mcp_execute_code",
-      ]),
-    );
+    expect(tools.tools.map((tool) => tool.name)).toEqual([
+      "mcp_search_tools",
+      "mcp_get_tool_details",
+      "mcp_execute_code",
+    ]);
     expect(tools.tools.map((tool) => tool.name)).not.toContain("search-docs");
+    expect(
+      Object.fromEntries(tools.tools.map((tool) => [tool.name, tool])),
+    ).toMatchObject({
+      mcp_execute_code: {
+        annotations: {
+          destructiveHint: true,
+          idempotentHint: false,
+          openWorldHint: true,
+          readOnlyHint: false,
+        },
+      },
+      mcp_get_tool_details: {
+        annotations: {
+          destructiveHint: false,
+          readOnlyHint: true,
+        },
+      },
+      mcp_search_tools: {
+        annotations: {
+          destructiveHint: false,
+          readOnlyHint: true,
+        },
+      },
+    });
 
     const searchResult = await wrappedClient.callTool({
       name: "mcp_search_tools",
@@ -172,10 +215,46 @@ describe("MCP adapters", () => {
     ) {
       throw new Error("Expected structured MCP search payload");
     }
-    expect(searchResult.structuredContent).toHaveProperty("types");
+    expect(searchResult.structuredContent).not.toHaveProperty("types");
+    expect(searchResult.structuredContent).not.toHaveProperty("inputSchema");
+    expect(searchResult.structuredContent).toMatchObject({
+      tools: [
+        expect.objectContaining({
+          annotations: {
+            destructiveHint: false,
+            idempotentHint: true,
+            openWorldHint: false,
+            readOnlyHint: true,
+            title: "Search docs",
+          },
+        }),
+      ],
+    });
+
+    const detailsResult = await wrappedClient.callTool({
+      name: "mcp_get_tool_details",
+      arguments: { safeName: "search_docs" },
+    });
+
+    expect(detailsResult.structuredContent).toMatchObject({
+      annotations: {
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+        readOnlyHint: true,
+        title: "Search docs",
+      },
+      inputSchema: expect.objectContaining({ type: "object" }),
+      originalName: "search-docs",
+      outputSchema: expect.objectContaining({ type: "object" }),
+      safeName: "search_docs",
+    });
     expect(
-      (searchResult.structuredContent as { types: string }).types,
-    ).toContain("Inspect structuredContent first");
+      (detailsResult.structuredContent as { types: string }).types,
+    ).toContain("function search_docs(input:");
+    expect(
+      (detailsResult.structuredContent as { types: string }).types,
+    ).not.toContain("function explode(input:");
 
     const executeResult = await wrappedClient.callTool({
       name: "mcp_execute_code",
@@ -347,6 +426,14 @@ describe("MCP adapters", () => {
 
     const tools = await wrappedClient.listTools();
     expect(tools.tools.map((tool) => tool.name)).toEqual(["mcp_code"]);
+    expect(tools.tools[0]).toMatchObject({
+      annotations: {
+        destructiveHint: true,
+        idempotentHint: false,
+        openWorldHint: true,
+        readOnlyHint: false,
+      },
+    });
 
     const executeResult = await wrappedClient.callTool({
       name: "mcp_code",

@@ -67,6 +67,14 @@ Declare the narrowest useful input and output shapes. They act as the contract
 between guest code and host capabilities, and they also improve generated guest
 types.
 
+## Tool annotations
+
+Tools can declare MCP-compatible annotations such as `readOnlyHint`,
+`destructiveHint`, `idempotentHint`, and `openWorldHint`. Execbox preserves
+these hints for discovery surfaces and MCP wrappers, but does not enforce them.
+Use annotations to help clients decide what to show or confirm; keep real
+authorization in host policy and provider selection.
+
 ## Result boundary
 
 Tool inputs and results cross a JSON-compatible boundary. Return plain data such

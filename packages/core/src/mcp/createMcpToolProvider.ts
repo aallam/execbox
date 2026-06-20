@@ -4,7 +4,12 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Implementation } from "@modelcontextprotocol/sdk/types.js";
 
 import { resolveProvider } from "../provider/resolveProvider";
-import type { ResolvedToolProvider, ToolProvider } from "../types";
+import type {
+  JsonSchema,
+  ResolvedToolProvider,
+  ToolAnnotations,
+  ToolProvider,
+} from "../types";
 import { generateMcpWrappedToolTypes } from "./mcpWrappedToolTypes";
 
 /**
@@ -61,6 +66,24 @@ export interface CreateMcpToolProviderOptions {
 }
 
 /**
+ * Full wrapped MCP tool metadata used by progressive discovery surfaces.
+ */
+export interface McpWrappedToolDefinition {
+  /** Optional MCP-compatible behavior hints copied from the upstream tool. */
+  annotations?: ToolAnnotations;
+  /** Optional human-readable description copied from the upstream tool. */
+  description?: string;
+  /** Normalized input schema used for wrapped tool argument validation. */
+  inputSchema?: JsonSchema;
+  /** Original upstream MCP tool name. */
+  originalName: string;
+  /** Upstream output schema for the tool's `structuredContent`, when provided. */
+  outputSchema?: JsonSchema;
+  /** Sanitized tool name visible in guest code. */
+  safeName: string;
+}
+
+/**
  * Explicit handle for a wrapped MCP provider and any owned source connections.
  */
 export interface McpToolProviderHandle {
@@ -68,6 +91,8 @@ export interface McpToolProviderHandle {
   provider: ResolvedToolProvider;
   /** Best-effort upstream server identity when available. */
   serverInfo?: Implementation;
+  /** Full wrapped MCP tool definitions keyed by safe guest-visible name. */
+  toolDefinitions: Record<string, McpWrappedToolDefinition>;
   /** Releases any internal MCP client/server connection opened for the provider. */
   close: () => Promise<void>;
 }
@@ -86,6 +111,12 @@ async function closeAll(closers: Array<() => Promise<void>>): Promise<void> {
   if (rejected) {
     throw rejected.reason;
   }
+}
+
+function asJsonSchema(schema: unknown): JsonSchema | undefined {
+  return typeof schema === "object" && schema !== null
+    ? (schema as JsonSchema)
+    : undefined;
 }
 
 async function openMcpToolClient(
@@ -149,6 +180,9 @@ export async function openMcpToolProvider(
 
   try {
     const toolsResponse = await connection.client.listTools();
+    const toolsByOriginalName = new Map(
+      toolsResponse.tools.map((tool) => [tool.name, tool] as const),
+    );
     const provider: ToolProvider = {
       name: options.namespace ?? "mcp",
       tools: {},
@@ -156,6 +190,7 @@ export async function openMcpToolProvider(
 
     for (const tool of toolsResponse.tools) {
       provider.tools[tool.name] = {
+        annotations: tool.annotations,
         description: tool.description,
         execute: async (input, context) => {
           const argumentsObject =
@@ -177,6 +212,23 @@ export async function openMcpToolProvider(
     }
 
     const resolvedProvider = resolveProvider(provider);
+    const toolDefinitions = Object.fromEntries(
+      Object.entries(resolvedProvider.tools).map(([safeName, descriptor]) => {
+        const upstreamTool = toolsByOriginalName.get(descriptor.originalName);
+
+        return [
+          safeName,
+          {
+            annotations: descriptor.annotations,
+            description: descriptor.description,
+            inputSchema: descriptor.inputSchema,
+            originalName: descriptor.originalName,
+            outputSchema: asJsonSchema(upstreamTool?.outputSchema),
+            safeName: descriptor.safeName,
+          },
+        ];
+      }),
+    );
 
     return {
       close: connection.close,
@@ -185,6 +237,7 @@ export async function openMcpToolProvider(
         types: generateMcpWrappedToolTypes(resolvedProvider),
       },
       serverInfo: getMcpToolSourceServerInfo(source),
+      toolDefinitions,
     };
   } catch (error) {
     await connection.close().catch(() => {});

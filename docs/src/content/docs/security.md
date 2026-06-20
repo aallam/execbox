@@ -45,6 +45,12 @@ decision. Treat an upstream MCP catalog as host capability, then expose a small
 resolved provider to guest code. Keep upstream client ownership, authentication,
 and tenant routing in host code.
 
+MCP tool annotations are advisory metadata, not enforcement. Execbox marks
+code-execution wrapper tools as potentially destructive because one code string
+can call a mix of read-only and write-capable wrapped tools. Keep confirmation
+and authorization policy in the downstream MCP host and in the provider surface
+you choose to expose.
+
 ## Deeper reading
 
 - [Architecture Overview](/architecture/)

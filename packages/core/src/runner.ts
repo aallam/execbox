@@ -8,12 +8,18 @@ import {
   isExecuteFailure,
   isJsonSerializable,
 } from "./errors.ts";
-import type { ExecuteError, ResolvedToolProvider } from "./types.ts";
+import type {
+  ExecuteError,
+  ResolvedToolProvider,
+  ToolAnnotations,
+} from "./types.ts";
 
 /**
  * Transport-safe metadata for one exposed tool.
  */
 export interface ProviderToolManifest {
+  /** Optional MCP-compatible behavior hints used by discovery surfaces. */
+  annotations?: ToolAnnotations;
   description?: string;
   originalName: string;
   safeName: string;
@@ -93,6 +99,7 @@ export function extractProviderManifests(
       Object.entries(provider.tools).map(([safeToolName, descriptor]) => [
         safeToolName,
         {
+          annotations: descriptor.annotations,
           description: descriptor.description,
           originalName: descriptor.originalName,
           safeName: descriptor.safeName,

@@ -42,5 +42,6 @@ export type {
   JsonSchema,
   ResolvedToolDescriptor,
   ResolvedToolProvider,
+  ToolAnnotations,
   ToolExecutionContext,
 } from "../types.ts";
